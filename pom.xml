@@ -4,13 +4,13 @@
 
     <groupId>com.github.tkurz</groupId>
     <artifactId>sesame-vocab-builder</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
 
     <scm>
         <url>https://github.com/tkurz/sesame-vocab-builder</url>
         <connection>scm:git:git://github.com/tkurz/sesame-vocab-builder.git</connection>
         <developerConnection>scm:git:git@github.com:tkurz/sesame-vocab-builder.git</developerConnection>
-      <tag>sesame-vocab-builder-1.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <build>

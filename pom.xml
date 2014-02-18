@@ -10,8 +10,7 @@
         <url>https://github.com/tkurz/sesame-vocab-builder</url>
         <connection>scm:git:git://github.com/tkurz/sesame-vocab-builder.git</connection>
         <developerConnection>scm:git:git@github.com:tkurz/sesame-vocab-builder.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <build>
         <plugins>

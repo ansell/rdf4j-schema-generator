@@ -52,7 +52,7 @@ public class VocabBuilder {
 
         name = this.file.getName();
 
-        if(name.contains(".")) name = name.substring(name.lastIndexOf(".")+1);
+        if(name.contains(".")) name = name.substring(0,name.lastIndexOf("."));
         name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
 
         connection.close();

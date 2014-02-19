@@ -1,8 +1,6 @@
 package com.github.tkurz.sesame.vocab;
 
-import java.io.BufferedReader;
 import java.io.Console;
-import java.io.InputStreamReader;
 
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;

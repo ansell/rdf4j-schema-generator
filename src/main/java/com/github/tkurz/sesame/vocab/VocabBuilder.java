@@ -3,7 +3,6 @@ package com.github.tkurz.sesame.vocab;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.util.GraphUtilException;
@@ -12,19 +11,11 @@ import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.model.vocabulary.SKOS;
-import org.openrdf.query.*;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
-import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.*;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
@@ -46,7 +37,7 @@ public class VocabBuilder {
     String packageName = "org.apache.marmotta.commons.vocabulary";
 	private Model model;
 
-    public VocabBuilder(String filename, RDFFormat format) throws IOException, RepositoryException, RDFParseException, MalformedQueryException, QueryEvaluationException {
+    public VocabBuilder(String filename, RDFFormat format) throws IOException, RDFParseException {
         this.file = new File(filename);
         if(!this.file.exists()) throw new FileNotFoundException();
         this.rdfFormat = format;

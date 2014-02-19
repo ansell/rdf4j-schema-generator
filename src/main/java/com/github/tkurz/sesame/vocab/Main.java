@@ -1,6 +1,7 @@
 package com.github.tkurz.sesame.vocab;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.InputStreamReader;
 
 import org.openrdf.rio.RDFFormat;
@@ -18,7 +19,7 @@ public class Main {
             String file = "ldp.ttl"; //"src/main/resources/ldp.ttl";
             RDFFormat type = RDFFormat.RDFXML;
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            Console reader = System.console();
             System.out.println("*** RDF Namespace Constants Constructor ***");
 
             if(args.length > 0 && args[0] != null) {

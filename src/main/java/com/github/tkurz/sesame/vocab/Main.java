@@ -14,7 +14,7 @@ import org.openrdf.rio.Rio;
  */
 public class Main {
 
-    public static void main(String [] args) {
+    public static void main(String [] args) throws Exception {
         try {
             String file = "ldp.ttl"; //"src/main/resources/ldp.ttl";
             RDFFormat type = RDFFormat.RDFXML;
@@ -57,6 +57,7 @@ public class Main {
             System.out.println("*** file created: '"+e.outputFolder+"/"+e.name+".java' ***");
         } catch(Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
 

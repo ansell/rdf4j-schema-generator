@@ -6,6 +6,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.util.GraphUtilException;
+import org.openrdf.model.vocabulary.DC;
 import org.openrdf.model.vocabulary.DCTERMS;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -95,6 +96,18 @@ public class VocabBuilder {
 	        	}
 	        	if(comment == null) {
 	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), SKOS.DEFINITION);
+	        	}
+	        	if(comment == null) {
+	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DC.DESCRIPTION);
+	        	}
+	        	if(comment == null) {
+	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), RDFS.LABEL);
+	        	}
+	        	if(comment == null) {
+	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DCTERMS.TITLE);
+	        	}
+	        	if(comment == null) {
+	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DC.TITLE);
 	        	}
 	            if(comment != null) {
 	                out.printf("\t/**\n\t * %s \n\t */\n", comment.getLabel());

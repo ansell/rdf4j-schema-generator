@@ -29,12 +29,12 @@ import java.util.regex.Pattern;
  */
 public class VocabBuilder {
 
-    File file;
-    String name;
-    RDFFormat rdfFormat;
-    String prefix = "http://example.org/ontology#";
-    String outputFolder = "/tmp";
-    String packageName = "org.apache.marmotta.commons.vocabulary";
+    private File file;
+    private String name;
+    private RDFFormat rdfFormat;
+    private String prefix = "http://example.org/ontology#";
+    private String outputFolder = "/tmp";
+    private String packageName = "org.apache.marmotta.commons.vocabulary";
 	private Model model;
 
     public VocabBuilder(String filename, RDFFormat format) throws IOException, RDFParseException {
@@ -47,19 +47,21 @@ public class VocabBuilder {
         //import
         Set<Resource> owlOntologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
         if(!owlOntologies.isEmpty()) {
-        	prefix = owlOntologies.iterator().next().stringValue();
+        	setPrefix(owlOntologies.iterator().next().stringValue());
         }
         
-        name = this.file.getName();
+        if(this.getName() == null) {
+        	setName(this.file.getName());
+        }
 
-        if(name.contains(".")) name = name.substring(0,name.lastIndexOf("."));
-        name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        if(getName().contains(".")) setName(getName().substring(0,getName().lastIndexOf(".")));
+        setName(Character.toUpperCase(getName().charAt(0)) + getName().substring(1));
 
     }
 
     public void run() throws IOException, GraphUtilException {
 
-        Pattern pattern = Pattern.compile(Pattern.quote(prefix)+"(.+)");
+        Pattern pattern = Pattern.compile(Pattern.quote(getPrefix())+"(.+)");
         HashMap<String,URI> splitUris = new HashMap<String, URI>();
         for(Resource nextSubject : model.subjects()) {
         	if(nextSubject instanceof URI) {
@@ -72,16 +74,16 @@ public class VocabBuilder {
         }
 
         //print
-        try(final FileWriter w = new FileWriter(outputFolder+"/"+name+".java");
+        try(final FileWriter w = new FileWriter(getOutputFolder()+"/"+getName()+".java");
         		final PrintWriter out = new PrintWriter(w);)
         {
-	        out.printf("package %s;",packageName);
+	        out.printf("package %s;",getPackageName());
 	        out.printf("\n\nimport org.openrdf.model.URI;\n" +
 	                "import org.openrdf.model.ValueFactory;\n" +
 	                "import org.openrdf.model.impl.ValueFactoryImpl;\n\n");
-	        out.printf("/** \n * Namespace %s\n */\npublic class %s {\n\n",name,name);
-	        out.printf("\tpublic static final String NAMESPACE = \"%s\";\n\n",prefix);
-	        out.printf("\tpublic static final String PREFIX = \"%s\";\n\n",name.toLowerCase());
+	        out.printf("/** \n * Namespace %s\n */\npublic class %s {\n\n",getName(),getName());
+	        out.printf("\tpublic static final String NAMESPACE = \"%s\";\n\n",getPrefix());
+	        out.printf("\tpublic static final String PREFIX = \"%s\";\n\n",getName().toLowerCase());
 	
 	        TreeSet<String> keys = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 	        keys.addAll(splitUris.keySet());
@@ -105,7 +107,7 @@ public class VocabBuilder {
 	        out.printf("\n\tstatic{\n\t\tValueFactory factory = ValueFactoryImpl.getInstance();");
 	        for(String key : keys) {
 	
-	            out.printf("\n\t\t%s = factory.createURI(%s, \"%s\");",key,name+".NAMESPACE",key);
+	            out.printf("\n\t\t%s = factory.createURI(%s, \"%s\");",key,getName()+".NAMESPACE",key);
 	        }
 	
 	        out.println("\n\t}\n}");
@@ -121,5 +123,37 @@ public class VocabBuilder {
         s = s.replaceAll("-","_");
         return s;
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getOutputFolder() {
+		return outputFolder;
+	}
+
+	public void setOutputFolder(String outputFolder) {
+		this.outputFolder = outputFolder;
+	}
+
+	public String getPackageName() {
+		return packageName;
+	}
+
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+
+	public String getPrefix() {
+		return prefix;
+	}
+
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
 
 }

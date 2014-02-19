@@ -39,20 +39,20 @@ public class Main {
 
             //parse data and get url prefix
             VocabBuilder e = new VocabBuilder(file,type);
-            System.out.println("insert url-prefix [" + e.prefix + "] : ");
-            String _prefix=reader.readLine();if(!_prefix.equals(""))e.prefix=_prefix;
+            System.out.println("insert url-prefix [" + e.getPrefix() + "] : ");
+            String _prefix=reader.readLine();if(!_prefix.equals(""))e.setPrefix(_prefix);
 
-            System.out.println("insert class name [" + e.name + "] : ");
-            String _name=reader.readLine();if(!_name.equals(""))e.name=_name;
+            System.out.println("insert class name [" + e.getName() + "] : ");
+            String _name=reader.readLine();if(!_name.equals(""))e.setName(_name);
 
-            System.out.println("insert package name ["+e.packageName+"] : ");
-            String _pname=reader.readLine();if(!_pname.equals(""))e.packageName=_pname;
+            System.out.println("insert package name ["+e.getPackageName()+"] : ");
+            String _pname=reader.readLine();if(!_pname.equals(""))e.setPackageName(_pname);
 
-            System.out.println("insert output folder ["+e.outputFolder+"] : ");
-            String _outputFolder=reader.readLine();if(!_outputFolder.equals(""))e.outputFolder=_outputFolder;
+            System.out.println("insert output folder ["+e.getOutputFolder()+"] : ");
+            String _outputFolder=reader.readLine();if(!_outputFolder.equals(""))e.setOutputFolder(_outputFolder);
 
             e.run();
-            System.out.println("*** file created: '"+e.outputFolder+"/"+e.name+".java' ***");
+            System.out.println("*** file created: '"+e.getOutputFolder()+"/"+e.getName()+".java' ***");
         } catch(Exception e) {
             e.printStackTrace();
             throw e;

@@ -61,9 +61,4 @@ public class Main {
         }
     }
 
-    private static RDFFormat getMimeType(String file_extension) {
-    	return Rio.getParserFormatForFileName(file_extension, RDFFormat.RDFXML);
-    }
-
-
 }

@@ -3,6 +3,9 @@ package com.github.tkurz.sesame.vocab;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
+
 /**
  * ...
  * <p/>
@@ -13,7 +16,7 @@ public class Main {
     public static void main(String [] args) {
         try {
             String file = "ldp.ttl"; //"src/main/resources/ldp.ttl";
-            String type = "application/rdf+xml";
+            RDFFormat type = RDFFormat.RDFXML;
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("*** RDF Namespace Constants Constructor ***");
@@ -27,12 +30,12 @@ public class Main {
             }
 
             if(args.length > 1 && args[1] != null) {
-                type = args[1];
+                type = Rio.getParserFormatForMIMEType(args[1], type);
                 System.out.println("mimetype : "+type);
             } else {
-                if(file.contains(".")) type = getMimeType(file.substring(file.lastIndexOf(".")));
-                System.out.println("insert file mimetype [" + type + "] : ");
-                String _type=reader.readLine();if(!_type.equals(""))type=_type;
+                if(file.contains(".")) type = Rio.getParserFormatForFileName(file, type);
+                System.out.println("insert file mimetype [" + type.getDefaultMIMEType() + "] : ");
+                String _type=reader.readLine();if(!_type.equals(""))type=Rio.getParserFormatForFileName(_type, type);
             }
 
             //parse data and get url prefix
@@ -56,11 +59,8 @@ public class Main {
         }
     }
 
-    private static String getMimeType(String file_extension) {
-        if(file_extension.equals(".ttl")) return "text/turtle";
-        if(file_extension.equals(".n3")) return "text/n3";
-        return "application/rdf+xml";
-
+    private static RDFFormat getMimeType(String file_extension) {
+    	return Rio.getParserFormatForFileName(file_extension, RDFFormat.RDFXML);
     }
 
 

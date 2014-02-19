@@ -1,9 +1,13 @@
 package com.github.tkurz.sesame.vocab;
 
+import org.openrdf.model.Statement;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
@@ -31,10 +35,10 @@ public class VocabBuilder {
     String outputFolder = "/tmp";
     String packageName = "org.apache.marmotta.commons.vocabulary";
 
-    public VocabBuilder(String filename, String format) throws IOException, RepositoryException, RDFParseException, MalformedQueryException, QueryEvaluationException {
+    public VocabBuilder(String filename, RDFFormat format) throws IOException, RepositoryException, RDFParseException, MalformedQueryException, QueryEvaluationException {
         this.file = new File(filename);
         if(!this.file.exists()) throw new FileNotFoundException();
-        this.rdfFormat = RDFFormat.forMIMEType(format);
+        this.rdfFormat = format;
 
         //parse
         repository = new SailRepository(new MemoryStore());
@@ -43,11 +47,9 @@ public class VocabBuilder {
 
         //import
         connection.add(file,null,rdfFormat);
-        TupleQuery tupleQuery = connection.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT ?ont {?ont a <http://www.w3.org/2002/07/owl#Ontology>}");
-
-        TupleQueryResult results = tupleQuery.evaluate();
+        RepositoryResult<Statement> results = connection.getStatements(null, RDF.TYPE, OWL.ONTOLOGY, true);
         if(results.hasNext()) {
-            prefix = results.next().getBinding("ont").getValue().stringValue();
+            prefix = results.next().getSubject().stringValue();
         }
 
         name = this.file.getName();

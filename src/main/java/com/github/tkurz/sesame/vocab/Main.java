@@ -34,7 +34,7 @@ public class Main {
             } else {
                 if(file.contains(".")) type = Rio.getParserFormatForFileName(file, type);
                 System.out.println("insert file mimetype [" + type.getDefaultMIMEType() + "] : ");
-                String _type=reader.readLine();if(!_type.equals(""))type=Rio.getParserFormatForFileName(_type, type);
+                String _type=reader.readLine();if(!_type.equals(""))type=Rio.getParserFormatForMIMEType(_type, type);
             }
 
             //parse data and get url prefix

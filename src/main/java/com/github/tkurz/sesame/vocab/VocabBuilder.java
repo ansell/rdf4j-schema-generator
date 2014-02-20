@@ -60,6 +60,9 @@ public class VocabBuilder {
 
     }
 
+    /**
+     * 
+     */
     public void run() throws IOException, GraphUtilException {
 
         Pattern pattern = Pattern.compile(Pattern.quote(getPrefix())+"(.+)");
@@ -110,9 +113,9 @@ public class VocabBuilder {
 	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DC.TITLE);
 	        	}
 	            if(comment != null) {
-	                out.printf("\t/**\n\t * %s \n\t */\n", comment.getLabel());
+	                out.printf("\t/**\n\t * %s \n\t @see <a href=\"%s\">%s</a>\n\t */\n", comment.getLabel(), splitUris.get(key).stringValue(), comment.getLabel());
 	            } else {
-	                out.printf("\t/**\n\t * %s \n\t */\n", key);
+	                out.printf("\t/**\n\t * %s \n\t @see <a href=\"%s\">%s</a>\n\t */\n", key, splitUris.get(key).stringValue(), key);
 	            }
 	            out.printf("\tpublic static final URI %s;\n\n",key);
 	        }

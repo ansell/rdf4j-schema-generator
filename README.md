@@ -6,27 +6,21 @@ out of RDF ontology files.
 ## How To
 
 1. Download the latest version [here](https://github.com/tkurz/sesame-vocab-builder/releases/tag/sesame-vocab-builder-1.0).
-2. Run jar from command line (Java 7 required), you can specify the filepath as parameter.
-3. Put in the required information (mimetype, url-prefix, classname, package and directory).
+2. Run jar from command line (Java 7 required): `java -jar sesame-vocab-builder-1.1.jar <input-file> <output>`
+3. Additional information can be configured using command-line parameters
 
-## Example:
+## Command Line Options
 
 ```
-$ java -jar sesame-vocab-builder-1.0.jar ldp.ttl
-
-*** RDF Namespace Constants Constructor ***
-filepath : myfile.ttl
-insert file mimetype [text/turtle] :
-
-insert url-prefix [http://www.w3.org/ns/ldp#] :
-
-insert class name [Ldp] :
-LDP
-insert package name [org.apache.marmotta.commons.vocabulary] :
-
-insert output folder [/tmp] :
-
-*** file created: '/tmp/LDP.java' ***
+  -f,--format <input-format>  mime-type of the input file (will try to guess if
+                              absent)
+  -h,--help                   pint this help
+  -n,--name <ns>              the name of the namespace (will try to guess from
+                              the input file if absent)
+  -p,--package <package>      package declaration (will use default (empty)
+                              package if absent
+  -u,--uri <prefix>           the prefix for the vocabulary (if not available in
+                              the input file)
 ```
 
 ## Run from Git

@@ -1,0 +1,13 @@
+#!/bin/bash
+# This script runs the Sesame Vocab Builder code.
+# Before running this script for the first time 
+# you may need to run:
+#     chmod +x sesame-vocab-builder
+#
+
+if [ ! -d "target/appassembler/bin" ]; then
+    mvn -quiet clean install
+fi
+
+chmod u+x target/appassembler/bin/*
+target/appassembler/bin/sesame-vocab-builder

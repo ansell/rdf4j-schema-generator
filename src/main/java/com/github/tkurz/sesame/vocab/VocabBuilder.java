@@ -2,10 +2,8 @@ package com.github.tkurz.sesame.vocab;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
+import org.openrdf.model.*;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.util.GraphUtilException;
 import org.openrdf.model.vocabulary.DC;
@@ -114,10 +112,34 @@ public class VocabBuilder {
             out.println("import org.openrdf.model.impl.ValueFactoryImpl;");
             out.println();
 
+            final URI pfx = new URIImpl(prefix);
+            Literal oTitle = getFirstExistingObjectLiteral(model, pfx, RDFS.LABEL, DCTERMS.TITLE, DC.TITLE);
+            Literal oDescr = getFirstExistingObjectLiteral(model, pfx, RDFS.COMMENT, DCTERMS.DESCRIPTION, DC.DESCRIPTION);
+            Set<Value> oSeeAlso = model.filter(pfx, RDFS.SEEALSO, null).objects();
+
             //class JavaDoc
-            out.printf("/** %n * Namespace %s%n */%n", name);
+            out.println("/**");
+            if (oTitle != null) {
+                out.printf(" * %s.%n", WordUtils.wrap(oTitle.getLabel().replaceAll("\\s+", " "), 70, "\n * ", false));
+                out.println(" * <p>");
+            }
+            if (oDescr != null) {
+                out.printf(" * %s.%n", WordUtils.wrap(oDescr.getLabel().replaceAll("\\s+", " "), 70, "\n * ", false));
+                out.println(" * <p>");
+            }
+            out.printf(" * Namespace %s.%n", name);
+            out.printf(" * Prefix: {@code <%s>}%n", prefix);
+            if (!oSeeAlso.isEmpty()) {
+                out.println(" *");
+                for(Value s: oSeeAlso) {
+                    if (s instanceof URI) {
+                        out.printf(" * @see <a href=\"%s\">%s</a>%n", s.stringValue(), s.stringValue());
+                    }
+                }
+            }
+            out.println(" */");
             //class Definition
-            out.printf("public class %s {%n",className);
+            out.printf("public class %s {%n", className);
             out.println();
 
             //constants
@@ -133,27 +155,14 @@ public class VocabBuilder {
             keys.addAll(splitUris.keySet());
 
             for(String key : keys) {
-                Literal comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), RDFS.COMMENT);
-                if(comment == null) {
-                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DCTERMS.DESCRIPTION);
-                }
-                if(comment == null) {
-                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), SKOS.DEFINITION);
-                }
-                if(comment == null) {
-                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DC.DESCRIPTION);
-                }
-                if(comment == null) {
-                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), RDFS.LABEL);
-                }
-                if(comment == null) {
-                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DCTERMS.TITLE);
-                }
-                if(comment == null) {
-                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DC.TITLE);
-                }
+                Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.COMMENT, DCTERMS.DESCRIPTION, SKOS.DEFINITION, DC.DESCRIPTION);
+                Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.LABEL, DCTERMS.TITLE, DC.TITLE);
 
                 out.println("\t/**");
+                if (label != null) {
+                    out.printf("\t * %s%n", label.getLabel());
+                    out.println("\t * <p>");
+                }
                 out.printf("\t * {@code %s}.%n", splitUris.get(key).stringValue());
                 if (comment != null) {
                     out.println("\t * <p>");
@@ -188,6 +197,16 @@ public class VocabBuilder {
             //end
             out.flush();
         }
+    }
+
+    private Literal getFirstExistingObjectLiteral(Model model, Resource subject, URI... predicates) throws GraphUtilException {
+        for (URI predicate: predicates) {
+            Literal literal = GraphUtil.getOptionalObjectLiteral(model, subject, predicate);
+            if (literal != null) {
+                return literal;
+            }
+        }
+        return null;
     }
 
     private String cleanKey(String s) {

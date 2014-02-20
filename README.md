@@ -6,7 +6,7 @@ out of RDF ontology files.
 ## How To
 
 1. Download the latest version [here](https://github.com/tkurz/sesame-vocab-builder/releases/tag/sesame-vocab-builder-1.0).
-2. Run jar from command line (Java 7 required): `java -jar sesame-vocab-builder-1.1.jar <input-file> <output>`
+2. Run jar from command line (Java 7 required): `java -jar sesame-vocab-builder-1.1.jar <input-file> <output-file>`
 3. Additional information can be configured using command-line parameters
 
 ## Command Line Options

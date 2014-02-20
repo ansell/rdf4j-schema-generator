@@ -175,6 +175,14 @@ public class VocabBuilder {
             }
             out.println("\t}");
             out.println();
+
+            //private contructor to avoid instances
+            out.printf("\tprivate %s() {%n", className);
+            out.println("\t\t//static access only");
+            out.println("\t}");
+            out.println();
+
+            //class end
             out.println("}");
 
             //end

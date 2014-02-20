@@ -1,5 +1,6 @@
 package com.github.tkurz.sesame.vocab;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
@@ -29,45 +30,60 @@ import java.util.regex.Pattern;
 /**
  * ...
  * <p/>
- * Author: Thomas Kurz (tkurz@apache.org)
+ * @author Thomas Kurz (tkurz@apache.org)
+ * @author Jakob Frank (jakob@apache.org)
  */
 public class VocabBuilder {
 
-    private String name;
-    private RDFFormat rdfFormat;
-    private String prefix = "http://example.org/ontology#";
+    private String name = null;
+    private String prefix = null;
     private String outputFolder = "/tmp";
-    private String packageName = "org.apache.marmotta.commons.vocabulary";
-	private Model model;
+    private String packageName = null;
+	private final Model model;
+
+    /**
+     * Create a new VocabularyBuilder, reading the vocab definition from the provided file
+     * @param filename the input file to read the vocab from
+     * @param format the format of the vocab file, may be {@code null}
+     * @throws java.io.IOException if the file could not be read
+     * @throws RDFParseException if the format of the vocab could not be detected or is unknown.
+     */
+    public VocabBuilder(String filename, String format) throws IOException, RDFParseException {
+        this(filename, format!=null?Rio.getParserFormatForMIMEType(format):null);
+    }
 
     public VocabBuilder(String filename, RDFFormat format) throws IOException, RDFParseException {
         Path file = Paths.get(filename);
         if(!Files.exists(file)) throw new FileNotFoundException(filename);
-        this.rdfFormat = format;
+
+        if (format == null) {
+            format = Rio.getParserFormatForFileName(filename);
+        }
 
         try(final InputStream inputStream = Files.newInputStream(file)) {
-        	model = Rio.parse(inputStream, "", rdfFormat);
+        	model = Rio.parse(inputStream, "", format);
         }
 
         //import
-        Set<Resource> owlOntologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
-        if(!owlOntologies.isEmpty()) {
-        	setPrefix(owlOntologies.iterator().next().stringValue());
+        if (prefix == null) {
+            Set<Resource> owlOntologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
+            if(!owlOntologies.isEmpty()) {
+                setPrefix(owlOntologies.iterator().next().stringValue());
+            }
         }
-        
-    	setName(file.getFileName().toString());
+
+        setName(file.getFileName().toString());
         if(getName().contains(".")) setName(getName().substring(0,getName().lastIndexOf(".")));
         setName(Character.toUpperCase(getName().charAt(0)) + getName().substring(1));
-
     }
 
     /**
-     * 
+     *
      */
     public void run() throws IOException, GraphUtilException {
 
         Pattern pattern = Pattern.compile(Pattern.quote(getPrefix())+"(.+)");
-        HashMap<String,URI> splitUris = new HashMap<String, URI>();
+        HashMap<String,URI> splitUris = new HashMap<>();
         for(Resource nextSubject : model.subjects()) {
         	if(nextSubject instanceof URI) {
 	            Matcher matcher = pattern.matcher(nextSubject.stringValue());
@@ -80,16 +96,33 @@ public class VocabBuilder {
 
         //print
         try(final FileWriter w = new FileWriter(getOutputFolder()+"/"+getName()+".java");
-        		final PrintWriter out = new PrintWriter(w);)
+        		final PrintWriter out = new PrintWriter(w))
         {
-	        out.printf("package %s;",getPackageName());
-	        out.printf("\n\nimport org.openrdf.model.URI;\n" +
-	                "import org.openrdf.model.ValueFactory;\n" +
-	                "import org.openrdf.model.impl.ValueFactoryImpl;\n\n");
-	        out.printf("/** \n * Namespace %s\n */\npublic class %s {\n\n",getName(),getName());
-	        out.printf("\tpublic static final String NAMESPACE = \"%s\";\n\n",getPrefix());
-	        out.printf("\tpublic static final String PREFIX = \"%s\";\n\n",getName().toLowerCase());
-	
+            //package is optional
+            if (packageName != null) {
+	            out.printf("package %s;%n%n",getPackageName());
+            }
+            //imports
+	        out.println("import org.openrdf.model.URI;");
+            out.println("import org.openrdf.model.ValueFactory;");
+            out.println("import org.openrdf.model.impl.ValueFactoryImpl;");
+            out.println();
+
+            //class JavaDoc
+            out.printf("/** %n * Namespace %s%n */%n", name);
+            //class Definition
+            out.printf("public class %s {%n",name);
+            out.println();
+
+            //constants
+            out.printf("\t/** {@code %s} **/%n", prefix);
+            out.printf("\tpublic static final String NAMESPACE = \"%s\";%n",prefix);
+            out.println();
+            out.printf("\t/** {@code %s} **/%n", name.toLowerCase());
+            out.printf("\tpublic static final String PREFIX = \"%s\";%n",name.toLowerCase());
+            out.println();
+
+            //and now the resources
 	        TreeSet<String> keys = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 	        keys.addAll(splitUris.keySet());
 	        
@@ -113,21 +146,30 @@ public class VocabBuilder {
 	        	if(comment == null) {
 	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DC.TITLE);
 	        	}
-	            if(comment != null) {
-	                out.printf("\t/**\n\t * %s \n\t * @see <a href=\"%s\">%s</a>\n\t */\n", comment.getLabel(), splitUris.get(key).stringValue(), comment.getLabel());
-	            } else {
-	                out.printf("\t/**\n\t * %s \n\t * @see <a href=\"%s\">%s</a>\n\t */\n", key, splitUris.get(key).stringValue(), key);
-	            }
-	            out.printf("\tpublic static final URI %s;\n\n",key);
+
+                out.println("\t/**");
+                out.printf("\t * {@code %s}.%n", splitUris.get(key).stringValue());
+                if (comment != null) {
+                    out.println("\t * <p>");
+                    out.printf("\t * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n\t * ", false));
+                }
+                out.println("\t *");
+                out.printf("\t * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
+                out.println("\t */");
+	            out.printf("\tpublic static final URI %s;%n", key);
+                out.println();
 	        }
-	
-	        out.printf("\n\tstatic{\n\t\tValueFactory factory = ValueFactoryImpl.getInstance();");
+
+            //static init
+            out.println("\tstatic {");
+	        out.printf("\t\tValueFactory factory = ValueFactoryImpl.getInstance();%n");
+            out.println();
 	        for(String key : keys) {
-	
-	            out.printf("\n\t\t%s = factory.createURI(%s, \"%s\");",key,getName()+".NAMESPACE",key);
+		            out.printf("\t\t%s = factory.createURI(%s, \"%s\");%n",key,getName()+".NAMESPACE",key);
 	        }
-	
-	        out.println("\n\t}\n}");
+	        out.println("\t}");
+            out.println();
+	        out.println("}");
 	
 	        //end
 	        out.flush();

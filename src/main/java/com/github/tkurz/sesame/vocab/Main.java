@@ -9,6 +9,8 @@ import org.openrdf.rio.Rio;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * ...
@@ -59,8 +61,8 @@ public class Main {
 
             if (output != null) {
                 System.out.printf("Starting generation%n");
-                builder.setOutputFolder(output);
-                builder.run();
+                Path outFile = Paths.get(output);
+                builder.run(outFile);
                 System.out.printf("Generation finished, result available in '%s'%n", output);
             }
 
@@ -74,6 +76,8 @@ public class Main {
             System.err.println("Error during file-access: " + e.getMessage());
         } catch (GraphUtilException e) {
             e.printStackTrace();
+        } catch (GenerationException e) {
+            System.err.printf(e.getMessage());
         }
     }
 

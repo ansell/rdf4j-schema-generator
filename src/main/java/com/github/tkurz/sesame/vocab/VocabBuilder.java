@@ -1,5 +1,6 @@
 package com.github.tkurz.sesame.vocab;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
@@ -18,6 +19,7 @@ import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,9 +39,8 @@ public class VocabBuilder {
 
     private String name = null;
     private String prefix = null;
-    private String outputFolder = "/tmp";
     private String packageName = null;
-	private final Model model;
+    private final Model model;
 
     /**
      * Create a new VocabularyBuilder, reading the vocab definition from the provided file
@@ -61,15 +62,13 @@ public class VocabBuilder {
         }
 
         try(final InputStream inputStream = Files.newInputStream(file)) {
-        	model = Rio.parse(inputStream, "", format);
+            model = Rio.parse(inputStream, "", format);
         }
 
         //import
-        if (prefix == null) {
-            Set<Resource> owlOntologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
-            if(!owlOntologies.isEmpty()) {
-                setPrefix(owlOntologies.iterator().next().stringValue());
-            }
+        Set<Resource> owlOntologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
+        if(!owlOntologies.isEmpty()) {
+            setPrefix(owlOntologies.iterator().next().stringValue());
         }
 
         setName(file.getFileName().toString());
@@ -80,30 +79,37 @@ public class VocabBuilder {
     /**
      *
      */
-    public void run() throws IOException, GraphUtilException {
+    public void run(Path output) throws IOException, GraphUtilException, GenerationException {
+
+        final String className = output.getFileName().toString().replaceFirst("\\.java$", "");
+
+        if (StringUtils.isBlank(name)) {
+            name = className;
+        }
+        if (StringUtils.isBlank(prefix)) {
+            throw new GenerationException("could not detect prefix, please set explicitly");
+        }
 
         Pattern pattern = Pattern.compile(Pattern.quote(getPrefix())+"(.+)");
         HashMap<String,URI> splitUris = new HashMap<>();
         for(Resource nextSubject : model.subjects()) {
-        	if(nextSubject instanceof URI) {
-	            Matcher matcher = pattern.matcher(nextSubject.stringValue());
-	            if(matcher.find()) {
-	                String k = cleanKey(matcher.group(1));
-	                splitUris.put(k, (URI)nextSubject);
-	            }
-        	}
+            if(nextSubject instanceof URI) {
+                Matcher matcher = pattern.matcher(nextSubject.stringValue());
+                if(matcher.find()) {
+                    String k = cleanKey(matcher.group(1));
+                    splitUris.put(k, (URI)nextSubject);
+                }
+            }
         }
 
         //print
-        try(final FileWriter w = new FileWriter(getOutputFolder()+"/"+getName()+".java");
-        		final PrintWriter out = new PrintWriter(w))
-        {
+        try(final PrintWriter out = new PrintWriter(Files.newBufferedWriter(output, Charset.forName("utf8")))) {
             //package is optional
-            if (packageName != null) {
-	            out.printf("package %s;%n%n",getPackageName());
+            if (StringUtils.isNotBlank(packageName)) {
+                out.printf("package %s;%n%n",getPackageName());
             }
             //imports
-	        out.println("import org.openrdf.model.URI;");
+            out.println("import org.openrdf.model.URI;");
             out.println("import org.openrdf.model.ValueFactory;");
             out.println("import org.openrdf.model.impl.ValueFactoryImpl;");
             out.println();
@@ -111,7 +117,7 @@ public class VocabBuilder {
             //class JavaDoc
             out.printf("/** %n * Namespace %s%n */%n", name);
             //class Definition
-            out.printf("public class %s {%n",name);
+            out.printf("public class %s {%n",className);
             out.println();
 
             //constants
@@ -123,29 +129,29 @@ public class VocabBuilder {
             out.println();
 
             //and now the resources
-	        TreeSet<String> keys = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-	        keys.addAll(splitUris.keySet());
-	        
-	        for(String key : keys) {
-	        	Literal comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), RDFS.COMMENT);
-	        	if(comment == null) {
-	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DCTERMS.DESCRIPTION);
-	        	}
-	        	if(comment == null) {
-	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), SKOS.DEFINITION);
-	        	}
-	        	if(comment == null) {
-	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DC.DESCRIPTION);
-	        	}
-	        	if(comment == null) {
-	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), RDFS.LABEL);
-	        	}
-	        	if(comment == null) {
-	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DCTERMS.TITLE);
-	        	}
-	        	if(comment == null) {
-	        		comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DC.TITLE);
-	        	}
+            TreeSet<String> keys = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+            keys.addAll(splitUris.keySet());
+
+            for(String key : keys) {
+                Literal comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), RDFS.COMMENT);
+                if(comment == null) {
+                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DCTERMS.DESCRIPTION);
+                }
+                if(comment == null) {
+                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), SKOS.DEFINITION);
+                }
+                if(comment == null) {
+                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DC.DESCRIPTION);
+                }
+                if(comment == null) {
+                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), RDFS.LABEL);
+                }
+                if(comment == null) {
+                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DCTERMS.TITLE);
+                }
+                if(comment == null) {
+                    comment = GraphUtil.getOptionalObjectLiteral(model, splitUris.get(key), DC.TITLE);
+                }
 
                 out.println("\t/**");
                 out.printf("\t * {@code %s}.%n", splitUris.get(key).stringValue());
@@ -156,23 +162,23 @@ public class VocabBuilder {
                 out.println("\t *");
                 out.printf("\t * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
                 out.println("\t */");
-	            out.printf("\tpublic static final URI %s;%n", key);
+                out.printf("\tpublic static final URI %s;%n", key);
                 out.println();
-	        }
+            }
 
             //static init
             out.println("\tstatic {");
-	        out.printf("\t\tValueFactory factory = ValueFactoryImpl.getInstance();%n");
+            out.printf("\t\tValueFactory factory = ValueFactoryImpl.getInstance();%n");
             out.println();
-	        for(String key : keys) {
-		            out.printf("\t\t%s = factory.createURI(%s, \"%s\");%n",key,getName()+".NAMESPACE",key);
-	        }
-	        out.println("\t}");
+            for(String key : keys) {
+                out.printf("\t\t%s = factory.createURI(%s, \"%s\");%n",key,getName()+".NAMESPACE",key);
+            }
+            out.println("\t}");
             out.println();
-	        out.println("}");
-	
-	        //end
-	        out.flush();
+            out.println("}");
+
+            //end
+            out.flush();
         }
     }
 
@@ -183,36 +189,28 @@ public class VocabBuilder {
         return s;
     }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getOutputFolder() {
-		return outputFolder;
-	}
+    public String getPackageName() {
+        return packageName;
+    }
 
-	public void setOutputFolder(String outputFolder) {
-		this.outputFolder = outputFolder;
-	}
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
 
-	public String getPackageName() {
-		return packageName;
-	}
+    public String getPrefix() {
+        return prefix;
+    }
 
-	public void setPackageName(String packageName) {
-		this.packageName = packageName;
-	}
-
-	public String getPrefix() {
-		return prefix;
-	}
-
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
-	}
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
 
 }

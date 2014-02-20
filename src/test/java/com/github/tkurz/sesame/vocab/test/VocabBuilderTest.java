@@ -3,15 +3,7 @@
  */
 package com.github.tkurz.sesame.vocab.test;
 
-import static org.junit.Assert.*;
-
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-
+import com.github.tkurz.sesame.vocab.VocabBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -22,21 +14,23 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.DCTERMS;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.model.vocabulary.RDFS;
-import org.openrdf.model.vocabulary.SKOS;
+import org.openrdf.model.vocabulary.*;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParserRegistry;
 import org.openrdf.rio.Rio;
 
-import com.github.tkurz.sesame.vocab.VocabBuilder;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for {@link VocabBuilder}
@@ -106,7 +100,7 @@ public class VocabBuilderTest {
 	}
 
 	/**
-	 * Test method for {@link com.github.tkurz.sesame.vocab.VocabBuilder#run()}.
+	 * Test method for {@link com.github.tkurz.sesame.vocab.VocabBuilder#run(java.nio.file.Path)}.
 	 */
 	@Test
 	public final void testRun() throws Exception {
@@ -128,10 +122,9 @@ public class VocabBuilderTest {
 		Files.createDirectories(outputPath);
 		
 		VocabBuilder testBuilder = new VocabBuilder(inputPath.toAbsolutePath().toString(), format);
-		testBuilder.setOutputFolder(outputPath.toAbsolutePath().toString());
-		testBuilder.run();
-		
+
 		Path javaFilePath = outputPath.resolve("Test.java");
+		testBuilder.run(javaFilePath);
 		assertTrue("Java file was not found", Files.exists(javaFilePath));
 		assertTrue("Java file was empty", Files.size(javaFilePath) > 0);
 	}

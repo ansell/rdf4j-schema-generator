@@ -17,6 +17,9 @@ import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
@@ -30,7 +33,6 @@ import java.util.regex.Pattern;
  */
 public class VocabBuilder {
 
-    private File file;
     private String name;
     private RDFFormat rdfFormat;
     private String prefix = "http://example.org/ontology#";
@@ -39,11 +41,13 @@ public class VocabBuilder {
 	private Model model;
 
     public VocabBuilder(String filename, RDFFormat format) throws IOException, RDFParseException {
-        this.file = new File(filename);
-        if(!this.file.exists()) throw new FileNotFoundException();
+        Path file = Paths.get(filename);
+        if(!Files.exists(file)) throw new FileNotFoundException(filename);
         this.rdfFormat = format;
 
-        model = Rio.parse(new FileInputStream(file), "", rdfFormat);
+        try(final InputStream inputStream = Files.newInputStream(file)) {
+        	model = Rio.parse(inputStream, "", rdfFormat);
+        }
 
         //import
         Set<Resource> owlOntologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
@@ -51,10 +55,7 @@ public class VocabBuilder {
         	setPrefix(owlOntologies.iterator().next().stringValue());
         }
         
-        if(this.getName() == null) {
-        	setName(this.file.getName());
-        }
-
+    	setName(file.getFileName().toString());
         if(getName().contains(".")) setName(getName().substring(0,getName().lastIndexOf(".")));
         setName(Character.toUpperCase(getName().charAt(0)) + getName().substring(1));
 

@@ -28,3 +28,10 @@ insert output folder [/tmp] :
 
 *** file created: '/tmp/LDP.java' ***
 ```
+
+## Run from Git
+
+1. Clone from https://github.com/tkurz/sesame-vocab-builder.git
+2. Run ./sesame-vocab-builder
+3. Put in the required information (mimetype, url-prefix, classname, package and directory).
+

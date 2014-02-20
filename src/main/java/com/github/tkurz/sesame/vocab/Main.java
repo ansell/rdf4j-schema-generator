@@ -1,7 +1,9 @@
 package com.github.tkurz.sesame.vocab;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.Console;
+
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 
 /**
  * ...
@@ -10,12 +12,12 @@ import java.io.InputStreamReader;
  */
 public class Main {
 
-    public static void main(String [] args) {
+    public static void main(String [] args) throws Exception {
         try {
             String file = "ldp.ttl"; //"src/main/resources/ldp.ttl";
-            String type = "application/rdf+xml";
+            RDFFormat type = RDFFormat.RDFXML;
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            Console reader = System.console();
             System.out.println("*** RDF Namespace Constants Constructor ***");
 
             if(args.length > 0 && args[0] != null) {
@@ -27,41 +29,34 @@ public class Main {
             }
 
             if(args.length > 1 && args[1] != null) {
-                type = args[1];
+                type = Rio.getParserFormatForMIMEType(args[1], type);
                 System.out.println("mimetype : "+type);
             } else {
-                if(file.contains(".")) type = getMimeType(file.substring(file.lastIndexOf(".")));
-                System.out.println("insert file mimetype [" + type + "] : ");
-                String _type=reader.readLine();if(!_type.equals(""))type=_type;
+                if(file.contains(".")) type = Rio.getParserFormatForFileName(file, type);
+                System.out.println("insert file mimetype [" + type.getDefaultMIMEType() + "] : ");
+                String _type=reader.readLine();if(!_type.equals(""))type=Rio.getParserFormatForMIMEType(_type, type);
             }
 
             //parse data and get url prefix
             VocabBuilder e = new VocabBuilder(file,type);
-            System.out.println("insert url-prefix [" + e.prefix + "] : ");
-            String _prefix=reader.readLine();if(!_prefix.equals(""))e.prefix=_prefix;
+            System.out.println("insert url-prefix [" + e.getPrefix() + "] : ");
+            String _prefix=reader.readLine();if(!_prefix.equals(""))e.setPrefix(_prefix);
 
-            System.out.println("insert class name [" + e.name + "] : ");
-            String _name=reader.readLine();if(!_name.equals(""))e.name=_name;
+            System.out.println("insert class name [" + e.getName() + "] : ");
+            String _name=reader.readLine();if(!_name.equals(""))e.setName(_name);
 
-            System.out.println("insert package name ["+e.packageName+"] : ");
-            String _pname=reader.readLine();if(!_pname.equals(""))e.packageName=_pname;
+            System.out.println("insert package name ["+e.getPackageName()+"] : ");
+            String _pname=reader.readLine();if(!_pname.equals(""))e.setPackageName(_pname);
 
-            System.out.println("insert output folder ["+e.outputFolder+"] : ");
-            String _outputFolder=reader.readLine();if(!_outputFolder.equals(""))e.outputFolder=_outputFolder;
+            System.out.println("insert output folder ["+e.getOutputFolder()+"] : ");
+            String _outputFolder=reader.readLine();if(!_outputFolder.equals(""))e.setOutputFolder(_outputFolder);
 
             e.run();
-            System.out.println("*** file created: '"+e.outputFolder+"/"+e.name+".java' ***");
+            System.out.println("*** file created: '"+e.getOutputFolder()+"/"+e.getName()+".java' ***");
         } catch(Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
-
-    private static String getMimeType(String file_extension) {
-        if(file_extension.equals(".ttl")) return "text/turtle";
-        if(file_extension.equals(".n3")) return "text/n3";
-        return "application/rdf+xml";
-
-    }
-
 
 }

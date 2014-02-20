@@ -171,7 +171,7 @@ public class VocabBuilder {
             out.printf("\t\tValueFactory factory = ValueFactoryImpl.getInstance();%n");
             out.println();
             for(String key : keys) {
-                out.printf("\t\t%s = factory.createURI(%s, \"%s\");%n",key,getName()+".NAMESPACE",key);
+                out.printf("\t\t%s = factory.createURI(%s, \"%s\");%n",key,className+".NAMESPACE",key);
             }
             out.println("\t}");
             out.println();

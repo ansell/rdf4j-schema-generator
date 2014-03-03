@@ -5,9 +5,9 @@
 #     chmod +x sesame-vocab-builder
 #
 
-if [ ! -d "target/appassembler/bin" ]; then
+if [ ! -d "sesame-vocab-builder-cli/target/appassembler/bin" ]; then
     mvn -quiet clean install
 fi
 
-chmod u+x target/appassembler/bin/*
-target/appassembler/bin/sesame-vocab-builder
+chmod u+x sesame-vocab-builder-cli/target/appassembler/bin/*
+sesame-vocab-builder-cli/target/appassembler/bin/sesame-vocab-builder

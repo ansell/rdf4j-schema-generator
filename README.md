@@ -29,3 +29,40 @@ out of RDF ontology files.
 2. Run ./sesame-vocab-builder
 3. Put in the required information (mimetype, url-prefix, classname, package and directory).
 
+## Maven Plugin
+
+```
+<build>
+    <plugins>
+        <plugin>
+            <groupId>com.github.tkurz</groupId>
+            <artifactId>sesame-vocabbuilder-maven-plugin</artifactId>
+            <version>1.1</version>
+            <executions>
+                <execution>
+                    <id>generate-vocabularies</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                    <configuration>
+                        <output>${project.build.directory}/generated-sources/sesame-vocabs</output>
+                        <packageName>com.example.sesame.vocabularies</packageName>
+                        <mimeType>text/turtle</mimeType>
+                        <vocabularies>
+                            <vocabulary>
+                                <className>LDP</className>
+                                <file>sesame-vocab-builder-core/src/test/resources/ldp.ttl</file>
+                            </vocabulary>
+                            <vocabulary>
+                                <className>RDF</className>
+                                <url>http://www.w3.org/1999/02/22-rdf-syntax-ns</url>
+                            </vocabulary>
+                        </vocabularies>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```

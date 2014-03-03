@@ -201,5 +201,6 @@
     <modules>
         <module>sesame-vocab-builder-core</module>
         <module>sesame-vocab-builder-cli</module>
+        <module>sesame-vocab-builder-maven-plugin</module>
     </modules>
 </project>

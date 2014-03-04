@@ -2,16 +2,12 @@ package com.github.tkurz.sesame.vocab.plugin;
 
 import com.github.tkurz.sesame.vocab.GenerationException;
 import com.github.tkurz.sesame.vocab.VocabBuilder;
-import com.github.tkurz.sesame.vocab.plugin.Vocabulary;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
 import org.openrdf.model.util.GraphUtilException;
 import org.openrdf.rio.RDFParseException;
@@ -29,10 +25,13 @@ import java.util.List;
  * Maven Plugin to generate Sesame Vocabulary Classes.
  * @author Jakob Frank (jakob@apache.org)
  */
-@Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
+@Mojo(name = "generate",
+        defaultPhase = LifecyclePhase.GENERATE_SOURCES,
+        requiresDependencyResolution = ResolutionScope.COMPILE,
+        requiresProject = true)
 public class VocabularyBuilderMojo extends AbstractMojo {
 
-    @Parameter(property = "output", defaultValue = "${project.build.directory}/generated-sources/sesame-vocabs", readonly = true)
+    @Parameter(property = "output", defaultValue = "${project.build.directory}/generated-sources/sesame-vocabs")
     private File outputDirectory;
 
     @Parameter
@@ -47,10 +46,10 @@ public class VocabularyBuilderMojo extends AbstractMojo {
     @Parameter(property = "className")
     private String className;
 
-    @Parameter(readonly = true, property = "package")
+    @Parameter(property = "package")
     private String packageName;
 
-    @Parameter(readonly = true, alias = "format")
+    @Parameter(alias = "format")
     private String mimeType;
 
     @Component
@@ -67,9 +66,9 @@ public class VocabularyBuilderMojo extends AbstractMojo {
             }
 
             if (url != null) {
-                vocabularies.add(0, new Vocabulary(url, name, className));
+                vocabularies.add(0, Vocabulary.create(url, name, className));
             } else if (file != null) {
-                vocabularies.add(0, new Vocabulary(file, name, className));
+                vocabularies.add(0, Vocabulary.create(file, name, className));
             }
 
 
@@ -139,6 +138,10 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                 } catch (GenerationException e) {
                     throw new MojoFailureException(String.format("Could not generate vocabulary %s: %s", displayName, e.getMessage()));
                 }
+            }
+            if (project != null) {
+                log.debug(String.format("Adding %s as additional compile source", output.toString()));
+                project.addCompileSourceRoot(output.toString());
             }
             log.info("Vocabulary generation complete");
         } catch (IOException e) {

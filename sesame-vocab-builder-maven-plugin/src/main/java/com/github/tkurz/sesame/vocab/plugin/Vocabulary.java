@@ -37,18 +37,6 @@ public class Vocabulary {
 
     private String mimeType;
 
-    public Vocabulary(URL url, String name, String className) {
-        this.url = url;
-        this.name = name;
-        this.className = className;
-    }
-
-    public Vocabulary(File file, String name, String className) {
-        this.file = file;
-        this.name = name;
-        this.className = className;
-    }
-
     public URL getUrl() {
         return url;
     }
@@ -97,5 +85,21 @@ public class Vocabulary {
         this.mimeType = mimeType;
     }
 
+
+    public static Vocabulary create(URL url, String name, String className) {
+        Vocabulary v = new Vocabulary();
+        v.url = url;
+        v.name = name;
+        v.className = className;
+        return v;
+    }
+
+    public static Vocabulary create(File file, String name, String className) {
+        Vocabulary v = new Vocabulary();
+        v.file = file;
+        v.name = name;
+        v.className = className;
+        return v;
+    }
 
 }

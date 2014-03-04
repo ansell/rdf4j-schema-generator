@@ -3,9 +3,6 @@
     <pluginExecutions>
         <pluginExecution>
             <pluginExecutionFilter>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>${project.artifactId}</artifactId>
-                <versionRange>[1.0,)</versionRange>
                 <goals>
                     <goal>generate</goal>
                 </goals>

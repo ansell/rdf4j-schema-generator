@@ -1,6 +1,7 @@
 package com.github.tkurz.sesame.vocab;
 
 import org.apache.commons.cli.*;
+import org.apache.commons.lang3.StringUtils;
 import org.openrdf.model.util.GraphUtilException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
@@ -37,7 +38,9 @@ public class Main {
                 case 0:
                     throw new ParseException("Missing input-file");
                 case 1:
-                    throw new ParseException("Missing output-dir");
+                    input = cliArgs[0];
+                    output = null;
+                    break;
                 case 2:
                     input = cliArgs[0];
                     output = cliArgs[1];
@@ -58,12 +61,23 @@ public class Main {
             if (cli.hasOption('u')) {
                 builder.setPrefix(cli.getOptionValue('u'));
             }
+            if (cli.hasOption('s')) {
+                try {
+                    builder.setIndent(StringUtils.repeat(' ', Integer.parseInt(cli.getOptionValue('s', "4"))));
+                } catch (NumberFormatException e) {
+                    throw new ParseException("indent must be numeric");
+                }
+            } else {
+                builder.setIndent("\t");
+            }
 
             if (output != null) {
                 System.out.printf("Starting generation%n");
                 Path outFile = Paths.get(output);
-                builder.run(outFile);
+                builder.generate(outFile);
                 System.out.printf("Generation finished, result available in '%s'%n", output);
+            } else {
+                builder.generate(System.out);
             }
 
         } catch (ParseException e) {
@@ -106,34 +120,43 @@ public class Main {
 
         o.addOption(OptionBuilder
                 .withLongOpt("format")
-                .hasArg()
-                .withArgName("input-format")
                 .withDescription("mime-type of the input file (will try to guess if absent)")
+                .hasArgs(1)
+                .withArgName("input-format")
                 .isRequired(false)
                 .create('f'));
 
         o.addOption(OptionBuilder
                 .withLongOpt("package")
-                .hasArg()
-                .withArgName("package")
                 .withDescription("package declaration (will use default (empty) package if absent")
+                .hasArgs(1)
+                .withArgName("package")
                 .isRequired(false)
                 .create('p'));
 
         o.addOption(OptionBuilder
                 .withLongOpt("name")
-                .hasArg()
-                .withArgName("ns")
                 .withDescription("the name of the namespace (will try to guess from the input file if absent)")
+                .hasArgs(1)
+                .withArgName("ns")
+                .isRequired(false)
                 .create('n'));
 
         o.addOption(OptionBuilder
                 .withLongOpt("uri")
-                .hasArg()
-                .withArgName("prefix")
                 .withDescription("the prefix for the vocabulary (if not available in the input file)")
+                .hasArgs(1)
+                .withArgName("prefix")
                 .isRequired(false)
                 .create('u'));
+
+        o.addOption(OptionBuilder
+                .withArgName("spaces")
+                .hasOptionalArgs(1)
+                .withArgName("indent")
+                .withDescription("use spaces for for indentation (tabs if missing, 4 spaces if no number given)")
+                .isRequired(false)
+                .create('s'));
 
         o.addOption(OptionBuilder
                 .withLongOpt("help")

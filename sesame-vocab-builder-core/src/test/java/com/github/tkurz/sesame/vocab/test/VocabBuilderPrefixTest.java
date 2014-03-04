@@ -41,7 +41,7 @@ public class VocabBuilderPrefixTest {
         try {
             //test without settings
             VocabBuilder vb = new VocabBuilder(input.getAbsolutePath(), (String) null);
-            vb.run(output);
+            vb.generate(output);
 
             Integer count = Files.toString(new File(output.toString()), Charsets.UTF_8).split("\n").length;
 
@@ -50,7 +50,7 @@ public class VocabBuilderPrefixTest {
             //test with settings
             vb = new VocabBuilder(input.getAbsolutePath(), (String) null);
             vb.setPrefix("http://schema.org/");
-            vb.run(output);
+            vb.generate(output);
 
             count = Files.toString(new File(output.toString()), Charsets.UTF_8).split("\n").length;
 

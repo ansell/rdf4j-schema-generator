@@ -38,6 +38,7 @@ public class VocabBuilder {
     private String name = null;
     private String prefix = null;
     private String packageName = null;
+    private String indent = "\t";
     private final Model model;
 
     /**
@@ -74,13 +75,27 @@ public class VocabBuilder {
         setName(Character.toUpperCase(getName().charAt(0)) + getName().substring(1));
     }
 
+    public void generate(OutputStream outputStream) throws GenerationException, IOException, GraphUtilException {
+        String cName = getName();
+        if (StringUtils.isBlank(cName)) {
+            throw new GenerationException("could not detect name, please set explicitly");
+        }
+        cName = WordUtils.capitalize(cName.replaceAll("\\W+", " ")).replaceAll("\\s+", "");
+
+        generate(cName, new PrintWriter(outputStream));
+    }
+
+    public void generate(Path output) throws IOException, GraphUtilException, GenerationException {
+        final String className = output.getFileName().toString().replaceFirst("\\.java$", "");
+        try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(output, Charset.forName("utf8")))) {
+            generate(className, out);
+        }
+    }
+
     /**
      *
      */
-    public void run(Path output) throws IOException, GraphUtilException, GenerationException {
-
-        final String className = output.getFileName().toString().replaceFirst("\\.java$", "");
-
+    public void generate(String className, PrintWriter out) throws IOException, GraphUtilException, GenerationException {
         if (StringUtils.isBlank(name)) {
             name = className;
         }
@@ -101,102 +116,102 @@ public class VocabBuilder {
         }
 
         //print
-        try(final PrintWriter out = new PrintWriter(Files.newBufferedWriter(output, Charset.forName("utf8")))) {
-            //package is optional
-            if (StringUtils.isNotBlank(packageName)) {
-                out.printf("package %s;%n%n",getPackageName());
-            }
-            //imports
-            out.println("import org.openrdf.model.URI;");
-            out.println("import org.openrdf.model.ValueFactory;");
-            out.println("import org.openrdf.model.impl.ValueFactoryImpl;");
-            out.println();
 
-            final URI pfx = new URIImpl(prefix);
-            Literal oTitle = getFirstExistingObjectLiteral(model, pfx, RDFS.LABEL, DCTERMS.TITLE, DC.TITLE);
-            Literal oDescr = getFirstExistingObjectLiteral(model, pfx, RDFS.COMMENT, DCTERMS.DESCRIPTION, DC.DESCRIPTION);
-            Set<Value> oSeeAlso = model.filter(pfx, RDFS.SEEALSO, null).objects();
-
-            //class JavaDoc
-            out.println("/**");
-            if (oTitle != null) {
-                out.printf(" * %s.%n", WordUtils.wrap(oTitle.getLabel().replaceAll("\\s+", " "), 70, "\n * ", false));
-                out.println(" * <p>");
-            }
-            if (oDescr != null) {
-                out.printf(" * %s.%n", WordUtils.wrap(oDescr.getLabel().replaceAll("\\s+", " "), 70, "\n * ", false));
-                out.println(" * <p>");
-            }
-            out.printf(" * Namespace %s.%n", name);
-            out.printf(" * Prefix: {@code <%s>}%n", prefix);
-            if (!oSeeAlso.isEmpty()) {
-                out.println(" *");
-                for(Value s: oSeeAlso) {
-                    if (s instanceof URI) {
-                        out.printf(" * @see <a href=\"%s\">%s</a>%n", s.stringValue(), s.stringValue());
-                    }
-                }
-            }
-            out.println(" */");
-            //class Definition
-            out.printf("public class %s {%n", className);
-            out.println();
-
-            //constants
-            out.printf("\t/** {@code %s} **/%n", prefix);
-            out.printf("\tpublic static final String NAMESPACE = \"%s\";%n",prefix);
-            out.println();
-            out.printf("\t/** {@code %s} **/%n", name.toLowerCase());
-            out.printf("\tpublic static final String PREFIX = \"%s\";%n",name.toLowerCase());
-            out.println();
-
-            //and now the resources
-            TreeSet<String> keys = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-            keys.addAll(splitUris.keySet());
-
-            for(String key : keys) {
-                Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.COMMENT, DCTERMS.DESCRIPTION, SKOS.DEFINITION, DC.DESCRIPTION);
-                Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.LABEL, DCTERMS.TITLE, DC.TITLE);
-
-                out.println("\t/**");
-                if (label != null) {
-                    out.printf("\t * %s%n", label.getLabel());
-                    out.println("\t * <p>");
-                }
-                out.printf("\t * {@code %s}.%n", splitUris.get(key).stringValue());
-                if (comment != null) {
-                    out.println("\t * <p>");
-                    out.printf("\t * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n\t * ", false));
-                }
-                out.println("\t *");
-                out.printf("\t * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
-                out.println("\t */");
-                out.printf("\tpublic static final URI %s;%n", key);
-                out.println();
-            }
-
-            //static init
-            out.println("\tstatic {");
-            out.printf("\t\tValueFactory factory = ValueFactoryImpl.getInstance();%n");
-            out.println();
-            for(String key : keys) {
-                out.printf("\t\t%s = factory.createURI(%s, \"%s\");%n",key,className+".NAMESPACE",key);
-            }
-            out.println("\t}");
-            out.println();
-
-            //private contructor to avoid instances
-            out.printf("\tprivate %s() {%n", className);
-            out.println("\t\t//static access only");
-            out.println("\t}");
-            out.println();
-
-            //class end
-            out.println("}");
-
-            //end
-            out.flush();
+        //package is optional
+        if (StringUtils.isNotBlank(packageName)) {
+            out.printf("package %s;%n%n",getPackageName());
         }
+        //imports
+        out.println("import org.openrdf.model.URI;");
+        out.println("import org.openrdf.model.ValueFactory;");
+        out.println("import org.openrdf.model.impl.ValueFactoryImpl;");
+        out.println();
+
+        final URI pfx = new URIImpl(prefix);
+        Literal oTitle = getFirstExistingObjectLiteral(model, pfx, RDFS.LABEL, DCTERMS.TITLE, DC.TITLE);
+        Literal oDescr = getFirstExistingObjectLiteral(model, pfx, RDFS.COMMENT, DCTERMS.DESCRIPTION, DC.DESCRIPTION);
+        Set<Value> oSeeAlso = model.filter(pfx, RDFS.SEEALSO, null).objects();
+
+        //class JavaDoc
+        out.println("/**");
+        if (oTitle != null) {
+            out.printf(" * %s.%n", WordUtils.wrap(oTitle.getLabel().replaceAll("\\s+", " "), 70, "\n * ", false));
+            out.println(" * <p>");
+        }
+        if (oDescr != null) {
+            out.printf(" * %s.%n", WordUtils.wrap(oDescr.getLabel().replaceAll("\\s+", " "), 70, "\n * ", false));
+            out.println(" * <p>");
+        }
+        out.printf(" * Namespace %s.%n", name);
+        out.printf(" * Prefix: {@code <%s>}%n", prefix);
+        if (!oSeeAlso.isEmpty()) {
+            out.println(" *");
+            for(Value s: oSeeAlso) {
+                if (s instanceof URI) {
+                    out.printf(" * @see <a href=\"%s\">%s</a>%n", s.stringValue(), s.stringValue());
+                }
+            }
+        }
+        out.println(" */");
+        //class Definition
+        out.printf("public class %s {%n", className);
+        out.println();
+
+        //constants
+        out.printf(getIndent(1) + "/** {@code %s} **/%n", prefix);
+        out.printf(getIndent(1) + "public static final String NAMESPACE = \"%s\";%n",prefix);
+        out.println();
+        out.printf(getIndent(1) + "/** {@code %s} **/%n", name.toLowerCase());
+        out.printf(getIndent(1) + "public static final String PREFIX = \"%s\";%n",name.toLowerCase());
+        out.println();
+
+        //and now the resources
+        TreeSet<String> keys = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        keys.addAll(splitUris.keySet());
+
+        for(String key : keys) {
+            Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.COMMENT, DCTERMS.DESCRIPTION, SKOS.DEFINITION, DC.DESCRIPTION);
+            Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.LABEL, DCTERMS.TITLE, DC.TITLE);
+
+            out.println(getIndent(1) + "/**");
+            if (label != null) {
+                out.printf(getIndent(1) + " * %s%n", label.getLabel());
+                out.println(getIndent(1) + " * <p>");
+            }
+            out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
+            if (comment != null) {
+                out.println(getIndent(1) + " * <p>");
+                out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n\t * ", false));
+            }
+            out.println(getIndent(1) + " *");
+            out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
+            out.println(getIndent(1) + " */");
+            out.printf(getIndent(1) + "public static final URI %s;%n", key);
+            out.println();
+        }
+
+        //static init
+        out.println(getIndent(1) + "static {");
+        out.printf(getIndent(2) + "ValueFactory factory = ValueFactoryImpl.getInstance();%n");
+        out.println();
+        for(String key : keys) {
+            out.printf(getIndent(2) + "%s = factory.createURI(%s, \"%s\");%n",key,className+".NAMESPACE",key);
+        }
+        out.println(getIndent(1) + "}");
+        out.println();
+
+        //private contructor to avoid instances
+        out.printf(getIndent(1) + "private %s() {%n", className);
+        out.println(getIndent(2) + "//static access only");
+        out.println(getIndent(1) + "}");
+        out.println();
+
+        //class end
+        out.println("}");
+    }
+
+    private String getIndent(int level) {
+        return StringUtils.repeat(getIndent(), level);
     }
 
     private Literal getFirstExistingObjectLiteral(Model model, Resource subject, URI... predicates) throws GraphUtilException {
@@ -240,4 +255,11 @@ public class VocabBuilder {
         this.prefix = prefix;
     }
 
+    public void setIndent(String indent) {
+        this.indent = indent;
+    }
+
+    public String getIndent() {
+        return indent;
+    }
 }

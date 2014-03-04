@@ -15,11 +15,8 @@ import org.openrdf.rio.RDFParseException;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Path;
 
 public class VocabBuilderCompileTest {
@@ -38,7 +35,7 @@ public class VocabBuilderCompileTest {
 
         try {
             VocabBuilder vb = new VocabBuilder(input.getAbsolutePath(), (String) null);
-            vb.run(output);
+            vb.generate(output);
             System.out.println(output);
         } catch (GenerationException e) {
             Assert.fail("Could not generate vocab " + e.getMessage());

@@ -100,7 +100,7 @@ public class VocabBuilderTest {
 	}
 
 	/**
-	 * Test method for {@link com.github.tkurz.sesame.vocab.VocabBuilder#run(java.nio.file.Path)}.
+	 * Test method for {@link com.github.tkurz.sesame.vocab.VocabBuilder#generate(java.nio.file.Path)}.
 	 */
 	@Test
 	public final void testRun() throws Exception {
@@ -124,7 +124,7 @@ public class VocabBuilderTest {
 		VocabBuilder testBuilder = new VocabBuilder(inputPath.toAbsolutePath().toString(), format);
 
 		Path javaFilePath = outputPath.resolve("Test.java");
-		testBuilder.run(javaFilePath);
+		testBuilder.generate(javaFilePath);
 		assertTrue("Java file was not found", Files.exists(javaFilePath));
 		assertTrue("Java file was empty", Files.size(javaFilePath) > 0);
 	}

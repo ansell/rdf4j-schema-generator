@@ -128,7 +128,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     }
 
                     final Path vFile = target.resolve(fName);
-                    builder.run(vFile);
+                    builder.generate(vFile);
                     log.info(String.format("Generated %s: %s", displayName, vFile));
 
                 } catch (RDFParseException e) {

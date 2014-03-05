@@ -157,11 +157,13 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     }
 
                     final Path vFile = target.resolve(fName);
-                    builder.generate(vFile.getFileName().toString().replaceFirst("\\.java$", ""), 
-                    		new PrintWriter(
-                    				new BufferedWriter(
-                    						new OutputStreamWriter(
-                    								buildContext.newFileOutputStream(vFile.toFile()), StandardCharsets.UTF_8))));
+                    try(final PrintWriter out = new PrintWriter(
+							new BufferedWriter(
+									new OutputStreamWriter(
+											buildContext.newFileOutputStream(vFile.toFile()), StandardCharsets.UTF_8))))
+					{
+						builder.generate(vFile.getFileName().toString().replaceFirst("\\.java$", ""), out);
+					}
                     log.info(String.format("Generated %s: %s", displayName, vFile));
 
                 } catch (RDFParseException e) {

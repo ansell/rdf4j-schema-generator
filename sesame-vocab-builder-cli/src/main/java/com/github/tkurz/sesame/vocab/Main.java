@@ -16,6 +16,7 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParserRegistry;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -118,6 +119,8 @@ public class Main {
             if (tempFile != null) {
                 Files.deleteIfExists(tempFile);
             }
+        } catch (UnsupportedRDFormatException e) {
+            System.err.printf("%s%nTry setting the format explicitly%n", e.getMessage());
         } catch (ParseException e) {
             printHelp(e.getMessage());
         } catch (RDFParseException e) {
@@ -129,7 +132,7 @@ public class Main {
         } catch (GraphUtilException e) {
             e.printStackTrace();
         } catch (GenerationException e) {
-            System.err.printf(e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 

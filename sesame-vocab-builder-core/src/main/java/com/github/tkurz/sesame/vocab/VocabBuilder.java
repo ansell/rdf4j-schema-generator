@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -132,8 +131,8 @@ public class VocabBuilder {
         out.println();
 
         final URI pfx = new URIImpl(prefix);
-        Literal oTitle = getFirstExistingObjectLiteral(model, pfx, RDFS.LABEL, DCTERMS.TITLE, DC.TITLE);
-        Literal oDescr = getFirstExistingObjectLiteral(model, pfx, RDFS.COMMENT, DCTERMS.DESCRIPTION, DC.DESCRIPTION);
+        Literal oTitle = getFirstExistingObjectLiteral(model, pfx, RDFS.LABEL, DCTERMS.TITLE, DC.TITLE, SKOS.PREF_LABEL, SKOS.ALT_LABEL);
+        Literal oDescr = getFirstExistingObjectLiteral(model, pfx, RDFS.COMMENT, DCTERMS.DESCRIPTION, DC.DESCRIPTION, SKOS.DEFINITION);
         Set<Value> oSeeAlso = model.filter(pfx, RDFS.SEEALSO, null).objects();
 
         //class JavaDoc
@@ -176,7 +175,7 @@ public class VocabBuilder {
         
         for(String key : keys) {
             Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.COMMENT, DCTERMS.DESCRIPTION, SKOS.DEFINITION, DC.DESCRIPTION);
-            Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.LABEL, DCTERMS.TITLE, DC.TITLE);
+            Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.LABEL, DCTERMS.TITLE, DC.TITLE, SKOS.PREF_LABEL, SKOS.ALT_LABEL);
 
             out.println(getIndent(1) + "/**");
             if (label != null) {

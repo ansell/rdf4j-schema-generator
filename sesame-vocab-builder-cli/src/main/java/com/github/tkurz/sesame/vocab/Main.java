@@ -1,17 +1,34 @@
 package com.github.tkurz.sesame.vocab;
 
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.openrdf.model.util.GraphUtilException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.RDFParserRegistry;
 import org.openrdf.rio.Rio;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * ...
@@ -50,7 +67,22 @@ public class Main {
             }
 
             RDFFormat format = Rio.getParserFormatForMIMEType(cli.getOptionValue('f', null));
-            final VocabBuilder builder = new VocabBuilder(input, format);
+
+            Path tempFile = null;
+            final VocabBuilder builder;
+            if (input.startsWith("http://")) {
+                tempFile = Files.createTempFile("vocab-builder", "."+(format!=null?format.getDefaultFileExtension():"cache"));
+                URL url = new URL(input);
+
+                try {
+                    fetchVocab(url, tempFile);
+                } catch (URISyntaxException e) {
+                    throw new ParseException("Invalid input URL: " +e.getMessage());
+                }
+
+                builder = new VocabBuilder(tempFile.toString(), format);
+            } else
+                builder = new VocabBuilder(input, format);
 
             if (cli.hasOption('p')) {
                 builder.setPackageName(cli.getOptionValue('p'));
@@ -83,6 +115,9 @@ public class Main {
                 builder.generate(System.out);
             }
 
+            if (tempFile != null) {
+                Files.deleteIfExists(tempFile);
+            }
         } catch (ParseException e) {
             printHelp(e.getMessage());
         } catch (RDFParseException e) {
@@ -177,6 +212,61 @@ public class Main {
                 .create('h'));
 
         return o;
+    }
+
+    private static File fetchVocab(URL url, final Path tempFile) throws URISyntaxException, IOException {
+        final Properties buildProperties = getBuildProperties();
+        final HttpClientBuilder clientBuilder = HttpClientBuilder.create()
+                .setUserAgent(
+                        String.format("%s:%s/%s (%s)",
+                                getBuildProperties().getProperty("groupId", "unknown"),
+                                getBuildProperties().getProperty("artifactId", "unknown"),
+                                getBuildProperties().getProperty("version", "unknown"),
+                                getBuildProperties().getProperty("name", "unknown"))
+                );
+
+        try(CloseableHttpClient client = clientBuilder.build()) {
+            final HttpUriRequest request = RequestBuilder.get()
+                    .setUri(url.toURI())
+                    .setHeader(HttpHeaders.ACCEPT, getAcceptHeaderValue())
+                    .build();
+
+            return client.execute(request, new ResponseHandler<File>() {
+                @Override
+                public File handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+                    final File cf = tempFile.toFile();
+                    FileUtils.copyInputStreamToFile(response.getEntity().getContent(), cf);
+                    return cf;
+                }
+            });
+        }
+    }
+
+    private static Properties getBuildProperties() {
+        Properties p = new Properties();
+        try {
+            p.load(Main.class.getResourceAsStream("/build.properties"));
+        } catch (IOException e) {
+            // ignore
+        }
+        return p;
+    }
+
+    private static String getAcceptHeaderValue() {
+        final Set<RDFFormat> rdfFormats = RDFParserRegistry.getInstance().getKeys();
+        final Iterator<String> acceptParams = RDFFormat.getAcceptParams(rdfFormats, false, RDFFormat.TURTLE).iterator();
+        if (acceptParams.hasNext()) {
+            final StringBuilder sb = new StringBuilder();
+            while (acceptParams.hasNext()) {
+                sb.append(acceptParams.next());
+                if (acceptParams.hasNext()) {
+                    sb.append(", ");
+                }
+            }
+            return sb.toString();
+        } else {
+            return null;
+        }
     }
 
 }

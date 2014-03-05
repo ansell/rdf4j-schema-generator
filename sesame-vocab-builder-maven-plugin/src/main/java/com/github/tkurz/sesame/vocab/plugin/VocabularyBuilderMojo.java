@@ -60,7 +60,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
     @Parameter(alias = "format")
     private String mimeType;
 
-    @Component
+    @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
 
 	@Component

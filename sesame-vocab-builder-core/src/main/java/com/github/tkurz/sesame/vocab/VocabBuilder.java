@@ -208,6 +208,7 @@ public class VocabBuilder {
 
         //class end
         out.println("}");
+        out.flush();
     }
 
     private String getIndent(int level) {

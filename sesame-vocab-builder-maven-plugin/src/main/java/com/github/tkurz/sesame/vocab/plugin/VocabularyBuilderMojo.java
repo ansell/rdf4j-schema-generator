@@ -129,13 +129,14 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                         log.warn("Generating from URL is not implemented!");
                         continue;
                     } else if (vocab.getFile() != null) {
-                        builder = new VocabBuilder(vocab.getFile().getAbsolutePath(), mime);
-
                         // Incremental builds can skip this file if the following returns true
             			if (!buildContext.hasDelta(vocab.getFile())) {
+                            log.debug(String.format("Skipping %s, vocabulary is did not change", displayName));
             				continue;
             			}
             			buildContext.removeMessages(vocab.getFile());
+
+                        builder = new VocabBuilder(vocab.getFile().getAbsolutePath(), mime);
                     } else {
                         final String msg = String.format("Incomplete Configuration for %s: Vocabulary without URL or FILE param!", displayName);
                         log.error(msg);

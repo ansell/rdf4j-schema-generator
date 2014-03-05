@@ -61,6 +61,9 @@ public class Main {
             if (cli.hasOption('u')) {
                 builder.setPrefix(cli.getOptionValue('u'));
             }
+            if (cli.hasOption('l')) {
+                builder.setPreferredLanguage(cli.getOptionValue('l'));
+            }
             if (cli.hasOption('s')) {
                 try {
                     builder.setIndent(StringUtils.repeat(' ', Integer.parseInt(cli.getOptionValue('s', "4"))));
@@ -114,7 +117,7 @@ public class Main {
         w.close();
     }
 
-    @SuppressWarnings("AccessStaticViaInstance")
+    @SuppressWarnings({"AccessStaticViaInstance", "static-access"})
     private static Options getCliOpts() {
         Options o = new Options();
 
@@ -157,6 +160,14 @@ public class Main {
                 .withDescription("use spaces for for indentation (tabs if missing, 4 spaces if no number given)")
                 .isRequired(false)
                 .create('s'));
+
+        o.addOption(OptionBuilder
+                .withLongOpt("language")
+                .withDescription("preferred language for vocabulary labels")
+                .hasArgs(1)
+                .withArgName("preferred-language")
+                .isRequired(false)
+                .create('l'));
 
         o.addOption(OptionBuilder
                 .withLongOpt("help")

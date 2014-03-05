@@ -2,7 +2,7 @@ package com.github.tkurz.sesame.vocab.test;
 
 import com.github.tkurz.sesame.vocab.GenerationException;
 import com.github.tkurz.sesame.vocab.VocabBuilder;
-import org.apache.commons.io.FileUtils;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,11 +12,10 @@ import org.openrdf.rio.RDFParseException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-
+import java.nio.file.StandardCopyOption;
 
 /**
  * ...
@@ -34,7 +33,7 @@ public class VocabBuilderPrefixTest {
     public void testVocabBuilder() throws IOException {
 
         File input = temp.newFile("schema.rdf");
-        FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/schema.rdf"), input);
+        Files.copy(getClass().getResourceAsStream("/schema.rdf"), input.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
         output = temp.newFile("SCHEMA.java").toPath();
 
@@ -43,18 +42,18 @@ public class VocabBuilderPrefixTest {
             VocabBuilder vb = new VocabBuilder(input.getAbsolutePath(), (String) null);
             vb.generate(output);
 
-            Integer count = Files.toString(new File(output.toString()), Charsets.UTF_8).split("\n").length;
+            int count = Files.readAllLines(output, StandardCharsets.UTF_8).size();
 
-            Assert.assertEquals("prefix was not set properly",(Integer)34,count);
+            Assert.assertEquals("prefix was not set properly", 34, count);
 
             //test with settings
             vb = new VocabBuilder(input.getAbsolutePath(), (String) null);
             vb.setPrefix("http://schema.org/");
             vb.generate(output);
 
-            count = Files.toString(new File(output.toString()), Charsets.UTF_8).split("\n").length;
+            count = Files.readAllLines(output, StandardCharsets.UTF_8).size();
 
-            Assert.assertEquals("prefix was not set properly", (Integer) 10463, count);
+            Assert.assertEquals("prefix was not set properly", 10666, count);
 
         } catch (GenerationException e) {
             Assert.fail("Could not generate vocab " + e.getMessage());

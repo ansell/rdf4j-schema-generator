@@ -21,6 +21,7 @@ out of RDF ontology files.
                               package if absent
   -u,--uri <prefix>           the prefix for the vocabulary (if not available in
                               the input file)
+  -l,--language <language>    preferred language for vocabulary labels
 ```
 
 ## Run from Git
@@ -49,6 +50,7 @@ out of RDF ontology files.
                         <output>${project.build.directory}/generated-sources/sesame-vocabs</output>
                         <packageName>com.example.sesame.vocabularies</packageName>
                         <mimeType>text/turtle</mimeType>
+                        <preferredLanguage>en</preferredLanguage>
                         <vocabularies>
                             <vocabulary>
                                 <className>LDP</className>

@@ -2,6 +2,7 @@ package com.github.tkurz.sesame.vocab.plugin;
 
 import com.github.tkurz.sesame.vocab.GenerationException;
 import com.github.tkurz.sesame.vocab.VocabBuilder;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -10,12 +11,19 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
 import org.openrdf.model.util.GraphUtilException;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.Rio;
 import org.slf4j.impl.StaticLoggerBinder;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -52,8 +60,14 @@ public class VocabularyBuilderMojo extends AbstractMojo {
     @Parameter(alias = "format")
     private String mimeType;
 
-    @Component
+    @Parameter(property = "preferredLanguage")
+    private String preferredLanguage;
+    
+    @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
+
+	@Component
+	private BuildContext buildContext;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -85,13 +99,31 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     throw new MojoExecutionException("Incomplete Configuration: Vocabulary without className or name");
                 }
                 try {
-                    final String mime;
-                    if (vocab.getMimeType() != null) {
-                        mime = vocab.getMimeType();
-                    } else {
-                        mime = mimeType;
+                	String language = preferredLanguage;
+                	if(vocab.getPreferredLanguage() != null) {
+                		language = vocab.getPreferredLanguage();
+                	}
+                	
+                    String mime = vocab.getMimeType();
+                    
+                    if(mime == null) {
+                    	if(vocab.getUrl() != null) {
+                    		RDFFormat guess = Rio.getParserFormatForFileName(vocab.getUrl().toString());
+                    		if(guess != null) {
+                    			mime = guess.getDefaultMIMEType();
+                    		}
+                    	} else if(vocab.getFile() != null) {
+                    		RDFFormat guess = Rio.getParserFormatForFileName(vocab.getFile().toString());
+                    		if(guess != null) {
+                    			mime = guess.getDefaultMIMEType();
+                    		}
+                    	}
                     }
 
+                    if(mime == null) {
+                    	mime = mimeType;
+                    }
+                    
                     final VocabBuilder builder;
                     if (vocab.getUrl() != null) {
                         log.warn("Generating from URL is not implemented!");
@@ -99,12 +131,19 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     } else if (vocab.getFile() != null) {
                         builder = new VocabBuilder(vocab.getFile().getAbsolutePath(), mime);
 
+                        // Incremental builds can skip this file if the following returns true
+            			if (!buildContext.hasDelta(vocab.getFile())) {
+            				continue;
+            			}
+            			buildContext.removeMessages(vocab.getFile());
                     } else {
                         final String msg = String.format("Incomplete Configuration for %s: Vocabulary without URL or FILE param!", displayName);
                         log.error(msg);
                         throw new MojoExecutionException(msg);
                     }
-
+                    
+                    builder.setPreferredLanguage(language);
+                    
                     builder.setPackageName(packageName);
                     if (vocab.getMimeType() != null) {
                         builder.setPackageName(vocab.getPackageName());
@@ -128,7 +167,13 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     }
 
                     final Path vFile = target.resolve(fName);
-                    builder.generate(vFile);
+                    try(final PrintWriter out = new PrintWriter(
+							new BufferedWriter(
+									new OutputStreamWriter(
+											buildContext.newFileOutputStream(vFile.toFile()), StandardCharsets.UTF_8))))
+					{
+						builder.generate(vFile.getFileName().toString().replaceFirst("\\.java$", ""), out);
+					}
                     log.info(String.format("Generated %s: %s", displayName, vFile));
 
                 } catch (RDFParseException e) {
@@ -148,4 +193,5 @@ public class VocabularyBuilderMojo extends AbstractMojo {
             throw new MojoExecutionException("Could not write Vocabularies", e);
         }
     }
+    
 }

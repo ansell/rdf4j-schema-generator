@@ -4,6 +4,7 @@
 package com.github.tkurz.sesame.vocab.test;
 
 import com.github.tkurz.sesame.vocab.VocabBuilder;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -23,7 +24,9 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParserRegistry;
 import org.openrdf.rio.Rio;
 
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -71,6 +74,10 @@ public class VocabBuilderTest {
 	
 	private Literal testProperty3Description;
 
+	private Literal testProperty4DescriptionEn;
+
+	private Literal testProperty4DescriptionFr;
+
 	private RDFFormat format;
 	
 	public VocabBuilderTest(RDFFormat format) {
@@ -92,6 +99,8 @@ public class VocabBuilderTest {
 		testProperty1Description = vf.createLiteral("property 1 description");
 		testProperty2Description = vf.createLiteral("property 2 description");
 		testProperty3Description = vf.createLiteral("property 3 description");
+		testProperty4DescriptionEn = vf.createLiteral("property 4 description english", "en");
+		testProperty4DescriptionFr = vf.createLiteral("Description de la propriété français", "fr");
 	}
 
 	@After
@@ -113,6 +122,8 @@ public class VocabBuilderTest {
 		testOntology.add(testProperty1, DCTERMS.DESCRIPTION, testProperty1Description);
 		testOntology.add(testProperty2, RDFS.COMMENT, testProperty2Description);
 		testOntology.add(testProperty3, SKOS.DEFINITION, testProperty3Description);
+		testOntology.add(testProperty4, SKOS.PREF_LABEL, testProperty4DescriptionEn);
+		testOntology.add(testProperty4, SKOS.PREF_LABEL, testProperty4DescriptionFr);
 		String fileName = "test."+ format.getDefaultFileExtension();
 		Path inputPath = testDir.resolve(fileName);
 		try(final OutputStream outputStream = Files.newOutputStream(inputPath)) {
@@ -122,11 +133,18 @@ public class VocabBuilderTest {
 		Files.createDirectories(outputPath);
 		
 		VocabBuilder testBuilder = new VocabBuilder(inputPath.toAbsolutePath().toString(), format);
-
+		
+		testBuilder.setPreferredLanguage("fr");
+		
 		Path javaFilePath = outputPath.resolve("Test.java");
 		testBuilder.generate(javaFilePath);
 		assertTrue("Java file was not found", Files.exists(javaFilePath));
 		assertTrue("Java file was empty", Files.size(javaFilePath) > 0);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Files.copy(javaFilePath, out);
+		String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
+		assertTrue(result.contains(testProperty4DescriptionFr.getLabel()));
+		assertFalse(result.contains(testProperty4DescriptionEn.getLabel()));
 	}
 
 }

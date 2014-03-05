@@ -37,6 +37,8 @@ public class Vocabulary {
 
     private String mimeType;
 
+    private String preferredLanguage;
+    
     public URL getUrl() {
         return url;
     }
@@ -85,6 +87,13 @@ public class Vocabulary {
         this.mimeType = mimeType;
     }
 
+    public void setPreferredLanguage(String language) {
+    	this.preferredLanguage = language;
+    }
+    
+    public String getPreferredLanguage() {
+    	return preferredLanguage;
+    }
 
     public static Vocabulary create(URL url, String name, String className) {
         Vocabulary v = new Vocabulary();

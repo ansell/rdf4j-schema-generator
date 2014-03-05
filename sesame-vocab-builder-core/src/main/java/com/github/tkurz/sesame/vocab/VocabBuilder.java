@@ -17,13 +17,15 @@ import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +41,7 @@ public class VocabBuilder {
     private String prefix = null;
     private String packageName = null;
     private String indent = "\t";
+	private String language = null;
     private final Model model;
 
     /**
@@ -87,7 +90,7 @@ public class VocabBuilder {
 
     public void generate(Path output) throws IOException, GraphUtilException, GenerationException {
         final String className = output.getFileName().toString().replaceFirst("\\.java$", "");
-        try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(output, Charset.forName("utf8")))) {
+        try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(output, StandardCharsets.UTF_8))) {
             generate(className, out);
         }
     }
@@ -128,8 +131,8 @@ public class VocabBuilder {
         out.println();
 
         final URI pfx = new URIImpl(prefix);
-        Literal oTitle = getFirstExistingObjectLiteral(model, pfx, RDFS.LABEL, DCTERMS.TITLE, DC.TITLE);
-        Literal oDescr = getFirstExistingObjectLiteral(model, pfx, RDFS.COMMENT, DCTERMS.DESCRIPTION, DC.DESCRIPTION);
+        Literal oTitle = getFirstExistingObjectLiteral(model, pfx, RDFS.LABEL, DCTERMS.TITLE, DC.TITLE, SKOS.PREF_LABEL, SKOS.ALT_LABEL);
+        Literal oDescr = getFirstExistingObjectLiteral(model, pfx, RDFS.COMMENT, DCTERMS.DESCRIPTION, DC.DESCRIPTION, SKOS.DEFINITION);
         Set<Value> oSeeAlso = model.filter(pfx, RDFS.SEEALSO, null).objects();
 
         //class JavaDoc
@@ -166,12 +169,13 @@ public class VocabBuilder {
         out.println();
 
         //and now the resources
-        TreeSet<String> keys = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        List<String> keys = new ArrayList<>();
         keys.addAll(splitUris.keySet());
-
+        Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
+        
         for(String key : keys) {
             Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.COMMENT, DCTERMS.DESCRIPTION, SKOS.DEFINITION, DC.DESCRIPTION);
-            Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.LABEL, DCTERMS.TITLE, DC.TITLE);
+            Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.LABEL, DCTERMS.TITLE, DC.TITLE, SKOS.PREF_LABEL, SKOS.ALT_LABEL);
 
             out.println(getIndent(1) + "/**");
             if (label != null) {
@@ -208,6 +212,7 @@ public class VocabBuilder {
 
         //class end
         out.println("}");
+        out.flush();
     }
 
     private String getIndent(int level) {
@@ -216,13 +221,30 @@ public class VocabBuilder {
 
     private Literal getFirstExistingObjectLiteral(Model model, Resource subject, URI... predicates) throws GraphUtilException {
         for (URI predicate: predicates) {
-            Literal literal = GraphUtil.getOptionalObjectLiteral(model, subject, predicate);
+            Literal literal = getOptionalObjectLiteral(model, subject, predicate);
             if (literal != null) {
                 return literal;
             }
         }
         return null;
     }
+    
+	private Literal getOptionalObjectLiteral(Model model, Resource subject,
+			URI predicate) {
+		Set<Value> objects = GraphUtil.getObjects(model, subject, predicate);
+
+		Literal result = null;
+		
+		for(Value nextValue : objects) {
+			if(nextValue instanceof Literal) {
+				if(result == null || 
+						(getPreferredLanguage() != null && getPreferredLanguage().equals(((Literal) nextValue).getLanguage()))) {
+					result = (Literal) nextValue;
+				}
+			}
+		}
+		return result;
+	}
 
     private String cleanKey(String s) {
         s = s.replaceAll("#","");
@@ -261,5 +283,13 @@ public class VocabBuilder {
 
     public String getIndent() {
         return indent;
+    }
+    
+    public void setPreferredLanguage(String language) {
+    	this.language = language;
+    }
+    
+    public String getPreferredLanguage() {
+    	return language;
     }
 }

@@ -54,7 +54,7 @@ public class VocabBuilderPrefixTest {
 
             count = Files.toString(new File(output.toString()), Charsets.UTF_8).split("\n").length;
 
-            Assert.assertEquals("prefix was not set properly", (Integer) 10463, count);
+            Assert.assertEquals("prefix was not set properly", (Integer) 10666, count);
 
         } catch (GenerationException e) {
             Assert.fail("Could not generate vocab " + e.getMessage());

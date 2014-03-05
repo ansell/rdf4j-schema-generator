@@ -45,7 +45,7 @@ public class VocabBuilder {
     private String prefix = null;
     private String packageName = null;
     private String indent = "\t";
-	private String language = "en";
+	private String language = null;
     private final Model model;
 
     /**
@@ -241,7 +241,8 @@ public class VocabBuilder {
 		
 		for(Value nextValue : objects) {
 			if(nextValue instanceof Literal) {
-				if(result == null || language.equals(((Literal) nextValue).getLanguage())) {
+				if(result == null || 
+						(getPreferredLanguage() != null && getPreferredLanguage().equals(((Literal) nextValue).getLanguage()))) {
 					result = (Literal) nextValue;
 				}
 			}

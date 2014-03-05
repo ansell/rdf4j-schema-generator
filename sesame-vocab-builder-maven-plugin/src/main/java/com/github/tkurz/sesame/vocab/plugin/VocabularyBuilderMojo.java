@@ -60,6 +60,9 @@ public class VocabularyBuilderMojo extends AbstractMojo {
     @Parameter(alias = "format")
     private String mimeType;
 
+    @Parameter(property = "preferredLanguage")
+    private String preferredLanguage;
+    
     @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
 
@@ -96,6 +99,11 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     throw new MojoExecutionException("Incomplete Configuration: Vocabulary without className or name");
                 }
                 try {
+                	String language = preferredLanguage;
+                	if(vocab.getPreferredLanguage() != null) {
+                		language = vocab.getPreferredLanguage();
+                	}
+                	
                     String mime = vocab.getMimeType();
                     
                     if(mime == null) {
@@ -133,7 +141,9 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                         log.error(msg);
                         throw new MojoExecutionException(msg);
                     }
-
+                    
+                    builder.setPreferredLanguage(language);
+                    
                     builder.setPackageName(packageName);
                     if (vocab.getMimeType() != null) {
                         builder.setPackageName(vocab.getPackageName());

@@ -20,6 +20,7 @@ import com.google.common.base.CaseFormat;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,6 +45,7 @@ public class VocabBuilder {
     private String prefix = null;
     private String packageName = null;
     private String indent = "\t";
+	private String language = "en";
     private final Model model;
 
     /**
@@ -92,7 +94,7 @@ public class VocabBuilder {
 
     public void generate(Path output) throws IOException, GraphUtilException, GenerationException {
         final String className = output.getFileName().toString().replaceFirst("\\.java$", "");
-        try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(output, Charset.forName("utf8")))) {
+        try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(output, StandardCharsets.UTF_8))) {
             generate(className, out);
         }
     }
@@ -235,12 +237,16 @@ public class VocabBuilder {
 			URI predicate) {
 		Set<Value> objects = GraphUtil.getObjects(model, subject, predicate);
 
+		Literal result = null;
+		
 		for(Value nextValue : objects) {
 			if(nextValue instanceof Literal) {
-				return (Literal) nextValue;
+				if(result == null || language.equals(((Literal) nextValue).getLanguage())) {
+					result = (Literal) nextValue;
+				}
 			}
 		}
-		return null;
+		return result;
 	}
 
     private String cleanKey(String s) {
@@ -280,5 +286,13 @@ public class VocabBuilder {
 
     public String getIndent() {
         return indent;
+    }
+    
+    public void setPreferredLanguage(String language) {
+    	this.language = language;
+    }
+    
+    public String getPreferredLanguage() {
+    	return language;
     }
 }

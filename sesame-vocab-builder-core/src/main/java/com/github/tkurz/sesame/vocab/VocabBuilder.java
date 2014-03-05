@@ -16,12 +16,17 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 
+import com.google.common.base.CaseFormat;
+
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -166,9 +171,10 @@ public class VocabBuilder {
         out.println();
 
         //and now the resources
-        TreeSet<String> keys = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        List<String> keys = new ArrayList<>();
         keys.addAll(splitUris.keySet());
-
+        Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
+        
         for(String key : keys) {
             Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.COMMENT, DCTERMS.DESCRIPTION, SKOS.DEFINITION, DC.DESCRIPTION);
             Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.LABEL, DCTERMS.TITLE, DC.TITLE);

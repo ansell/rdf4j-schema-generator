@@ -5,18 +5,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.openrdf.model.util.GraphUtilException;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
-import org.openrdf.rio.RDFParserRegistry;
-import org.openrdf.rio.Rio;
-import org.openrdf.rio.UnsupportedRDFormatException;
+import org.openrdf.rio.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -222,10 +217,10 @@ public class Main {
         final HttpClientBuilder clientBuilder = HttpClientBuilder.create()
                 .setUserAgent(
                         String.format("%s:%s/%s (%s)",
-                                getBuildProperties().getProperty("groupId", "unknown"),
-                                getBuildProperties().getProperty("artifactId", "unknown"),
-                                getBuildProperties().getProperty("version", "unknown"),
-                                getBuildProperties().getProperty("name", "unknown"))
+                                buildProperties.getProperty("groupId", "unknown"),
+                                buildProperties.getProperty("artifactId", "unknown"),
+                                buildProperties.getProperty("version", "unknown"),
+                                buildProperties.getProperty("name", "unknown"))
                 );
 
         try(CloseableHttpClient client = clientBuilder.build()) {
@@ -236,7 +231,7 @@ public class Main {
 
             return client.execute(request, new ResponseHandler<File>() {
                 @Override
-                public File handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+                public File handleResponse(HttpResponse response) throws IOException {
                     final File cf = tempFile.toFile();
                     FileUtils.copyInputStreamToFile(response.getEntity().getContent(), cf);
                     return cf;

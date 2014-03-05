@@ -6,12 +6,7 @@ import org.openrdf.model.*;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.util.GraphUtilException;
-import org.openrdf.model.vocabulary.DC;
-import org.openrdf.model.vocabulary.DCTERMS;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.model.vocabulary.RDFS;
-import org.openrdf.model.vocabulary.SKOS;
+import org.openrdf.model.vocabulary.*;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
@@ -21,11 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +32,7 @@ public class VocabBuilder {
     private String prefix = null;
     private String packageName = null;
     private String indent = "\t";
-	private String language = null;
+    private String language = null;
     private final Model model;
 
     /**
@@ -172,7 +163,7 @@ public class VocabBuilder {
         List<String> keys = new ArrayList<>();
         keys.addAll(splitUris.keySet());
         Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
-        
+
         for(String key : keys) {
             Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.COMMENT, DCTERMS.DESCRIPTION, SKOS.DEFINITION, DC.DESCRIPTION);
             Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), RDFS.LABEL, DCTERMS.TITLE, DC.TITLE, SKOS.PREF_LABEL, SKOS.ALT_LABEL);
@@ -228,23 +219,23 @@ public class VocabBuilder {
         }
         return null;
     }
-    
-	private Literal getOptionalObjectLiteral(Model model, Resource subject,
-			URI predicate) {
-		Set<Value> objects = GraphUtil.getObjects(model, subject, predicate);
 
-		Literal result = null;
-		
-		for(Value nextValue : objects) {
-			if(nextValue instanceof Literal) {
-				if(result == null || 
-						(getPreferredLanguage() != null && getPreferredLanguage().equals(((Literal) nextValue).getLanguage()))) {
-					result = (Literal) nextValue;
-				}
-			}
-		}
-		return result;
-	}
+    private Literal getOptionalObjectLiteral(Model model, Resource subject,
+                                             URI predicate) {
+        Set<Value> objects = GraphUtil.getObjects(model, subject, predicate);
+
+        Literal result = null;
+
+        for(Value nextValue : objects) {
+            if(nextValue instanceof Literal) {
+                if(result == null ||
+                        (getPreferredLanguage() != null && getPreferredLanguage().equals(((Literal) nextValue).getLanguage()))) {
+                    result = (Literal) nextValue;
+                }
+            }
+        }
+        return result;
+    }
 
     private String cleanKey(String s) {
         s = s.replaceAll("#","");
@@ -284,12 +275,12 @@ public class VocabBuilder {
     public String getIndent() {
         return indent;
     }
-    
+
     public void setPreferredLanguage(String language) {
-    	this.language = language;
+        this.language = language;
     }
-    
+
     public String getPreferredLanguage() {
-    	return language;
+        return language;
     }
 }

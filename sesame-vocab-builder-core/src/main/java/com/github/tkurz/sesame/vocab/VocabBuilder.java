@@ -223,13 +223,25 @@ public class VocabBuilder {
 
     private Literal getFirstExistingObjectLiteral(Model model, Resource subject, URI... predicates) throws GraphUtilException {
         for (URI predicate: predicates) {
-            Literal literal = GraphUtil.getOptionalObjectLiteral(model, subject, predicate);
+            Literal literal = getOptionalObjectLiteral(model, subject, predicate);
             if (literal != null) {
                 return literal;
             }
         }
         return null;
     }
+    
+	private Literal getOptionalObjectLiteral(Model model, Resource subject,
+			URI predicate) {
+		Set<Value> objects = GraphUtil.getObjects(model, subject, predicate);
+
+		for(Value nextValue : objects) {
+			if(nextValue instanceof Literal) {
+				return (Literal) nextValue;
+			}
+		}
+		return null;
+	}
 
     private String cleanKey(String s) {
         s = s.replaceAll("#","");

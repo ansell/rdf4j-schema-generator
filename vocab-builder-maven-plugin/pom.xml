@@ -39,7 +39,7 @@
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.2</version>
                 <configuration>
-                    <goalPrefix>sesame-vocab-builder</goalPrefix>
+                    <goalPrefix>vocab-builder</goalPrefix>
                 </configuration>
                 <executions>
                     <execution>

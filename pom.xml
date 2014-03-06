@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.tkurz</groupId>
-    <artifactId>sesame-vocab-builder</artifactId>
+    <groupId>com.github.tkurz.sesame</groupId>
+    <artifactId>vocab-builder</artifactId>
     <version>1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -210,8 +210,8 @@
     </dependencyManagement>
 
     <modules>
-        <module>sesame-vocab-builder-core</module>
-        <module>sesame-vocab-builder-cli</module>
-        <module>sesame-vocab-builder-maven-plugin</module>
+        <module>vocab-builder-core</module>
+        <module>vocab-builder-cli</module>
+        <module>vocab-builder-maven-plugin</module>
     </modules>
 </project>

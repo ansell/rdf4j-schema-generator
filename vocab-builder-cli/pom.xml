@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.tkurz</groupId>
-        <artifactId>sesame-vocab-builder</artifactId>
+        <groupId>com.github.tkurz.sesame</groupId>
+        <artifactId>vocab-builder</artifactId>
         <version>1.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>sesame-vocab-builder-cli</artifactId>
+    <artifactId>vocab-builder-cli</artifactId>
     <name>Sesame Vocabulary Builder :: CLI</name>
 
     <prerequisites>
@@ -103,8 +103,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.tkurz</groupId>
-            <artifactId>sesame-vocab-builder-core</artifactId>
+            <groupId>com.github.tkurz.sesame</groupId>
+            <artifactId>vocab-builder-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

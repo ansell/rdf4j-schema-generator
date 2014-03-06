@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>sesame-vocab-builder</artifactId>
-        <groupId>com.github.tkurz</groupId>
+        <groupId>com.github.tkurz.sesame</groupId>
+        <artifactId>vocab-builder</artifactId>
         <version>1.1-SNAPSHOT</version>
     </parent>
 
@@ -12,7 +12,7 @@
         <maven>3.0.4</maven>
     </prerequisites>
 
-    <artifactId>sesame-vocab-builder-maven-plugin</artifactId>
+    <artifactId>vocab-builder-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <name>Sesame Vocabulary Builder :: Maven Plugin</name>
 
@@ -64,8 +64,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.tkurz</groupId>
-            <artifactId>sesame-vocab-builder-core</artifactId>
+            <groupId>com.github.tkurz.sesame</groupId>
+            <artifactId>vocab-builder-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

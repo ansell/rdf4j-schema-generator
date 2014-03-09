@@ -1,0 +1,291 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+<http://www.w3.org/2000/01/rdf-schema#> a owl:Ontology ;
+	dc:title "The RDF Schema vocabulary (RDFS)" .
+
+rdfs:Resource a rdfs:Class ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "Resource" ;
+	rdfs:comment "The class resource, everything." .
+
+rdfs:Class a rdfs:Class ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "Class" ;
+	rdfs:comment "The class of classes." ;
+	rdfs:subClassOf rdfs:Resource .
+
+rdfs:subClassOf a rdf:Property ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "subClassOf" ;
+	rdfs:comment "The subject is a subclass of a class." ;
+	rdfs:range rdfs:Class ;
+	rdfs:domain rdfs:Class .
+
+rdfs:subPropertyOf a rdf:Property ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "subPropertyOf" ;
+	rdfs:comment "The subject is a subproperty of a property." ;
+	rdfs:range rdf:Property ;
+	rdfs:domain rdf:Property .
+
+rdfs:comment a rdf:Property ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "comment" ;
+	rdfs:comment "A description of the subject resource." ;
+	rdfs:domain rdfs:Resource ;
+	rdfs:range rdfs:Literal .
+
+rdfs:label a rdf:Property ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "label" ;
+	rdfs:comment "A human-readable name for the subject." ;
+	rdfs:domain rdfs:Resource ;
+	rdfs:range rdfs:Literal .
+
+rdfs:domain a rdf:Property ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "domain" ;
+	rdfs:comment "A domain of the subject property." ;
+	rdfs:range rdfs:Class ;
+	rdfs:domain rdf:Property .
+
+rdfs:range a rdf:Property ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "range" ;
+	rdfs:comment "A range of the subject property." ;
+	rdfs:range rdfs:Class ;
+	rdfs:domain rdf:Property .
+
+rdfs:seeAlso a rdf:Property ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "seeAlso" ;
+	rdfs:comment "Further information about the subject resource." ;
+	rdfs:range rdfs:Resource ;
+	rdfs:domain rdfs:Resource .
+
+rdfs:isDefinedBy a rdf:Property ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:subPropertyOf rdfs:seeAlso ;
+	rdfs:label "isDefinedBy" ;
+	rdfs:comment "The defininition of the subject resource." ;
+	rdfs:range rdfs:Resource ;
+	rdfs:domain rdfs:Resource .
+
+rdfs:Literal a rdfs:Class ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "Literal" ;
+	rdfs:comment "The class of literal values, eg. textual strings and integers." ;
+	rdfs:subClassOf rdfs:Resource .
+
+rdfs:Container a rdfs:Class ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "Container" ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:comment "The class of RDF containers." .
+
+rdfs:ContainerMembershipProperty a rdfs:Class ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "ContainerMembershipProperty" ;
+	rdfs:comment """The class of container membership properties, rdf:_1, rdf:_2, ...,
+                    all of which are sub-properties of 'member'.""" ;
+	rdfs:subClassOf rdf:Property .
+
+rdfs:member a rdf:Property ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "member" ;
+	rdfs:comment "A member of the subject resource." ;
+	rdfs:domain rdfs:Resource ;
+	rdfs:range rdfs:Resource .
+
+rdfs:Datatype a rdfs:Class ;
+	rdfs:isDefinedBy <http://www.w3.org/2000/01/rdf-schema#> ;
+	rdfs:label "Datatype" ;
+	rdfs:comment "The class of RDF datatypes." ;
+	rdfs:subClassOf rdfs:Class .
+
+<http://www.w3.org/2000/01/rdf-schema#> rdfs:seeAlso <http://www.w3.org/2000/01/rdf-schema-more> .
+
+rdf:Alt a rdfs:Class;
+	rdfs:comment "La clase de los contenedores\r\nalternativos."@es;
+	rdfs:label "Alternativo"@es.
+rdf:Bag a rdfs:Class;
+	rdfs:comment "La clase de los contenedores\r\nno ordenados."@es;
+	rdfs:label "Bolsa"@es.
+rdf:first a rdf:Property;
+	rdfs:comment "El primero elemento del sujeto que es una lista\r\nRDF."@es;
+	rdfs:label "primero"@es.
+rdf:List a rdfs:Class;
+	rdfs:comment "La classe des listas RDF."@es;
+	rdfs:label "Lista"@es.
+rdf:nil a rdf:List;
+	rdfs:comment "La lista vacia, sin elementos. Si el resto de una lista es\r\n'nil' la lista no contiene m\u00E1s elementos."@es;
+	rdfs:label "nil"@es.
+rdf:object a rdf:Property;
+	rdfs:comment "El objeto del sujeto que es una declaraci\u00F3n\r\nRDF."@es;
+	rdfs:label "objeto"@es.
+rdf:predicate a rdf:Property;
+	rdfs:comment "El predicato del sujeto que es una declaraci\u00F3n\r\nRDF."@es;
+	rdfs:label "predicato"@es.
+rdf:Property a rdfs:Class;
+	rdfs:comment "La clase de Propiedades RDF."@es;
+	rdfs:label "Propiedad"@es.
+rdf:rest a rdf:Property;
+	rdfs:comment "El resto de los miembros del sujeto que es una lista\r\nRDF."@es;
+	rdfs:label "resto"@es.
+rdf:Seq a rdfs:Class;
+	rdfs:comment "La classe de los contenedores\r\nordenados."@es;
+	rdfs:label "Sequenc\u00EDa"@es.
+rdf:Statement a rdfs:Class;
+	rdfs:comment "La clase de los enunciados o declaraciones RDF."@es;
+	rdfs:label "Declaraci\u00F3n"@es.
+rdf:subject a rdf:Property;
+	rdfs:comment "El sujeto del sujeto que es una declaraci\u00F3n\r\nRDF."@es;
+	rdfs:label "sujeto"@es.
+rdf:value a rdf:Property;
+	rdfs:comment "Propiedad particular o idiom\u00E1tica usado para los valores\r\nestructurados."@es;
+	rdfs:label "valor"@es.
+rdf:XMLLiteral a rdfs:Datatype;
+	rdfs:comment "La clase de los literales\r\nXML."@es;
+	rdfs:label "Literal XML"@es.
+rdfs: dc:title " El\r\nvocabulario de RDF y Lenguaje de definici\u00F3n de vocabularios RDF (RDF\r\nSchema)."@es;
+	a owl:Ontology.
+rdfs:Class a rdfs:Class;
+	rdfs:comment "La clase de todas las clases."@es;
+	rdfs:label "Clase"@es.
+rdfs:comment a rdf:Property;
+	rdfs:comment "Una descripci\u00F3n del sujeto, que es un\r\nrecurso."@es;
+	rdfs:label "comentario"@es.
+rdfs:Container a rdfs:Class;
+	rdfs:comment "La clase de los contenedores RDF."@es;
+	rdfs:label "Contenedor"@es.
+rdfs:ContainerMembershipProperty a rdfs:Class;
+	rdfs:comment "La clase de la propeiedad de pertenecer a un contenedor, por ejemplos\r\nrdf:_1, rdf:_2, etc, que son subpropiedades de\r\n'miembro'."@es;
+	rdfs:label "Propiedad pertenecendo al contenedor"@es.
+rdfs:Datatype a rdfs:Class;
+	rdfs:comment "Le clase de los tipos de datos RDF."@es;
+	rdfs:label "Tipo de datos"@es.
+rdfs:domain a rdf:Property;
+	rdfs:comment "Un dominio del sujeto que es una\r\npropiedad."@es;
+	rdfs:label "dominio"@es.
+rdfs:isDefinedBy a rdf:Property;
+	rdfs:comment "La definici\u00F3n del recurso sujeto."@es;
+	rdfs:label "definido por"@es.
+rdfs:label a rdf:Property;
+	rdfs:comment "Un nombre dado al sujeto, legibile por un ser\r\nhumano."@es;
+	rdfs:label "etiqueta"@es.
+rdfs:Literal a rdfs:Class;
+	rdfs:comment "La clase de los valores literales, por ejemplo catenas de caracteras, \r\no n\u00FAmeros enteros."@es;
+	rdfs:label "Literal"@es.
+rdfs:member a rdf:Property;
+	rdfs:comment "Un membre del recurso sujeto."@es;
+	rdfs:label "miembro"@es.
+rdfs:range a rdf:Property;
+	rdfs:comment "El rango  o tipos del sujeto al cual(es) se aplica la propiedad."@es;
+	rdfs:label "rango"@es.
+rdfs:seeAlso a rdf:Property;
+	rdfs:comment "Informaci\u00F3n adicional sobre el sujeto.\r\n"@es;
+	rdfs:label "ver tambi\u00E9n"@es.
+rdfs:subClassOf a rdf:Property;
+	rdfs:comment "El sujeto es una subclase de una\r\nclase."@es;
+	rdfs:label "subclase"@es.
+rdfs:subPropertyOf a rdf:Property;
+	rdfs:comment "El sujeto es una subpropiedad del objeto, que es una\r\npropriedad."@es;
+	rdfs:label "subpropiedad"@es.
+
+rdf:Alt a rdfs:Class;
+	rdfs:comment "La classe des conteneurs d'alternatives."@fr;
+	rdfs:label "Alt"@fr.
+rdf:Bag a rdfs:Class;
+	rdfs:comment "La classe des conteneurs non ordonn\u00E9s."@fr;
+	rdfs:label "Sac"@fr.
+rdf:first a rdf:Property;
+	rdfs:comment "Le premier \u00E9l\u00E9ment du sujet liste RDF."@fr;
+	rdfs:label "premier"@fr.
+rdf:List a rdfs:Class;
+	rdfs:comment "La classe des listes RDF."@fr;
+	rdfs:label "Liste"@fr.
+rdf:nil a rdf:List;
+	rdfs:comment "La liste vide, sans \u00E9l\u00E9ments. Si le reste d'une liste est 'nil' alors la liste ne contient plus d'\u00E9l\u00E9ments."@fr;
+	rdfs:label "nil"@fr.
+rdf:object a rdf:Property;
+	rdfs:comment "L'objet du sujet affirmation RDF."@fr;
+	rdfs:label "objet"@fr.
+rdf:predicate a rdf:Property;
+	rdfs:comment "Le pr\u00E9dicat du sujet affirmation RDF."@fr;
+	rdfs:label "pr\u00E9dicat"@fr.
+rdf:Property a rdfs:Class;
+	rdfs:comment "La classe des Propri\u00E9t\u00E9s RDF."@fr;
+	rdfs:label "Propri\u00E9t\u00E9"@fr.
+rdf:rest a rdf:Property;
+	rdfs:comment "Le reste du sujet liste RDF apr\u00E8s le premier \u00E9l\u00E9ment."@fr;
+	rdfs:label "reste"@fr.
+rdf:Seq a rdfs:Class;
+	rdfs:comment "La classe des conteneurs ordonn\u00E9s."@fr;
+	rdfs:label "S\u00E9q"@fr.
+rdf:Statement a rdfs:Class;
+	rdfs:comment "La classe des affirmations RDF."@fr;
+	rdfs:label "Affirmation"@fr.
+rdf:subject a rdf:Property;
+	rdfs:comment "Le sujet du sujet affirmation RDF."@fr;
+	rdfs:label "sujet"@fr.
+rdf:type a rdf:Property;
+	rdfs:comment "Le sujet est une instance d'une classe."@fr;
+	rdfs:label "type"@fr.
+rdf:value a rdf:Property;
+	rdfs:comment "Propri\u00E9t\u00E9 idiomatique utilis\u00E9e pour les valeurs structur\u00E9es."@fr;
+	rdfs:label "valeur"@fr.
+rdf:XMLLiteral a rdfs:Datatype;
+	rdfs:comment "La classe des litteraux XML."@fr;
+	rdfs:label "LitteralXML"@fr.
+rdfs: dc:title "Le vocabulaire de RDF et RDF Schema."@fr;
+	a owl:Ontology.
+rdfs:Class a rdfs:Class;
+	rdfs:comment "La classe des toutes les classes."@fr;
+	rdfs:label "Classe"@fr.
+rdfs:comment a rdf:Property;
+	rdfs:comment "Une description de la ressource sujet."@fr;
+	rdfs:label "commentaire"@fr.
+rdfs:Container a rdfs:Class;
+	rdfs:comment "La classe des conteneurs RDF."@fr;
+	rdfs:label "Conteneur"@fr.
+rdfs:ContainerMembershipProperty a rdfs:Class;
+	rdfs:comment "La classe des properi\u00E9t\u00E9 d'appartenance \u00E0 un conteneur, rdf:_1, rdf:_2, ..., qui sont chacun des sous-propri\u00E9t\u00E9s de 'membre'."@fr;
+	rdfs:label "Propri\u00E9t\u00E9AppartenanceConteneur"@fr.
+rdfs:Datatype a rdfs:Class;
+	rdfs:comment "Le classe des types de donn\u00E9es RDF."@fr;
+	rdfs:label "TypeDeDonn\u00E9es"@fr.
+rdfs:domain a rdf:Property;
+	rdfs:comment "Un domaine de la propri\u00E9t\u00E9 sujet."@fr;
+	rdfs:label "domaine"@fr.
+rdfs:isDefinedBy a rdf:Property;
+	rdfs:comment "La d\u00E9finition de la ressource sujet."@fr;
+	rdfs:label "estD\u00E9finiPar"@fr.
+rdfs:label a rdf:Property;
+	rdfs:comment "Un nom du sujet lisible par un humain."@fr;
+	rdfs:label "label"@fr.
+rdfs:Literal a rdfs:Class;
+	rdfs:comment "La classe des valeurs litt\u00E9rales, par ex. cha\u00EEnes de caract\u00E8res et nombres entiers."@fr;
+	rdfs:label "Litteral"@fr.
+rdfs:member a rdf:Property;
+	rdfs:comment "Un membre de la ressource sujet."@fr;
+	rdfs:label "membre"@fr.
+rdfs:range a rdf:Property;
+	rdfs:comment "La port\u00E9e de la propri\u00E9t\u00E9 sujet."@fr;
+	rdfs:label "port\u00E9e"@fr.
+rdfs:Resource a rdfs:Class;
+	rdfs:comment "La classe ressource: tout."@fr;
+	rdfs:label "Ressource"@fr.
+rdfs:seeAlso a rdf:Property;
+	rdfs:comment "Informations suppl\u00E9mentaires concernant la ressource sujet."@fr;
+	rdfs:label "voirAussi"@fr.
+rdfs:subClassOf a rdf:Property;
+	rdfs:comment "Le sujet est une sous-classe d'une classe."@fr;
+	rdfs:label "sousClasseDe"@fr.
+rdfs:subPropertyOf a rdf:Property;
+	rdfs:comment "Le sujet est une sous-propri\u00E9t\u00E9 d'une propri\u00E9t\u00E9."@fr;
+	rdfs:label "sousPropri\u00E9t\u00E9De"@fr.
+
+

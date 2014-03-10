@@ -106,6 +106,10 @@ public class Main {
                 System.out.printf("Starting generation%n");
                 Path outFile = Paths.get(output);
                 builder.generate(outFile);
+                if (cli.hasOption('b')) {
+                    System.out.printf("Generate ResourceBundles%n");
+                    builder.generateResourceBundle(outFile.getFileName().toString().replaceAll("\\.[^.]+$", ""), outFile.getParent());
+                }
                 System.out.printf("Generation finished, result available in '%s'%n", output);
             } else {
                 builder.generate(System.out);
@@ -142,9 +146,9 @@ public class Main {
             hf.printWrapped(w, 80, error);
             w.println();
         }
-        hf.printWrapped(w, 80, "usage: Main [options...] <input-file> [<output-file>]");
-        hf.printWrapped(w, 80, "  <input-file>                the input file to read from");
-        hf.printWrapped(w, 80, "  [<output-file>]             the output file to write, StdOut if omitted");
+        hf.printWrapped(w, 80, 12, "usage: Main [options...] <input-file> [<output-file>]");
+        hf.printWrapped(w, 80, 30, "  <input-file>                the input file to read from");
+        hf.printWrapped(w, 80, 30, "  [<output-file>]             the output file to write, StdOut if omitted");
         hf.printOptions(w, 80, getCliOpts(), 2, 2);
         w.flush();
         w.close();
@@ -187,18 +191,25 @@ public class Main {
                 .create('u'));
 
         o.addOption(OptionBuilder
-                .withArgName("spaces")
+                .withLongOpt("spaces")
+                .withDescription("use spaces for for indentation (tabs if missing, 4 spaces if no number given)")
                 .hasOptionalArgs(1)
                 .withArgName("indent")
-                .withDescription("use spaces for for indentation (tabs if missing, 4 spaces if no number given)")
                 .isRequired(false)
                 .create('s'));
+
+        o.addOption(OptionBuilder
+                .withLongOpt("languageBundles")
+                .withDescription("generate L14N LanguageBundles")
+                .hasArg(false)
+                .isRequired(false)
+                .create('b'));
 
         o.addOption(OptionBuilder
                 .withLongOpt("language")
                 .withDescription("preferred language for vocabulary labels")
                 .hasArgs(1)
-                .withArgName("preferred-language")
+                .withArgName("prefLang")
                 .isRequired(false)
                 .create('l'));
 

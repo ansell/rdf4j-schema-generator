@@ -38,6 +38,7 @@ public class Vocabulary {
     private String mimeType;
 
     private String preferredLanguage;
+    private Boolean createResourceBundles;
     
     public URL getUrl() {
         return url;
@@ -111,4 +112,15 @@ public class Vocabulary {
         return v;
     }
 
+    public boolean isCreateResourceBundles() {
+        return createResourceBundles;
+    }
+
+    public boolean isCreateResourceBundlesSet() {
+        return createResourceBundles != null;
+    }
+
+    public void setCreateResourceBundles(boolean createResourceBundles) {
+        this.createResourceBundles = createResourceBundles;
+    }
 }

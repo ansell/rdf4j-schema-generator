@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -15,6 +14,7 @@ import org.apache.http.client.utils.DateUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -36,7 +36,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.*;
 
@@ -50,8 +49,17 @@ import java.util.*;
         requiresProject = true)
 public class VocabularyBuilderMojo extends AbstractMojo {
 
-    @Parameter(property = "output", defaultValue = "${project.build.directory}/generated-sources/sesame-vocabs")
+    @Parameter(property = "output", defaultValue = "${project.build.directory}/generated-sources/sesame-vocabs",
+            readonly = true)
     private File outputDirectory;
+
+    @Parameter(property = "bundleOutput", defaultValue = "${project.build.directory}/generated-resources/sesame-vocabs",
+            readonly = true)
+    private File bundleOutputDirectory;
+
+    @Parameter(property = "remoteCacheDir", defaultValue = "${project.build.directory}/vocab-builder-maven-plugin.cache",
+            readonly = true)
+    private File remoteCacheDir;
 
     @Parameter
     private List<Vocabulary> vocabularies;
@@ -74,6 +82,9 @@ public class VocabularyBuilderMojo extends AbstractMojo {
     @Parameter(property = "preferredLanguage")
     private String preferredLanguage;
 
+    @Parameter(property = "createResourceBundles", defaultValue = "false")
+    private boolean createResourceBundles;
+
     @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
 
@@ -91,6 +102,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
         StaticLoggerBinder.getSingleton().setLog(getLog());
         try {
             final Path output = outputDirectory.toPath();
+            final Path bundleOutput = bundleOutputDirectory.toPath();
 
             if (vocabularies == null) {
                 vocabularies = new ArrayList<>();
@@ -104,6 +116,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
 
 
             Files.createDirectories(output);
+            Files.createDirectories(bundleOutput);
 
 
             final Log log = getLog();
@@ -168,6 +181,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                             log.debug(String.format("Skipping %s, vocabulary is did not change", displayName));
                             continue;
                         }
+                        log.info(String.format("Generating %s vocabulary", displayName));
                         buildContext.removeMessages(vocab.getFile());
 
                         builder = new VocabBuilder(vocab.getFile().getAbsolutePath(), mime);
@@ -177,11 +191,17 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                         throw new MojoExecutionException(msg);
                     }
 
+                    log.debug(String.format("    Setting default preferred language: %s", language));
                     builder.setPreferredLanguage(language);
 
-                    builder.setPackageName(packageName);
-                    if (vocab.getMimeType() != null) {
+                    if (vocab.getPackageName() != null) {
+                        log.debug(String.format("    Setting package: %s", vocab.getPackageName()));
                         builder.setPackageName(vocab.getPackageName());
+                    } else if (packageName != null) {
+                        log.debug(String.format("    Setting default package: %s", packageName));
+                        builder.setPackageName(packageName);
+                    } else {
+                        log.warn(String.format("%s is using discouraged default package", displayName));
                     }
 
                     builder.setName(vocab.getName());
@@ -202,14 +222,43 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     }
 
                     final Path vFile = target.resolve(fName);
+                    final String className = vFile.getFileName().toString().replaceFirst("\\.java$", "");
                     try(final PrintWriter out = new PrintWriter(
                             new BufferedWriter(
                                     new OutputStreamWriter(
                                             buildContext.newFileOutputStream(vFile.toFile()), StandardCharsets.UTF_8))))
                     {
-                        builder.generate(vFile.getFileName().toString().replaceFirst("\\.java$", ""), out);
+                        if (builder.getPackageName() != null) {
+                            log.info(String.format("    Generating vocabulary class: %s.%s", builder.getPackageName(), className));
+                        } else {
+                            log.info(String.format("    Generating vocabulary class: %s", className));
+                        }
+                        builder.generate(className, out);
                     }
-                    log.info(String.format("Generated %s: %s", displayName, vFile));
+                    if (vocab.isCreateResourceBundlesSet() && vocab.isCreateResourceBundles() || createResourceBundles) {
+                        Path bundleTarget = bundleOutput;
+                        if (builder.getPackageName() != null) {
+                            bundleTarget = bundleTarget.resolve(builder.getPackageName().replaceAll("\\.", "/"));
+                            Files.createDirectories(bundleTarget);
+                        }
+                        final HashMap<String, Properties> bundles = builder.generateResourceBundle(className);
+                        for (String bKey: bundles.keySet()) {
+                            try(final Writer out = new OutputStreamWriter(
+                                    buildContext.newFileOutputStream(bundleTarget.resolve(bKey + ".properties").toFile()), StandardCharsets.UTF_8))
+                            {
+                                log.info(String.format("    Generating ResourceBundle: %s", bKey));
+                                bundles.get(bKey).store(out, String.format("Generated by %s:%s v%s (%s)",
+                                        pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId(), pluginDescriptor.getVersion(), pluginDescriptor.getName()));
+                            }
+                        }
+
+                        Resource rsc = new Resource();
+                        rsc.setDirectory(bundleOutput.toAbsolutePath().toString());
+                        rsc.setFiltering(false);
+                        log.debug(String.format("Adding %s as additional resource folder", rsc));
+                        project.addResource(rsc);
+                    }
+                    log.info(String.format("Generated %s", displayName));
 
                 } catch (RDFParseException e) {
                     throw new MojoFailureException(String.format("Could not parse vocabulary %s: %s", displayName, e.getMessage()));
@@ -224,6 +273,8 @@ public class VocabularyBuilderMojo extends AbstractMojo {
             if (project != null) {
                 log.debug(String.format("Adding %s as additional compile source", output.toString()));
                 project.addCompileSourceRoot(output.toString());
+
+
             }
             log.info("Vocabulary generation complete");
         } catch (IOException e) {
@@ -239,7 +290,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                                 project.getGroupId(), project.getArtifactId(), project.getVersion(), project.getName())
                 );
 
-        final Path cache = Paths.get(project.getBuild().getDirectory(), pluginDescriptor.getArtifactId() + ".cache");
+        final Path cache = remoteCacheDir.toPath();
         Files.createDirectories(cache);
 
         try(CloseableHttpClient client = clientBuilder.build()) {
@@ -250,7 +301,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
 
             return client.execute(request, new ResponseHandler<File>() {
                 @Override
-                public File handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+                public File handleResponse(HttpResponse response) throws IOException {
                     final Log log = getLog();
                     // Check the mime-type
                     String mime = mimeType;

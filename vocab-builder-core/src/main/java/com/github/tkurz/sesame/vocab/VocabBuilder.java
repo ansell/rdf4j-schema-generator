@@ -136,8 +136,8 @@ public class VocabBuilder {
         out.println();
 
         final URI pfx = new URIImpl(prefix);
-        Literal oTitle = getFirstExistingObjectLiteral(model, pfx, getPreferredLanguage(), RDFS.LABEL, DCTERMS.TITLE, DC.TITLE, SKOS.PREF_LABEL, SKOS.ALT_LABEL);
-        Literal oDescr = getFirstExistingObjectLiteral(model, pfx, getPreferredLanguage(), RDFS.COMMENT, DCTERMS.DESCRIPTION, DC.DESCRIPTION, SKOS.DEFINITION);
+        Literal oTitle = getFirstExistingObjectLiteral(model, pfx, getPreferredLanguage(), LABEL_PROPERTIES);
+        Literal oDescr = getFirstExistingObjectLiteral(model, pfx, getPreferredLanguage(), COMMENT_PROPERTIES);
         Set<Value> oSeeAlso = model.filter(pfx, RDFS.SEEALSO, null).objects();
 
         //class JavaDoc
@@ -220,7 +220,7 @@ public class VocabBuilder {
         out.flush();
     }
 
-    public void generateResourceBundle(String baseName, Path bundleDir) throws GenerationException {
+    public void generateResourceBundle(String baseName, Path bundleDir) throws GenerationException, IOException {
         HashMap<String, Properties> bundles = generateResourceBundle(baseName);
 
         for (String bKey : bundles.keySet()) {
@@ -234,6 +234,7 @@ public class VocabBuilder {
                         MavenUtil.loadVersion("com.github.tkurz.sesame", "vocab-builder", "0.0.0-DEVELOP")));
             } catch (IOException e) {
                 log.error("Could not write Bundle {} to {}: {}", bKey, file, e);
+                throw e;
             }
         }
 

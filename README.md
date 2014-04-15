@@ -36,7 +36,7 @@ out of RDF ontology files.
 
 ## Maven Plugin
 
-```
+```xml
 <build>
     <plugins>
         <plugin>

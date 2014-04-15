@@ -20,6 +20,8 @@ package com.github.tkurz.sesame.vocab.plugin;
 import java.io.File;
 import java.net.URL;
 
+import com.google.common.base.CaseFormat;
+
 /**
  * Configuration for a Vocabulary to be generated.
  *
@@ -39,6 +41,7 @@ public class Vocabulary {
 
     private String preferredLanguage;
     private Boolean createResourceBundles;
+	private CaseFormat caseFormat;
     
     public URL getUrl() {
         return url;
@@ -96,6 +99,14 @@ public class Vocabulary {
     	return preferredLanguage;
     }
 
+    public void setConstantCase(CaseFormat caseFormat) {
+    	this.caseFormat = caseFormat;
+    }
+    
+    public CaseFormat getConstantCase() {
+    	return caseFormat;
+    }
+    
     public static Vocabulary create(URL url, String name, String className) {
         Vocabulary v = new Vocabulary();
         v.url = url;

@@ -10,4 +10,4 @@ if [ ! -d "vocab-builder-cli/target/appassembler/bin" ]; then
 fi
 
 chmod u+x vocab-builder-cli/target/appassembler/bin/*
-vocab-builder-cli/target/appassembler/bin/vocab-builder "$@"
+vocab-builder-cli/target/appassembler/bin/sesame-vocab-builder "$@"

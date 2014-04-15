@@ -43,6 +43,7 @@ import java.util.*;
 
 /**
  * Maven Plugin to generate Sesame Vocabulary Classes.
+ *
  * @author Jakob Frank (jakob@apache.org)
  */
 @Mojo(name = "generate",
@@ -89,7 +90,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
 
     @Parameter(property = "constantCase")
     private CaseFormat constantCase;
-    
+
     @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
 
@@ -128,34 +129,34 @@ public class VocabularyBuilderMojo extends AbstractMojo {
             log.info(String.format("Generating %d vocabularies", vocabularies.size()));
 
             for (Vocabulary vocab : vocabularies) {
-                final String displayName = vocab.getName() != null?vocab.getName():vocab.getClassName();
+                final String displayName = vocab.getName() != null ? vocab.getName() : vocab.getClassName();
                 if (displayName == null) {
                     log.error("Incomplete Configuration: Vocabulary without className or name");
                     throw new MojoExecutionException("Incomplete Configuration: Vocabulary without className or name");
                 }
                 try {
                     String language = preferredLanguage;
-                    if(vocab.getPreferredLanguage() != null) {
+                    if (vocab.getPreferredLanguage() != null) {
                         language = vocab.getPreferredLanguage();
                     }
 
                     String mime = vocab.getMimeType();
 
-                    if(mime == null) {
-                        if(vocab.getUrl() != null) {
+                    if (mime == null) {
+                        if (vocab.getUrl() != null) {
                             RDFFormat guess = Rio.getParserFormatForFileName(vocab.getUrl().toString());
-                            if(guess != null) {
+                            if (guess != null) {
                                 mime = guess.getDefaultMIMEType();
                             }
-                        } else if(vocab.getFile() != null) {
+                        } else if (vocab.getFile() != null) {
                             RDFFormat guess = Rio.getParserFormatForFileName(vocab.getFile().toString());
-                            if(guess != null) {
+                            if (guess != null) {
                                 mime = guess.getDefaultMIMEType();
                             }
                         }
                     }
 
-                    if(mime == null) {
+                    if (mime == null) {
                         mime = mimeType;
                     }
 
@@ -208,15 +209,15 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     } else {
                         log.warn(String.format("%s is using discouraged default package", displayName));
                     }
-                    
+
                     if (vocab.getConstantCase() != null) {
                         log.debug(String.format("    Setting constant case: %s", vocab.getConstantCase()));
-                    	builder.setConstantCase(vocab.getConstantCase());
+                        builder.setConstantCase(vocab.getConstantCase());
                     } else {
                         log.debug(String.format("    Setting default constant case: %s", constantCase));
-                    	builder.setConstantCase(constantCase);
+                        builder.setConstantCase(constantCase);
                     }
-                    
+
                     builder.setName(vocab.getName());
 
                     String fName;
@@ -236,11 +237,12 @@ public class VocabularyBuilderMojo extends AbstractMojo {
 
                     final Path vFile = target.resolve(fName);
                     final String className = vFile.getFileName().toString().replaceFirst("\\.java$", "");
-                    try(final PrintWriter out = new PrintWriter(
+                    try (final PrintWriter out = new PrintWriter(
                             new BufferedWriter(
                                     new OutputStreamWriter(
-                                            buildContext.newFileOutputStream(vFile.toFile()), StandardCharsets.UTF_8))))
-                    {
+                                            buildContext.newFileOutputStream(vFile.toFile()), StandardCharsets.UTF_8)
+                            )
+                    )) {
                         if (builder.getPackageName() != null) {
                             log.info(String.format("    Generating vocabulary class: %s.%s", builder.getPackageName(), className));
                         } else {
@@ -255,10 +257,9 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                             Files.createDirectories(bundleTarget);
                         }
                         final HashMap<String, Properties> bundles = builder.generateResourceBundle(className);
-                        for (String bKey: bundles.keySet()) {
-                            try(final Writer out = new OutputStreamWriter(
-                                    buildContext.newFileOutputStream(bundleTarget.resolve(bKey + ".properties").toFile()), StandardCharsets.UTF_8))
-                            {
+                        for (String bKey : bundles.keySet()) {
+                            try (final Writer out = new OutputStreamWriter(
+                                    buildContext.newFileOutputStream(bundleTarget.resolve(bKey + ".properties").toFile()), StandardCharsets.UTF_8)) {
                                 log.info(String.format("    Generating ResourceBundle: %s", bKey));
                                 bundles.get(bKey).store(out, String.format("Generated by %s:%s v%s (%s)",
                                         pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId(), pluginDescriptor.getVersion(), pluginDescriptor.getName()));
@@ -304,7 +305,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
         final Path cache = remoteCacheDir.toPath();
         Files.createDirectories(cache);
 
-        try(CloseableHttpClient client = clientBuilder.build()) {
+        try (CloseableHttpClient client = clientBuilder.build()) {
             final HttpUriRequest request = RequestBuilder.get()
                     .setUri(url.toURI())
                     .setHeader(HttpHeaders.ACCEPT, getAcceptHeaderValue())
@@ -341,7 +342,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                         final FileTime fileTime = Files.getLastModifiedTime(cache);
                         final Date remoteDate = DateUtils.parseDate(getHeaderValue(response, HttpHeaders.LAST_MODIFIED));
 
-                        if (remoteDate != null && remoteDate.getTime()<fileTime.toMillis()) {
+                        if (remoteDate != null && remoteDate.getTime() < fileTime.toMillis()) {
                             // The remote file was changed before the cache, so no action required
                             log.debug(String.format("%tF %<tT is after %tF %<tT, no action required", new Date(fileTime.toMillis()), remoteDate));
                             return null;

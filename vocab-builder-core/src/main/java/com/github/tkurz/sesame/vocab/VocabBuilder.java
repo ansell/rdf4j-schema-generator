@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 /**
  * ...
  * <p/>
+ *
  * @author Thomas Kurz (tkurz@apache.org)
  * @author Jakob Frank (jakob@apache.org)
  */
@@ -47,41 +48,42 @@ public class VocabBuilder {
     private String indent = "\t";
     private String language = null;
     private final Model model;
-	private CaseFormat caseFormat;
+    private CaseFormat caseFormat;
 
     /**
      * Create a new VocabularyBuilder, reading the vocab definition from the provided file
+     *
      * @param filename the input file to read the vocab from
-     * @param format the format of the vocab file, may be {@code null}
+     * @param format   the format of the vocab file, may be {@code null}
      * @throws java.io.IOException if the file could not be read
-     * @throws RDFParseException if the format of the vocab could not be detected or is unknown.
+     * @throws RDFParseException   if the format of the vocab could not be detected or is unknown.
      */
     public VocabBuilder(String filename, String format) throws IOException, RDFParseException {
-        this(filename, format!=null?Rio.getParserFormatForMIMEType(format):null);
+        this(filename, format != null ? Rio.getParserFormatForMIMEType(format) : null);
     }
 
     public VocabBuilder(String filename, RDFFormat format) throws IOException, RDFParseException {
         Path file = Paths.get(filename);
-        if(!Files.exists(file)) throw new FileNotFoundException(filename);
+        if (!Files.exists(file)) throw new FileNotFoundException(filename);
 
         if (format == null) {
             format = Rio.getParserFormatForFileName(filename);
             log.trace("detected input format from filename {}: {}", filename, format);
         }
 
-        try(final InputStream inputStream = Files.newInputStream(file)) {
+        try (final InputStream inputStream = Files.newInputStream(file)) {
             log.trace("Loading input file");
             model = Rio.parse(inputStream, "", format);
         }
 
         //import
         Set<Resource> owlOntologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
-        if(!owlOntologies.isEmpty()) {
+        if (!owlOntologies.isEmpty()) {
             setPrefix(owlOntologies.iterator().next().stringValue());
         }
 
         setName(file.getFileName().toString());
-        if(getName().contains(".")) setName(getName().substring(0,getName().lastIndexOf(".")));
+        if (getName().contains(".")) setName(getName().substring(0, getName().lastIndexOf(".")));
         setName(StringUtils.capitalize(getName()));
         log.trace("name: {}", getName());
     }
@@ -117,17 +119,17 @@ public class VocabBuilder {
             log.debug("prefix: {}", prefix);
         }
 
-        Pattern pattern = Pattern.compile(Pattern.quote(getPrefix())+"(.+)");
-        ConcurrentMap<String,URI> splitUris = new ConcurrentHashMap<>();
-        for(Resource nextSubject : model.subjects()) {
-            if(nextSubject instanceof URI) {
+        Pattern pattern = Pattern.compile(Pattern.quote(getPrefix()) + "(.+)");
+        ConcurrentMap<String, URI> splitUris = new ConcurrentHashMap<>();
+        for (Resource nextSubject : model.subjects()) {
+            if (nextSubject instanceof URI) {
                 Matcher matcher = pattern.matcher(nextSubject.stringValue());
-                if(matcher.find()) {
+                if (matcher.find()) {
                     String k = cleanKey(matcher.group(1));
-                    URI putIfAbsent = splitUris.putIfAbsent(k, (URI)nextSubject);
-                    if(putIfAbsent != null) {
-                    	log.warn("Conflicting keys found: uri={} cleanKey={} existing={}", 
-                    			nextSubject.stringValue(), k, putIfAbsent);
+                    URI putIfAbsent = splitUris.putIfAbsent(k, (URI) nextSubject);
+                    if (putIfAbsent != null) {
+                        log.warn("Conflicting keys found: uri={} cleanKey={} existing={}",
+                                nextSubject.stringValue(), k, putIfAbsent);
                     }
                 }
             }
@@ -137,7 +139,7 @@ public class VocabBuilder {
 
         //package is optional
         if (StringUtils.isNotBlank(packageName)) {
-            out.printf("package %s;%n%n",getPackageName());
+            out.printf("package %s;%n%n", getPackageName());
         }
         //imports
         out.println("import org.openrdf.model.URI;");
@@ -164,7 +166,7 @@ public class VocabBuilder {
         out.printf(" * Prefix: {@code <%s>}%n", prefix);
         if (!oSeeAlso.isEmpty()) {
             out.println(" *");
-            for(Value s: oSeeAlso) {
+            for (Value s : oSeeAlso) {
                 if (s instanceof URI) {
                     out.printf(" * @see <a href=\"%s\">%s</a>%n", s.stringValue(), s.stringValue());
                 }
@@ -177,10 +179,10 @@ public class VocabBuilder {
 
         //constants
         out.printf(getIndent(1) + "/** {@code %s} **/%n", prefix);
-        out.printf(getIndent(1) + "public static final String NAMESPACE = \"%s\";%n",prefix);
+        out.printf(getIndent(1) + "public static final String NAMESPACE = \"%s\";%n", prefix);
         out.println();
         out.printf(getIndent(1) + "/** {@code %s} **/%n", name.toLowerCase());
-        out.printf(getIndent(1) + "public static final String PREFIX = \"%s\";%n",name.toLowerCase());
+        out.printf(getIndent(1) + "public static final String PREFIX = \"%s\";%n", name.toLowerCase());
         out.println();
 
         //and now the resources
@@ -188,7 +190,7 @@ public class VocabBuilder {
         keys.addAll(splitUris.keySet());
         Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
 
-        for(String key : keys) {
+        for (String key : keys) {
             Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
             Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
 
@@ -205,9 +207,9 @@ public class VocabBuilder {
             out.println(getIndent(1) + " *");
             out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
             out.println(getIndent(1) + " */");
-            
+
             String nextKey = doCaseFormatting(key);
-        	out.printf(getIndent(1) + "public static final URI %s;%n", nextKey);
+            out.printf(getIndent(1) + "public static final URI %s;%n", nextKey);
             out.println();
         }
 
@@ -215,9 +217,9 @@ public class VocabBuilder {
         out.println(getIndent(1) + "static {");
         out.printf(getIndent(2) + "ValueFactory factory = ValueFactoryImpl.getInstance();%n");
         out.println();
-        for(String key : keys) {
+        for (String key : keys) {
             String nextKey = doCaseFormatting(key);
-            out.printf(getIndent(2) + "%s = factory.createURI(%s, \"%s\");%n",nextKey,className+".NAMESPACE",key);
+            out.printf(getIndent(2) + "%s = factory.createURI(%s, \"%s\");%n", nextKey, className + ".NAMESPACE", key);
         }
         out.println(getIndent(1) + "}");
         out.println();
@@ -233,7 +235,7 @@ public class VocabBuilder {
         out.flush();
     }
 
-	public void generateResourceBundle(String baseName, Path bundleDir) throws GenerationException, IOException {
+    public void generateResourceBundle(String baseName, Path bundleDir) throws GenerationException, IOException {
         HashMap<String, Properties> bundles = generateResourceBundle(baseName);
 
         for (String bKey : bundles.keySet()) {
@@ -254,14 +256,14 @@ public class VocabBuilder {
     }
 
     public HashMap<String, Properties> generateResourceBundle(String baseName) throws GenerationException {
-        Pattern pattern = Pattern.compile(Pattern.quote(getPrefix())+"(.+)");
-        HashMap<String,URI> splitUris = new HashMap<>();
-        for(Resource nextSubject : model.subjects()) {
-            if(nextSubject instanceof URI) {
+        Pattern pattern = Pattern.compile(Pattern.quote(getPrefix()) + "(.+)");
+        HashMap<String, URI> splitUris = new HashMap<>();
+        for (Resource nextSubject : model.subjects()) {
+            if (nextSubject instanceof URI) {
                 Matcher matcher = pattern.matcher(nextSubject.stringValue());
-                if(matcher.find()) {
+                if (matcher.find()) {
                     String k = cleanKey(matcher.group(1));
-                    splitUris.put(k, (URI)nextSubject);
+                    splitUris.put(k, (URI) nextSubject);
                 }
             }
         }
@@ -273,23 +275,23 @@ public class VocabBuilder {
         HashMap<String, Properties> bundles = new HashMap<>();
         // Default we have for sure
         bundles.put(baseName, new Properties());
-        for(String key : keys) {
+        for (String key : keys) {
             final URI resource = splitUris.get(key);
             String nextKey = doCaseFormatting(key);
 
-            for(URI p: LABEL_PROPERTIES) {
-                for (Value v: GraphUtil.getObjects(model, resource, p)) {
+            for (URI p : LABEL_PROPERTIES) {
+                for (Value v : GraphUtil.getObjects(model, resource, p)) {
                     if (v instanceof Literal) {
                         final Literal lit = (Literal) v;
                         final String lang = lit.getLanguage();
                         final Properties bundle;
                         if (lang == null) {
                             bundle = bundles.get(baseName);
-                        } else if (bundles.containsKey(baseName+"_"+lang)) {
-                            bundle = bundles.get(baseName+"_"+lang);
+                        } else if (bundles.containsKey(baseName + "_" + lang)) {
+                            bundle = bundles.get(baseName + "_" + lang);
                         } else {
                             bundle = new Properties();
-                            bundles.put(baseName+"_"+lang, bundle);
+                            bundles.put(baseName + "_" + lang, bundle);
                         }
 
                         if (!bundle.containsKey(nextKey + ".label")) {
@@ -299,19 +301,19 @@ public class VocabBuilder {
                 }
             }
 
-            for(URI p: COMMENT_PROPERTIES) {
-                for (Value v: GraphUtil.getObjects(model, resource, p)) {
+            for (URI p : COMMENT_PROPERTIES) {
+                for (Value v : GraphUtil.getObjects(model, resource, p)) {
                     if (v instanceof Literal) {
                         final Literal lit = (Literal) v;
                         final String lang = lit.getLanguage();
                         final Properties bundle;
                         if (lang == null) {
                             bundle = bundles.get(baseName);
-                        } else if (bundles.containsKey(baseName+"_"+lang)) {
-                            bundle = bundles.get(baseName+"_"+lang);
+                        } else if (bundles.containsKey(baseName + "_" + lang)) {
+                            bundle = bundles.get(baseName + "_" + lang);
                         } else {
                             bundle = new Properties();
-                            bundles.put(baseName+"_"+lang, bundle);
+                            bundles.put(baseName + "_" + lang, bundle);
                         }
 
                         if (!bundle.containsKey(nextKey + ".comment")) {
@@ -327,7 +329,7 @@ public class VocabBuilder {
             final Properties defaultBundle = bundles.get(baseName);
             final Properties prefBundle = bundles.get(baseName + "_" + getPreferredLanguage());
             if (prefBundle != null) {
-                for (String key: prefBundle.stringPropertyNames()) {
+                for (String key : prefBundle.stringPropertyNames()) {
                     String nextKey = doCaseFormatting(key);
                     if (!defaultBundle.containsKey(nextKey)) {
                         log.trace("copying {} from {} to default Bundle", nextKey, getPreferredLanguage());
@@ -346,7 +348,7 @@ public class VocabBuilder {
     }
 
     private Literal getFirstExistingObjectLiteral(Model model, Resource subject, String lang, URI... predicates) throws GraphUtilException {
-        for (URI predicate: predicates) {
+        for (URI predicate : predicates) {
             Literal literal = getOptionalObjectLiteral(model, subject, predicate, lang);
             if (literal != null) {
                 return literal;
@@ -361,10 +363,10 @@ public class VocabBuilder {
 
         Literal result = null;
 
-        for(Value nextValue : objects) {
-            if(nextValue instanceof Literal) {
+        for (Value nextValue : objects) {
+            if (nextValue instanceof Literal) {
                 final Literal literal = (Literal) nextValue;
-                if(result == null || (lang != null && lang.equals(literal.getLanguage()))) {
+                if (result == null || (lang != null && lang.equals(literal.getLanguage()))) {
                     result = literal;
                 }
             }
@@ -373,27 +375,27 @@ public class VocabBuilder {
     }
 
     private String cleanKey(String s) {
-        s = s.replaceAll("#","");
-        s = s.replaceAll("\\.","_");
-        s = s.replaceAll("-","_");
+        s = s.replaceAll("#", "");
+        s = s.replaceAll("\\.", "_");
+        s = s.replaceAll("-", "_");
         return s;
     }
 
     private String doCaseFormatting(String key) {
-        if(caseFormat == null) {
-        	return key;
+        if (caseFormat == null) {
+            return key;
         } else {
             CaseFormat originalFormat = CaseFormat.LOWER_CAMEL;
-            if(Character.isUpperCase(key.charAt(0))) {
-            	originalFormat = CaseFormat.UPPER_CAMEL;
-            } else if(key.contains("_")) {
-            	originalFormat = CaseFormat.LOWER_UNDERSCORE;
-            } else if(key.contains("-")) {
-            	originalFormat = CaseFormat.LOWER_HYPHEN;
+            if (Character.isUpperCase(key.charAt(0))) {
+                originalFormat = CaseFormat.UPPER_CAMEL;
+            } else if (key.contains("_")) {
+                originalFormat = CaseFormat.LOWER_UNDERSCORE;
+            } else if (key.contains("-")) {
+                originalFormat = CaseFormat.LOWER_HYPHEN;
             }
-        	return originalFormat.to(caseFormat, key);
-        } 
-	}
+            return originalFormat.to(caseFormat, key);
+        }
+    }
 
     public String getName() {
         return name;
@@ -434,12 +436,12 @@ public class VocabBuilder {
     public String getPreferredLanguage() {
         return language;
     }
-    
+
     public void setConstantCase(CaseFormat caseFormat) {
-    	this.caseFormat = caseFormat;
+        this.caseFormat = caseFormat;
     }
-    
+
     public CaseFormat getConstantCase() {
-    	return caseFormat;
+        return caseFormat;
     }
 }

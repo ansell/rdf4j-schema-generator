@@ -32,12 +32,13 @@ import java.util.Set;
 /**
  * ...
  * <p/>
- * @author  Thomas Kurz (tkurz@apache.org)
- * @author  Jakob Frank (jakob@apache.org)
+ *
+ * @author Thomas Kurz (tkurz@apache.org)
+ * @author Jakob Frank (jakob@apache.org)
  */
 public class Main {
 
-    public static void main(String [] args) {
+    public static void main(String[] args) {
         try {
             CommandLineParser parser = new PosixParser();
             CommandLine cli = parser.parse(getCliOpts(), args);
@@ -70,13 +71,13 @@ public class Main {
             Path tempFile = null;
             final VocabBuilder builder;
             if (input.startsWith("http://")) {
-                tempFile = Files.createTempFile("vocab-builder", "."+(format!=null?format.getDefaultFileExtension():"cache"));
+                tempFile = Files.createTempFile("vocab-builder", "." + (format != null ? format.getDefaultFileExtension() : "cache"));
                 URL url = new URL(input);
 
                 try {
                     fetchVocab(url, tempFile);
                 } catch (URISyntaxException e) {
-                    throw new ParseException("Invalid input URL: " +e.getMessage());
+                    throw new ParseException("Invalid input URL: " + e.getMessage());
                 }
 
                 builder = new VocabBuilder(tempFile.toString(), format);
@@ -96,15 +97,15 @@ public class Main {
                 builder.setPreferredLanguage(cli.getOptionValue('l'));
             }
             if (cli.hasOption('c')) {
-            	try {
-	            	CaseFormat caseFormat = CaseFormat.valueOf(cli.getOptionValue('c'));
-	            	if(caseFormat == null) {
-	            		throw new ParseException("Did not recognise constantCase: Must be one of "+ Arrays.asList(CaseFormat.values()));
-	            	}
-	            	builder.setConstantCase(caseFormat);
-            	} catch (IllegalArgumentException e) {
-            		throw new ParseException("Did not recognise constantCase: Must be one of "+ Arrays.asList(CaseFormat.values()));
-            	}
+                try {
+                    CaseFormat caseFormat = CaseFormat.valueOf(cli.getOptionValue('c'));
+                    if (caseFormat == null) {
+                        throw new ParseException("Did not recognise constantCase: Must be one of " + Arrays.asList(CaseFormat.values()));
+                    }
+                    builder.setConstantCase(caseFormat);
+                } catch (IllegalArgumentException e) {
+                    throw new ParseException("Did not recognise constantCase: Must be one of " + Arrays.asList(CaseFormat.values()));
+                }
             }
             if (cli.hasOption('s')) {
                 try {
@@ -256,7 +257,7 @@ public class Main {
                                 buildProperties.getProperty("name", "unknown"))
                 );
 
-        try(CloseableHttpClient client = clientBuilder.build()) {
+        try (CloseableHttpClient client = clientBuilder.build()) {
             final HttpUriRequest request = RequestBuilder.get()
                     .setUri(url.toURI())
                     .setHeader(HttpHeaders.ACCEPT, getAcceptHeaderValue())

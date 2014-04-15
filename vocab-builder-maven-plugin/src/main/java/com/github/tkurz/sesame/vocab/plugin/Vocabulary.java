@@ -41,8 +41,8 @@ public class Vocabulary {
 
     private String preferredLanguage;
     private Boolean createResourceBundles;
-	private CaseFormat caseFormat;
-    
+    private CaseFormat caseFormat;
+
     public URL getUrl() {
         return url;
     }
@@ -92,21 +92,21 @@ public class Vocabulary {
     }
 
     public void setPreferredLanguage(String language) {
-    	this.preferredLanguage = language;
+        this.preferredLanguage = language;
     }
-    
+
     public String getPreferredLanguage() {
-    	return preferredLanguage;
+        return preferredLanguage;
     }
 
     public void setConstantCase(CaseFormat caseFormat) {
-    	this.caseFormat = caseFormat;
+        this.caseFormat = caseFormat;
     }
-    
+
     public CaseFormat getConstantCase() {
-    	return caseFormat;
+        return caseFormat;
     }
-    
+
     public static Vocabulary create(URL url, String name, String className) {
         Vocabulary v = new Vocabulary();
         v.url = url;

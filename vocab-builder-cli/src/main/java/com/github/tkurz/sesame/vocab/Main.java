@@ -13,6 +13,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.openrdf.model.util.GraphUtilException;
 import org.openrdf.rio.*;
 
+import com.google.common.base.CaseFormat;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,6 +24,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
@@ -91,6 +94,17 @@ public class Main {
             }
             if (cli.hasOption('l')) {
                 builder.setPreferredLanguage(cli.getOptionValue('l'));
+            }
+            if (cli.hasOption('c')) {
+            	try {
+	            	CaseFormat caseFormat = CaseFormat.valueOf(cli.getOptionValue('c'));
+	            	if(caseFormat == null) {
+	            		throw new ParseException("Did not recognise constantCase: Must be one of "+ Arrays.asList(CaseFormat.values()));
+	            	}
+	            	builder.setConstantCase(caseFormat);
+            	} catch (IllegalArgumentException e) {
+            		throw new ParseException("Did not recognise constantCase: Must be one of "+ Arrays.asList(CaseFormat.values()));
+            	}
             }
             if (cli.hasOption('s')) {
                 try {
@@ -192,7 +206,7 @@ public class Main {
 
         o.addOption(OptionBuilder
                 .withLongOpt("spaces")
-                .withDescription("use spaces for for indentation (tabs if missing, 4 spaces if no number given)")
+                .withDescription("use spaces for indentation (tabs if missing, 4 spaces if no number given)")
                 .hasOptionalArgs(1)
                 .withArgName("indent")
                 .isRequired(false)
@@ -214,8 +228,16 @@ public class Main {
                 .create('l'));
 
         o.addOption(OptionBuilder
+                .withLongOpt("constantCase")
+                .withDescription("case to use for URI constants")
+                .hasArgs(1)
+                .withArgName("prefConstantCase")
+                .isRequired(false)
+                .create('c'));
+
+        o.addOption(OptionBuilder
                 .withLongOpt("help")
-                .withDescription("pint this help")
+                .withDescription("print this help")
                 .isRequired(false)
                 .hasArg(false)
                 .create('h'));

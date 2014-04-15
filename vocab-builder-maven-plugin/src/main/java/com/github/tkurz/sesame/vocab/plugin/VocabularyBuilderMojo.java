@@ -2,6 +2,8 @@ package com.github.tkurz.sesame.vocab.plugin;
 
 import com.github.tkurz.sesame.vocab.GenerationException;
 import com.github.tkurz.sesame.vocab.VocabBuilder;
+import com.google.common.base.CaseFormat;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -85,6 +87,9 @@ public class VocabularyBuilderMojo extends AbstractMojo {
     @Parameter(property = "createResourceBundles", defaultValue = "false")
     private boolean createResourceBundles;
 
+    @Parameter(property = "constantCase")
+    private CaseFormat constantCase;
+    
     @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
 
@@ -203,7 +208,15 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     } else {
                         log.warn(String.format("%s is using discouraged default package", displayName));
                     }
-
+                    
+                    if (vocab.getConstantCase() != null) {
+                        log.debug(String.format("    Setting constant case: %s", vocab.getConstantCase()));
+                    	builder.setConstantCase(vocab.getConstantCase());
+                    } else {
+                        log.debug(String.format("    Setting default constant case: %s", constantCase));
+                    	builder.setConstantCase(constantCase);
+                    }
+                    
                     builder.setName(vocab.getName());
 
                     String fName;
@@ -273,8 +286,6 @@ public class VocabularyBuilderMojo extends AbstractMojo {
             if (project != null) {
                 log.debug(String.format("Adding %s as additional compile source", output.toString()));
                 project.addCompileSourceRoot(output.toString());
-
-
             }
             log.info("Vocabulary generation complete");
         } catch (IOException e) {

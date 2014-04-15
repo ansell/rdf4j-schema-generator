@@ -40,9 +40,9 @@ out of RDF ontology files.
 <build>
     <plugins>
         <plugin>
-            <groupId>com.github.tkurz</groupId>
-            <artifactId>sesame-vocabbuilder-maven-plugin</artifactId>
-            <version>1.1</version>
+            <groupId>com.github.tkurz.sesame</groupId>
+            <artifactId>vocab-builder-maven-plugin</artifactId>
+            <version>1.2-SNAPSHOT</version>
             <executions>
                 <execution>
                     <id>generate-vocabularies</id>
@@ -50,26 +50,33 @@ out of RDF ontology files.
                     <goals>
                         <goal>generate</goal>
                     </goals>
-                    <configuration>
-                        <output>${project.build.directory}/generated-sources/sesame-vocabs</output>
-                        <packageName>com.example.sesame.vocabularies</packageName>
-                        <mimeType>text/turtle</mimeType>
-                        <preferredLanguage>en</preferredLanguage>
-                        <createResourceBundles>true</createResourceBundles>
-                        <constantCase>UPPER_UNDERSCORE</constantCase>
-                        <vocabularies>
-                            <vocabulary>
-                                <className>LDP</className>
-                                <file>sesame-vocab-builder-core/src/test/resources/ldp.ttl</file>
-                            </vocabulary>
-                            <vocabulary>
-                                <className>RDF</className>
-                                <url>http://www.w3.org/1999/02/22-rdf-syntax-ns</url>
-                            </vocabulary>
-                        </vocabularies>
-                    </configuration>
+                </execution>
+                <execution>
+                    <id>generate-vocabulary-resource-bundles</id>
+                    <phase>generate-resources</phase>
+                    <goals>
+                        <goal>generate-bundles</goal>
+                    </goals>
                 </execution>
             </executions>
+            <configuration>
+                <output>${project.build.directory}/generated-sources/sesame-vocabs</output>
+                <packageName>com.example.sesame.vocabularies</packageName>
+                <mimeType>text/turtle</mimeType>
+                <preferredLanguage>en</preferredLanguage>
+                <createResourceBundles>true</createResourceBundles>
+                <constantCase>UPPER_UNDERSCORE</constantCase>
+                <vocabularies>
+                    <vocabulary>
+                        <className>LDP</className>
+                        <file>sesame-vocab-builder-core/src/test/resources/ldp.ttl</file>
+                    </vocabulary>
+                    <vocabulary>
+                        <className>RDF</className>
+                        <url>http://www.w3.org/1999/02/22-rdf-syntax-ns</url>
+                    </vocabulary>
+                </vocabularies>
+            </configuration>
         </plugin>
     </plugins>
 </build>

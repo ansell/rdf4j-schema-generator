@@ -238,10 +238,8 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     final Path vFile = target.resolve(fName);
                     final String className = vFile.getFileName().toString().replaceFirst("\\.java$", "");
                     try (final PrintWriter out = new PrintWriter(
-                            new BufferedWriter(
-                                    new OutputStreamWriter(
-                                            buildContext.newFileOutputStream(vFile.toFile()), StandardCharsets.UTF_8)
-                            )
+                            new OutputStreamWriter(
+                                    buildContext.newFileOutputStream(vFile.toFile()), StandardCharsets.UTF_8)
                     )) {
                         if (builder.getPackageName() != null) {
                             log.info(String.format("    Generating vocabulary class: %s.%s", builder.getPackageName(), className));

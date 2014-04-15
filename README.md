@@ -53,6 +53,7 @@ out of RDF ontology files.
                         <packageName>com.example.sesame.vocabularies</packageName>
                         <mimeType>text/turtle</mimeType>
                         <preferredLanguage>en</preferredLanguage>
+                        <createResourceBundles>true</createResourceBundles>
                         <constantCase>UPPER_UNDERSCORE</constantCase>
                         <vocabularies>
                             <vocabulary>

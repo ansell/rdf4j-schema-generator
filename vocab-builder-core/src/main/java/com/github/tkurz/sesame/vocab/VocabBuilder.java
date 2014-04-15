@@ -275,6 +275,7 @@ public class VocabBuilder {
         bundles.put(baseName, new Properties());
         for(String key : keys) {
             final URI resource = splitUris.get(key);
+            String nextKey = doCaseFormatting(key);
 
             for(URI p: LABEL_PROPERTIES) {
                 for (Value v: GraphUtil.getObjects(model, resource, p)) {
@@ -291,8 +292,8 @@ public class VocabBuilder {
                             bundles.put(baseName+"_"+lang, bundle);
                         }
 
-                        if (!bundle.containsKey(key + ".label")) {
-                            bundle.put(key + ".label", lit.getLabel().replaceAll("\\s+", " "));
+                        if (!bundle.containsKey(nextKey + ".label")) {
+                            bundle.put(nextKey + ".label", lit.getLabel().replaceAll("\\s+", " "));
                         }
                     }
                 }
@@ -313,8 +314,8 @@ public class VocabBuilder {
                             bundles.put(baseName+"_"+lang, bundle);
                         }
 
-                        if (!bundle.containsKey(key + ".comment")) {
-                            bundle.put(key + ".comment", lit.getLabel().replaceAll("\\s+", " "));
+                        if (!bundle.containsKey(nextKey + ".comment")) {
+                            bundle.put(nextKey + ".comment", lit.getLabel().replaceAll("\\s+", " "));
                         }
                     }
                 }
@@ -327,9 +328,10 @@ public class VocabBuilder {
             final Properties prefBundle = bundles.get(baseName + "_" + getPreferredLanguage());
             if (prefBundle != null) {
                 for (String key: prefBundle.stringPropertyNames()) {
-                    if (!defaultBundle.containsKey(key)) {
-                        log.trace("copying {} from {} to default Bundle", key, getPreferredLanguage());
-                        defaultBundle.setProperty(key, prefBundle.getProperty(key));
+                    String nextKey = doCaseFormatting(key);
+                    if (!defaultBundle.containsKey(nextKey)) {
+                        log.trace("copying {} from {} to default Bundle", nextKey, getPreferredLanguage());
+                        defaultBundle.setProperty(nextKey, prefBundle.getProperty(nextKey));
                     }
                 }
             } else {

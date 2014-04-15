@@ -4,6 +4,7 @@
 package com.github.tkurz.sesame.vocab.test;
 
 import com.github.tkurz.sesame.vocab.VocabBuilder;
+import com.google.common.base.CaseFormat;
 
 import org.junit.After;
 import org.junit.Before;
@@ -79,6 +80,8 @@ public class VocabBuilderTest {
 	private Literal testProperty4DescriptionFr;
 
 	private RDFFormat format;
+
+	private Path inputPath;
 	
 	public VocabBuilderTest(RDFFormat format) {
 		this.format = format;
@@ -95,24 +98,13 @@ public class VocabBuilderTest {
 		testProperty1 = vf.createURI(ns, "property1");
 		testProperty2 = vf.createURI(ns, "property2");
 		testProperty3 = vf.createURI(ns, "property3");
-		testProperty4 = vf.createURI(ns, "property4");
+		testProperty4 = vf.createURI(ns, "propertyLocalised4");
 		testProperty1Description = vf.createLiteral("property 1 description");
 		testProperty2Description = vf.createLiteral("property 2 description");
 		testProperty3Description = vf.createLiteral("property 3 description");
 		testProperty4DescriptionEn = vf.createLiteral("property 4 description english", "en");
 		testProperty4DescriptionFr = vf.createLiteral("Description de la propriété français", "fr");
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		testDir = null;
-	}
-
-	/**
-	 * Test method for {@link com.github.tkurz.sesame.vocab.VocabBuilder#generate(java.nio.file.Path)}.
-	 */
-	@Test
-	public final void testRun() throws Exception {
+		
 		Model testOntology = new LinkedHashModel();
 		testOntology.add(testOntologyUri, RDF.TYPE, OWL.ONTOLOGY);
 		testOntology.add(testProperty1, RDF.TYPE, OWL.DATATYPEPROPERTY);
@@ -125,10 +117,22 @@ public class VocabBuilderTest {
 		testOntology.add(testProperty4, SKOS.PREF_LABEL, testProperty4DescriptionEn);
 		testOntology.add(testProperty4, SKOS.PREF_LABEL, testProperty4DescriptionFr);
 		String fileName = "test."+ format.getDefaultFileExtension();
-		Path inputPath = testDir.resolve(fileName);
+		inputPath = testDir.resolve(fileName);
 		try(final OutputStream outputStream = Files.newOutputStream(inputPath)) {
 			Rio.write(testOntology, outputStream, format);
 		}
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		testDir = null;
+	}
+
+	/**
+	 * Test method for {@link com.github.tkurz.sesame.vocab.VocabBuilder#generate(java.nio.file.Path)}.
+	 */
+	@Test
+	public final void testRun() throws Exception {
 		Path outputPath = testDir.resolve("output");
 		Files.createDirectories(outputPath);
 		
@@ -145,6 +149,52 @@ public class VocabBuilderTest {
 		String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
 		assertTrue(result.contains(testProperty4DescriptionFr.getLabel()));
 		assertFalse(result.contains(testProperty4DescriptionEn.getLabel()));
+	}
+
+	/**
+	 * Test method for {@link com.github.tkurz.sesame.vocab.VocabBuilder#generate(java.nio.file.Path)}.
+	 */
+	@Test
+	public final void testUpperUnderscoreCase() throws Exception {
+		Path outputPath = testDir.resolve("output");
+		Files.createDirectories(outputPath);
+		
+		VocabBuilder testBuilder = new VocabBuilder(inputPath.toAbsolutePath().toString(), format);
+		
+		testBuilder.setConstantCase(CaseFormat.UPPER_UNDERSCORE);
+		
+		Path javaFilePath = outputPath.resolve("Test.java");
+		testBuilder.generate(javaFilePath);
+		assertTrue("Java file was not found", Files.exists(javaFilePath));
+		assertTrue("Java file was empty", Files.size(javaFilePath) > 0);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Files.copy(javaFilePath, out);
+		String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
+		assertTrue("Did not find expected key case", result.contains("PROPERTY_LOCALISED4 = "));
+		assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
+	}
+
+	/**
+	 * Test method for {@link com.github.tkurz.sesame.vocab.VocabBuilder#generate(java.nio.file.Path)}.
+	 */
+	@Test
+	public final void testNoExplicitCase() throws Exception {
+		Path outputPath = testDir.resolve("output");
+		Files.createDirectories(outputPath);
+		
+		VocabBuilder testBuilder = new VocabBuilder(inputPath.toAbsolutePath().toString(), format);
+		
+		testBuilder.setConstantCase(null);
+		
+		Path javaFilePath = outputPath.resolve("Test.java");
+		testBuilder.generate(javaFilePath);
+		assertTrue("Java file was not found", Files.exists(javaFilePath));
+		assertTrue("Java file was empty", Files.size(javaFilePath) > 0);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Files.copy(javaFilePath, out);
+		String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
+		assertTrue("Did not find expected key case", result.contains("propertyLocalised4 = "));
+		assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
 	}
 
 }

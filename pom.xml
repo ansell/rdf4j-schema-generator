@@ -223,7 +223,6 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>16.0.1</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

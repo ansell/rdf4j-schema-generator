@@ -214,7 +214,7 @@ public class Main {
 
         o.addOption(OptionBuilder
                 .withLongOpt("languageBundles")
-                .withDescription("generate L14N LanguageBundles")
+                .withDescription("generate L10N LanguageBundles")
                 .hasArg(false)
                 .isRequired(false)
                 .create('b'));

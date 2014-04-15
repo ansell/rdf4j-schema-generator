@@ -22,6 +22,8 @@ out of RDF ontology files.
   -u,--uri <prefix>           the prefix for the vocabulary (if not available in
                               the input file)
   -l,--language <language>    preferred language for vocabulary labels
+  -c,--constantCase           case to use for URI constants
+  -b,--languageBundles        generate L10N LanguageBundles
 ```
 
 ## Run from Git
@@ -51,6 +53,7 @@ out of RDF ontology files.
                         <packageName>com.example.sesame.vocabularies</packageName>
                         <mimeType>text/turtle</mimeType>
                         <preferredLanguage>en</preferredLanguage>
+                        <constantCase>UPPER_UNDERSCORE</constantCase>
                         <vocabularies>
                             <vocabulary>
                                 <className>LDP</className>

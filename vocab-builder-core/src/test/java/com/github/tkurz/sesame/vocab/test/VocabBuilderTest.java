@@ -96,8 +96,8 @@ public class VocabBuilderTest {
         String ns = "http://example.com/ns/ontology#";
         testOntologyUri = vf.createURI(ns);
         testProperty1 = vf.createURI(ns, "property1");
-        testProperty2 = vf.createURI(ns, "property2");
-        testProperty3 = vf.createURI(ns, "property3");
+        testProperty2 = vf.createURI(ns, "property_2");
+        testProperty3 = vf.createURI(ns, "property-3");
         testProperty4 = vf.createURI(ns, "propertyLocalised4");
         testProperty1Description = vf.createLiteral("property 1 description");
         testProperty2Description = vf.createLiteral("property 2 description");
@@ -149,6 +149,10 @@ public class VocabBuilderTest {
         String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
         assertTrue(result.contains(testProperty4DescriptionFr.getLabel()));
         assertFalse(result.contains(testProperty4DescriptionEn.getLabel()));
+        assertTrue(result.contains("\"property_2\""));
+        assertTrue(result.contains("\"property-3\""));
+        assertTrue(result.contains("property_2 = "));
+        assertTrue(result.contains("property_3 = "));
     }
 
     /**

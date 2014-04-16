@@ -125,10 +125,10 @@ public class VocabBuilder {
             if (nextSubject instanceof URI) {
                 Matcher matcher = pattern.matcher(nextSubject.stringValue());
                 if (matcher.find()) {
-                    String k = cleanKey(matcher.group(1));
+                    String k = matcher.group(1);
                     URI putIfAbsent = splitUris.putIfAbsent(k, (URI) nextSubject);
                     if (putIfAbsent != null) {
-                        log.warn("Conflicting keys found: uri={} cleanKey={} existing={}",
+                        log.warn("Conflicting keys found: uri={} key={} existing={}",
                                 nextSubject.stringValue(), k, putIfAbsent);
                     }
                 }
@@ -208,7 +208,7 @@ public class VocabBuilder {
             out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
             out.println(getIndent(1) + " */");
 
-            String nextKey = doCaseFormatting(key);
+            String nextKey = cleanKey(doCaseFormatting(key));
             out.printf(getIndent(1) + "public static final URI %s;%n", nextKey);
             out.println();
         }
@@ -218,7 +218,7 @@ public class VocabBuilder {
         out.printf(getIndent(2) + "ValueFactory factory = ValueFactoryImpl.getInstance();%n");
         out.println();
         for (String key : keys) {
-            String nextKey = doCaseFormatting(key);
+            String nextKey = cleanKey(doCaseFormatting(key));
             out.printf(getIndent(2) + "%s = factory.createURI(%s, \"%s\");%n", nextKey, className + ".NAMESPACE", key);
         }
         out.println(getIndent(1) + "}");
@@ -262,7 +262,7 @@ public class VocabBuilder {
             if (nextSubject instanceof URI) {
                 Matcher matcher = pattern.matcher(nextSubject.stringValue());
                 if (matcher.find()) {
-                    String k = cleanKey(matcher.group(1));
+                    String k = matcher.group(1);
                     splitUris.put(k, (URI) nextSubject);
                 }
             }
@@ -277,7 +277,7 @@ public class VocabBuilder {
         bundles.put(baseName, new Properties());
         for (String key : keys) {
             final URI resource = splitUris.get(key);
-            String nextKey = doCaseFormatting(key);
+            String nextKey = cleanKey(doCaseFormatting(key));
 
             for (URI p : LABEL_PROPERTIES) {
                 for (Value v : GraphUtil.getObjects(model, resource, p)) {
@@ -330,7 +330,7 @@ public class VocabBuilder {
             final Properties prefBundle = bundles.get(baseName + "_" + getPreferredLanguage());
             if (prefBundle != null) {
                 for (String key : prefBundle.stringPropertyNames()) {
-                    String nextKey = doCaseFormatting(key);
+                    String nextKey = cleanKey(doCaseFormatting(key));
                     if (!defaultBundle.containsKey(nextKey)) {
                         log.trace("copying {} from {} to default Bundle", nextKey, getPreferredLanguage());
                         defaultBundle.setProperty(nextKey, prefBundle.getProperty(nextKey));

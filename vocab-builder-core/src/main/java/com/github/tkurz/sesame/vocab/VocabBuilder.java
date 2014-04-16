@@ -81,11 +81,6 @@ public class VocabBuilder {
         if (!owlOntologies.isEmpty()) {
             setPrefix(owlOntologies.iterator().next().stringValue());
         }
-
-        setName(file.getFileName().toString());
-        if (getName().contains(".")) setName(getName().substring(0, getName().lastIndexOf(".")));
-        setName(StringUtils.capitalize(getName()));
-        log.trace("name: {}", getName());
     }
 
     public void generate(OutputStream outputStream) throws GenerationException, IOException, GraphUtilException {

@@ -6,7 +6,7 @@ out of RDF ontology files.
 ## How To
 
 1. Download the latest version [here](https://github.com/tkurz/sesame-vocab-builder/releases).
-2. Run jar from command line (Java 7 required): `java -jar vocab-builder-cli-1.1-exe.jar <input-file> <output-file>`
+2. Run jar from command line (Java 7 required): `java -jar vocab-builder-cli-{VERSION}-exe.jar <input-file> <output-file>`
 3. Additional information can be configured using command-line parameters
 
 ## Command Line Options
@@ -30,9 +30,9 @@ out of RDF ontology files.
 
 ## Run from Git
 
-1. Clone from https://github.com/tkurz/sesame-vocab-builder.git
-2. Run ./sesame-vocab-builder
-3. Put in the required information (mimetype, url-prefix, classname, package and directory).
+1. Clone from https://github.com/tkurz/sesame-vocab-builder.git and build it with maven
+2. Run `./sesame-vocab-builder  <input-file> <output-file>`
+3. Additional information can be configured using command-line parameters
 
 ## Maven Plugin
 
@@ -42,7 +42,7 @@ out of RDF ontology files.
         <plugin>
             <groupId>com.github.tkurz.sesame</groupId>
             <artifactId>vocab-builder-maven-plugin</artifactId>
-            <version>1.2-SNAPSHOT</version>
+            <version>1.2</version>
             <executions>
                 <execution>
                     <id>generate-vocabularies</id>

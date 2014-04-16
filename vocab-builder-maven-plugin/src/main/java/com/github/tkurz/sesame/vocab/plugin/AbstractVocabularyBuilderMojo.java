@@ -168,7 +168,7 @@ public abstract class AbstractVocabularyBuilderMojo extends AbstractMojo {
                     } else if (vocab.getFile() != null) {
                         // Incremental builds can skip this file if the following returns true
                         if (!buildContext.hasDelta(vocab.getFile())) {
-                            log.debug(String.format("Skipping %s, vocabulary is did not change", displayName));
+                            log.debug(String.format("Skipping %s, vocabulary did not change", displayName));
                             continue;
                         }
                         log.info(String.format("Generating %s vocabulary", displayName));
@@ -201,7 +201,11 @@ public abstract class AbstractVocabularyBuilderMojo extends AbstractMojo {
                         log.debug(String.format("    Setting default constant case: %s", constantCase));
                         builder.setConstantCase(constantCase);
                     }
-
+                    
+                    if (vocab.getPrefix() != null) {
+                    	builder.setPrefix(vocab.getPrefix());
+                    }
+                    
                     builder.setName(vocab.getName());
 
                     final String className;

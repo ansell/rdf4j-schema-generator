@@ -69,6 +69,7 @@ out of RDF ontology files.
                 <vocabularies>
                     <vocabulary>
                         <className>LDP</className>
+			<prefix>http://www.w3.org/ns/ldp#</prefix>
                         <file>sesame-vocab-builder-core/src/test/resources/ldp.ttl</file>
                     </vocabulary>
                     <vocabulary>

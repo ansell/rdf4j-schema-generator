@@ -201,11 +201,11 @@ public abstract class AbstractVocabularyBuilderMojo extends AbstractMojo {
                         log.debug(String.format("    Setting default constant case: %s", constantCase));
                         builder.setConstantCase(constantCase);
                     }
-                    
+
                     if (vocab.getPrefix() != null) {
-                    	builder.setPrefix(vocab.getPrefix());
+                        builder.setPrefix(vocab.getPrefix());
                     }
-                    
+
                     builder.setName(vocab.getName());
 
                     final String className;

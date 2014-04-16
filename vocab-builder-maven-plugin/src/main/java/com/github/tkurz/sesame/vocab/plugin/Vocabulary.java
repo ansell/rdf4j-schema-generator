@@ -25,7 +25,7 @@ public class Vocabulary {
     private String preferredLanguage;
     private Boolean createResourceBundles;
     private CaseFormat caseFormat;
-	private String prefix;
+    private String prefix;
 
     public URL getUrl() {
         return url;
@@ -50,15 +50,15 @@ public class Vocabulary {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String getPrefix() {
-    	return prefix;
+        return prefix;
     }
-    
+
     public void setPrefix(String prefix) {
-    	this.prefix = prefix;
+        this.prefix = prefix;
     }
-    
+
     public String getPackageName() {
         return packageName;
     }

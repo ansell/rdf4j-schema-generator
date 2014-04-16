@@ -71,8 +71,12 @@ public class Main {
             Path tempFile = null;
             final VocabBuilder builder;
             if (input.startsWith("http://")) {
-                tempFile = Files.createTempFile("vocab-builder", "." + (format != null ? format.getDefaultFileExtension() : "cache"));
                 URL url = new URL(input);
+
+                //try to guess format
+                format = RDFFormat.forFileName(url.getFile());
+
+                tempFile = Files.createTempFile("vocab-builder", "." + (format != null ? format.getDefaultFileExtension() : "cache"));
 
                 try {
                     fetchVocab(url, tempFile);

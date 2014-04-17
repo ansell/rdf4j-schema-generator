@@ -39,6 +39,7 @@ import java.util.Set;
 public class Main {
 
     public static void main(String[] args) {
+        Path tempFile = null;
         try {
             CommandLineParser parser = new PosixParser();
             CommandLine cli = parser.parse(getCliOpts(), args);
@@ -68,7 +69,6 @@ public class Main {
 
             RDFFormat format = Rio.getParserFormatForMIMEType(cli.getOptionValue('f', null));
 
-            Path tempFile = null;
             final VocabBuilder builder;
             if (input.startsWith("http://")) {
                 URL url = new URL(input);
@@ -124,19 +124,19 @@ public class Main {
             if (output != null) {
                 System.out.printf("Starting generation%n");
                 Path outFile = Paths.get(output);
+                if (outFile.getParent() != null) {
+                    Files.createDirectories(outFile.getParent());
+                }
                 builder.generate(outFile);
                 if (cli.hasOption('b')) {
                     System.out.printf("Generate ResourceBundles%n");
-                    builder.generateResourceBundle(outFile.getFileName().toString().replaceAll("\\.[^.]+$", ""), outFile.getParent());
+                    builder.generateResourceBundle(outFile.getFileName().toString().replaceAll("\\.[^.]+$", ""), outFile.toAbsolutePath().getParent());
                 }
                 System.out.printf("Generation finished, result available in '%s'%n", output);
             } else {
                 builder.generate(System.out);
             }
 
-            if (tempFile != null) {
-                Files.deleteIfExists(tempFile);
-            }
         } catch (UnsupportedRDFormatException e) {
             System.err.printf("%s%nTry setting the format explicitly%n", e.getMessage());
         } catch (ParseException e) {
@@ -151,6 +151,14 @@ public class Main {
             e.printStackTrace();
         } catch (GenerationException e) {
             System.err.println(e.getMessage());
+        } finally {
+            if (tempFile != null) {
+                try {
+                    Files.deleteIfExists(tempFile);
+                } catch (IOException e) {
+                    System.err.println("Error while deleting temp-file " + tempFile + ": "+ e.getMessage());
+                }
+            }
         }
     }
 
@@ -251,6 +259,7 @@ public class Main {
     }
 
     private static File fetchVocab(URL url, final Path tempFile) throws URISyntaxException, IOException {
+        System.out.printf("Fetching remote vocabulary <%s>%n", url);
         final Properties buildProperties = getBuildProperties();
         final HttpClientBuilder clientBuilder = HttpClientBuilder.create()
                 .setUserAgent(

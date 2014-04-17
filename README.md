@@ -30,7 +30,7 @@ out of RDF ontology files.
 
 ## Run from Git
 
-1. Clone from https://github.com/tkurz/sesame-vocab-builder.git and build it with maven
+1. Clone from https://github.com/tkurz/sesame-vocab-builder.git
 2. Run `./sesame-vocab-builder  <input-file> <output-file>`
 3. Additional information can be configured using command-line parameters
 

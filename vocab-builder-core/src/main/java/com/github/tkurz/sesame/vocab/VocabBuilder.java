@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
@@ -324,11 +325,11 @@ public class VocabBuilder {
             final Properties defaultBundle = bundles.get(baseName);
             final Properties prefBundle = bundles.get(baseName + "_" + getPreferredLanguage());
             if (prefBundle != null) {
-                for (String key : prefBundle.stringPropertyNames()) {
-                    String nextKey = cleanKey(doCaseFormatting(key));
+                for (Entry<Object, Object> key : prefBundle.entrySet()) {
+                    String nextKey = (String)key.getKey();
                     if (!defaultBundle.containsKey(nextKey)) {
                         log.trace("copying {} from {} to default Bundle", nextKey, getPreferredLanguage());
-                        defaultBundle.setProperty(nextKey, prefBundle.getProperty(nextKey));
+                        defaultBundle.setProperty(nextKey, (String) key.getValue());
                     }
                 }
             } else {

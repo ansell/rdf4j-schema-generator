@@ -93,5 +93,10 @@
             <artifactId>jsonld-java-sesame</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.semarglproject</groupId>
+            <artifactId>semargl-sesame</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

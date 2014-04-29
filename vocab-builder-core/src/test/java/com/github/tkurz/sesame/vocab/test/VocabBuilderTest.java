@@ -24,6 +24,7 @@ import org.openrdf.model.vocabulary.*;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParserRegistry;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -48,7 +49,16 @@ public class VocabBuilderTest {
     public static Collection<Object[]> data() {
         Collection<Object[]> result = new ArrayList<>();
         for (RDFFormat nextParserFormat : RDFParserRegistry.getInstance().getKeys()) {
-            result.add(new Object[]{nextParserFormat});
+            try {
+                // Try to create a writer, as not all formats (RDFa for example) have writers,
+                // and we can't automatically test those formats like this
+                OutputStream out = new ByteArrayOutputStream();
+                Rio.createWriter(nextParserFormat, out);
+                // If the writer creation did not throw an exception, add it to the list
+                result.add(new Object[]{nextParserFormat});
+            } catch(UnsupportedRDFormatException e) {
+                // Ignore to drop this format from the list
+            }
         }
         assertFalse("No RDFFormats found with RDFParser implementations on classpath", result.isEmpty());
         return result;

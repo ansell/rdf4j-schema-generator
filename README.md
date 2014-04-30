@@ -1,7 +1,6 @@
-# Sesame Vocab Builder
+# Sesame Vocabulary Builder
 
-Sesame Vocab Builder provides a command line tool that allows to create constants for RDF primitives for a given namespace
-out of RDF ontology files.
+Sesame Vocabulary Builder provides a command line tool and maven plugin that allows to create constants for RDF primitives for a given namespace from RDF ontology files.
 
 ## How To
 

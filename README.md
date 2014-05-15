@@ -50,13 +50,6 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
                         <goal>generate</goal>
                     </goals>
                 </execution>
-                <execution>
-                    <id>generate-vocabulary-resource-bundles</id>
-                    <phase>generate-resources</phase>
-                    <goals>
-                        <goal>generate-bundles</goal>
-                    </goals>
-                </execution>
             </executions>
             <configuration>
                 <output>${project.build.directory}/generated-sources/sesame-vocabs</output>

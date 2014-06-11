@@ -125,7 +125,11 @@ public class Main {
                 System.out.printf("Starting generation%n");
                 Path outFile = Paths.get(output);
                 if (outFile.getParent() != null) {
-                    Files.createDirectories(outFile.getParent());
+                    if (!Files.exists(outFile.getParent())) {
+                        Files.createDirectories(outFile.getParent());
+                    } else if (!Files.isDirectory(outFile.getParent())) {
+                        throw new IOException(String.format("%s is not a directory", outFile.getParent()));
+                    }
                 }
                 builder.generate(outFile);
                 if (cli.hasOption('b')) {

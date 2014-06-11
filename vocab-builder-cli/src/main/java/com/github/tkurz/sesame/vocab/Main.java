@@ -174,8 +174,8 @@ public class Main {
             w.println();
         }
         hf.printWrapped(w, 80, 12, "usage: Main [options...] <input-file> [<output-file>]");
-        hf.printWrapped(w, 80, 30, "  <input-file>                the input file to read from");
-        hf.printWrapped(w, 80, 30, "  [<output-file>]             the output file to write, StdOut if omitted");
+        hf.printWrapped(w, 80, 40, "  <input-file>                          the input file to read from");
+        hf.printWrapped(w, 80, 40, "  [<output-file>]                       the output file to write, StdOut if omitted");
         hf.printOptions(w, 80, getCliOpts(), 2, 2);
         w.flush();
         w.close();

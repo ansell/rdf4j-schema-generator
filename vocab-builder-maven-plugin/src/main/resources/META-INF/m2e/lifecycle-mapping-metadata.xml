@@ -5,7 +5,6 @@
             <pluginExecutionFilter>
                 <goals>
                     <goal>generate</goal>
-                    <goal>generate-bundles</goal>
                 </goals>
             </pluginExecutionFilter>
             <action>

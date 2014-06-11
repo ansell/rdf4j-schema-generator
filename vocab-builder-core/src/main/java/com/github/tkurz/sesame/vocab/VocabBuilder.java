@@ -382,7 +382,9 @@ public class VocabBuilder {
             return key;
         } else {
             CaseFormat originalFormat = CaseFormat.LOWER_CAMEL;
-            if (Character.isUpperCase(key.charAt(0))) {
+            if (Character.isUpperCase(key.charAt(0)) && key.contains("_")) {
+                originalFormat = CaseFormat.UPPER_UNDERSCORE;
+            } else if (Character.isUpperCase(key.charAt(0))) {
                 originalFormat = CaseFormat.UPPER_CAMEL;
             } else if (key.contains("_")) {
                 originalFormat = CaseFormat.LOWER_UNDERSCORE;

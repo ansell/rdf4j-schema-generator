@@ -4,7 +4,7 @@
 
     <groupId>com.github.tkurz.sesame</groupId>
     <artifactId>vocab-builder</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -45,7 +45,7 @@
         <url>https://github.com/tkurz/sesame-vocab-builder.git</url>
         <connection>scm:git:git@github.com:tkurz/sesame-vocab-builder.git</connection>
         <developerConnection>scm:git:git@github.com:tkurz/sesame-vocab-builder.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>vocabulary-builder-1.3</tag>
     </scm>
 
     <properties>

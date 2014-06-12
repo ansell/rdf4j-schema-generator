@@ -5,26 +5,29 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
 ## How To
 
 1. Download the latest version [here](https://github.com/tkurz/sesame-vocab-builder/releases).
-2. Run jar from command line (Java 7 required): `java -jar vocab-builder-cli-{VERSION}-exe.jar <input-file> <output-file>`
+2. Run jar from command line (Java 7 required): `java -jar vocab-builder-cli-{VERSION}-exe.jar <input-file> [<output-file>]`
 3. Additional information can be configured using command-line parameters
 
 ## Command Line Options
 
 ```
-  -b,--languageBundles        generate L10N LanguageBundles
-  -f,--format <input-format>  mime-type of the input file (will try to guess if
-                              absent)
-  -h,--help                   pint this help
-  -l,--language <prefLang>    preferred language for vocabulary labels
-  -n,--name <ns>              the name of the namespace (will try to guess from
-                              the input file if absent)
-  -p,--package <package>      package declaration (will use default (empty)
-                              package if absent
-  -s,--spaces <indent>        use spaces for for indentation (tabs if missing, 4
-                              spaces if no number given)
-  -u,--uri <prefix>           the prefix for the vocabulary (if not available in
-                              the input file)
-  -c,--constantCase           case to use for URI constants
+  <input-file>                          the input file to read from
+  [<output-file>]                       the output file to write, StdOut if
+                                        omitted
+  -b,--languageBundles                  generate L10N LanguageBundles
+  -c,--constantCase <prefConstantCase>  case to use for URI constants
+  -f,--format <input-format>            mime-type of the input file (will try to
+                                        guess if absent)
+  -h,--help                             print this help
+  -l,--language <prefLang>              preferred language for vocabulary labels
+  -n,--name <ns>                        the name of the namespace (will try to
+                                        guess from the input file if absent)
+  -p,--package <package>                package declaration (will use default
+                                        (empty) package if absent
+  -s,--spaces <indent>                  use spaces for indentation (tabs if
+                                        missing, 4 spaces if no number given)
+  -u,--uri <prefix>                     the prefix for the vocabulary (if not
+                                        available in the input file)
 ```
 
 ## Run from Git
@@ -41,7 +44,7 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
         <plugin>
             <groupId>com.github.tkurz.sesame</groupId>
             <artifactId>vocab-builder-maven-plugin</artifactId>
-            <version>1.2</version>
+            <version>1.3</version>
             <executions>
                 <execution>
                     <id>generate-vocabularies</id>

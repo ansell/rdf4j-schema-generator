@@ -52,16 +52,13 @@ import java.util.*;
         requiresProject = true)
 public class VocabularyBuilderMojo extends AbstractMojo {
 
-    @Parameter(property = "output", defaultValue = "${project.build.directory}/generated-sources/sesame-vocabs",
-            readonly = true)
+    @Parameter(property = "output", defaultValue = "${project.build.directory}/generated-sources/sesame-vocabs")
     private File outputDirectory;
 
-    @Parameter(property = "bundleOutput", defaultValue = "${project.build.directory}/generated-resources/sesame-vocabs",
-            readonly = true)
+    @Parameter(property = "bundleOutput", defaultValue = "${project.build.directory}/generated-resources/sesame-vocabs")
     private File bundleOutputDirectory;
 
-    @Parameter(property = "remoteCacheDir", defaultValue = "${project.build.directory}/vocab-builder-maven-plugin.cache",
-            readonly = true)
+    @Parameter(property = "remoteCacheDir", defaultValue = "${project.build.directory}/vocab-builder-maven-plugin.cache")
     private File remoteCacheDir;
 
     @Parameter

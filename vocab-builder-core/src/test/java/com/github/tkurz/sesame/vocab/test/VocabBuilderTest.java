@@ -5,7 +5,6 @@ package com.github.tkurz.sesame.vocab.test;
 
 import com.github.tkurz.sesame.vocab.VocabBuilder;
 import com.google.common.base.CaseFormat;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

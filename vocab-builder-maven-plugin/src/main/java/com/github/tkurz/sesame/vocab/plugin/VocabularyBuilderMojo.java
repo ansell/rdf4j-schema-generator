@@ -85,6 +85,11 @@ public class VocabularyBuilderMojo extends AbstractMojo {
     @Parameter(property = "createResourceBundles", defaultValue = "false")
     private boolean createResourceBundles;
 
+    @Parameter(property = "createStringConstants", defaultValue = "false")
+    private boolean createStringConstants;
+    @Parameter(property = "stringConstantPrefix")
+    private String stringConstantPrefix;
+    
     @Parameter(property = "constantCase")
     private CaseFormat constantCase;
 
@@ -235,7 +240,16 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                         target = target.resolve(builder.getPackageName().replaceAll("\\.", "/"));
                         Files.createDirectories(target);
                     }
-
+                    // when string constant generation set, specify a prefix
+                    if ( createStringConstants ) {
+                    	// when prefix set, the builder will generate string constants in addition to the URI's
+                    	// when no string constant prefix set, use a single underscore by default
+                    	builder.setStringPropertyPrefix((stringConstantPrefix==null? "_": stringConstantPrefix));
+                    }
+                    else {
+                    	// be sure to not generate String constants
+                    	builder.setStringPropertyPrefix(null);
+                    }
                     final Path vFile = target.resolve(fName);
                     final String className = vFile.getFileName().toString().replaceFirst("\\.java$", "");
                     try (final PrintWriter out = new PrintWriter(

@@ -61,6 +61,8 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
                 <preferredLanguage>en</preferredLanguage>
                 <createResourceBundles>true</createResourceBundles>
                 <constantCase>UPPER_UNDERSCORE</constantCase>
+                <createStringConstants>true</createStringConstants>
+                <stringConstantPrefix>_</stringConstantPrefix>
                 <vocabularies>
                     <vocabulary>
                         <className>LDP</className>

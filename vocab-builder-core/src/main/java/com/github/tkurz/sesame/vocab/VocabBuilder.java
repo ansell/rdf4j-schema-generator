@@ -91,6 +91,7 @@ public class VocabBuilder {
         if (StringUtils.isBlank(cName)) {
             throw new GenerationException("could not detect name, please set explicitly");
         }
+        //noinspection ConstantConditions
         cName = WordUtils.capitalize(cName.replaceAll("\\W+", " ")).replaceAll("\\s+", "");
 
         generate(cName, new PrintWriter(outputStream));
@@ -188,8 +189,7 @@ public class VocabBuilder {
         Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
 
         //string constant values
-        if (((stringPropertyPrefix != null) && (stringPropertyPrefix.length() > 0))
-                || ((stringPropertySuffix != null) && (stringPropertySuffix.length() > 0))) {
+        if (StringUtils.isNotBlank(stringPropertyPrefix) || (StringUtils.isNotBlank(stringPropertySuffix))) {
             // add the possibility to add a string property with the namespace for usage in
             for (String key : keys) {
                 Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
@@ -203,15 +203,17 @@ public class VocabBuilder {
                 out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
                 if (comment != null) {
                     out.println(getIndent(1) + " * <p>");
-                    out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n\t * ", false));
+                    out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
                 }
                 out.println(getIndent(1) + " *");
                 out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
                 out.println(getIndent(1) + " */");
 
-                String nextKey = cleanKey(doCaseFormatting(key, CaseFormat.UPPER_UNDERSCORE));
-                out.printf(getIndent(1) + "public static final String %s%s%s = %s.NAMESPACE + \"%s\";%n",
-                        StringUtils.defaultString(stringPropertyPrefix), nextKey, StringUtils.defaultString(stringPropertySuffix), className, key);
+                String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(stringPropertyPrefix),
+                        doCaseFormatting(key, CaseFormat.UPPER_UNDERSCORE),
+                        StringUtils.defaultString(stringPropertySuffix)));
+                out.printf(getIndent(1) + "public static final String %s = %s.NAMESPACE + \"%s\";%n",
+                         nextKey, className, key);
                 out.println();
             }
         }
@@ -229,7 +231,7 @@ public class VocabBuilder {
             out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
             if (comment != null) {
                 out.println(getIndent(1) + " * <p>");
-                out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n\t * ", false));
+                out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
             }
             out.println(getIndent(1) + " *");
             out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
@@ -414,7 +416,7 @@ public class VocabBuilder {
     }
 
     private String doCaseFormatting(String key) {
-        return doCaseFormatting(key, caseFormat);
+        return doCaseFormatting(key, getConstantCase());
     }
 
     private String doCaseFormatting(String key, CaseFormat targetFormat) {

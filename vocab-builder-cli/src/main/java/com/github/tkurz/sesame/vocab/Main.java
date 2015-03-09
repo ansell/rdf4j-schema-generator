@@ -101,9 +101,9 @@ public class Main {
                 builder.setPreferredLanguage(cli.getOptionValue('l'));
             }
             if (cli.hasOption('S')) {
-                builder.setStringPropertyPrefix(cli.getOptionValue('S'));
+                builder.setStringPropertySuffix(cli.getOptionValue('S'));
             } else {
-                builder.setStringPropertyPrefix(null);
+                builder.setStringPropertySuffix(null);
             }
             if (cli.hasOption('c')) {
                 try {
@@ -258,10 +258,10 @@ public class Main {
                 .create('c'));
 
         o.addOption(OptionBuilder
-                .withLongOpt("stringConstantPrefix")
-                .withDescription("prefix to create string constants")
+                .withLongOpt("stringConstantSuffix")
+                .withDescription("suffix to create string constants (e.g. _STRING")
                 .hasArgs(1)
-                .withArgName("prefix")
+                .withArgName("suffix")
                 .create('S'));
 
         o.addOption(OptionBuilder

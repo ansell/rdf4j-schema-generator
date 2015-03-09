@@ -51,6 +51,7 @@ public class VocabBuilder {
     private String language = null;
     private final Model model;
     private CaseFormat caseFormat;
+    private String stringPropertyPrefix;
     private static Set<String> reservedWords = Sets.newHashSet("abstract","assert","boolean","break","byte","case","catch","char","class","const","default","do","double","else","enum","extends","false","final","finally","float","for","goto","if","implements","import","instanceof","int","interface","long","native","new","null","package","private","protected","public","return","short","static","strictfp","super","switch","synchronized","this","throw","throws","transient","true","try","void","volatile","while","continue","PREFIX","NAMESPACE");
     /**
      * Create a new VocabularyBuilder, reading the vocab definition from the provided file
@@ -207,6 +208,25 @@ public class VocabBuilder {
 
             String nextKey = cleanKey(doCaseFormatting(key));
             out.printf(getIndent(1) + "public static final URI %s;%n", nextKey);
+            // add the possibility to add a string property with the namespace for usage in
+            // 
+            if (stringPropertyPrefix!=null && stringPropertyPrefix.length() > 0 ) {
+                out.println(getIndent(1) + "/**");
+                if (label != null) {
+                    out.printf(getIndent(1) + " * %s%n", label.getLabel());
+                    out.println(getIndent(1) + " * <p>");
+                }
+                out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
+                if (comment != null) {
+                    out.println(getIndent(1) + " * <p>");
+                    out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n\t * ", false));
+                }
+                out.println(getIndent(1) + " *");
+                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
+                out.println(getIndent(1) + " */");
+
+            	out.printf(getIndent(1) + "public static final String %s = %s + \"%s\";%n", stringPropertyPrefix + nextKey, className + ".NAMESPACE", key );
+            }
             out.println();
         }
 
@@ -448,4 +468,12 @@ public class VocabBuilder {
     public CaseFormat getConstantCase() {
         return caseFormat;
     }
+
+	public String getStringPropertyPrefix() {
+		return stringPropertyPrefix;
+	}
+
+	public void setStringPropertyPrefix(String stringPropertyPrefix) {
+		this.stringPropertyPrefix = stringPropertyPrefix;
+	}
 }

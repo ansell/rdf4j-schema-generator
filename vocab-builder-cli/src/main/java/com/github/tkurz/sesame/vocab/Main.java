@@ -100,6 +100,11 @@ public class Main {
             if (cli.hasOption('l')) {
                 builder.setPreferredLanguage(cli.getOptionValue('l'));
             }
+            if (cli.hasOption('S')) {
+                builder.setStringPropertyPrefix(cli.getOptionValue('S'));
+            } else {
+                builder.setStringPropertyPrefix(null);
+            }
             if (cli.hasOption('c')) {
                 try {
                     CaseFormat caseFormat = CaseFormat.valueOf(cli.getOptionValue('c'));
@@ -251,6 +256,13 @@ public class Main {
                 .withArgName("prefConstantCase")
                 .isRequired(false)
                 .create('c'));
+
+        o.addOption(OptionBuilder
+                .withLongOpt("stringConstantPrefix")
+                .withDescription("prefix to create string constants")
+                .hasArgs(1)
+                .withArgName("prefix")
+                .create('S'));
 
         o.addOption(OptionBuilder
                 .withLongOpt("help")

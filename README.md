@@ -26,6 +26,8 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
                                         (empty) package if absent
   -s,--spaces <indent>                  use spaces for indentation (tabs if
                                         missing, 4 spaces if no number given)
+  -S,--stringConstantSuffix <suffix>    suffix to create string constants (e.g.
+                                        _STRING
   -u,--uri <prefix>                     the prefix for the vocabulary (if not
                                         available in the input file)
 ```
@@ -63,6 +65,7 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
                 <constantCase>UPPER_UNDERSCORE</constantCase>
                 <createStringConstants>true</createStringConstants>
                 <stringConstantPrefix>_</stringConstantPrefix>
+                <stringConstantSuffix>_STRING</stringConstantSuffix>
                 <vocabularies>
                     <vocabulary>
                         <className>LDP</className>

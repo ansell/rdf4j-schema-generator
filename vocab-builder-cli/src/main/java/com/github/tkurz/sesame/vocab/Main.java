@@ -199,8 +199,8 @@ public class Main {
             w.println();
         }
         hf.printWrapped(w, 80, 12, "usage: Main [options...] <input-file> [<output-file>]");
-        hf.printWrapped(w, 80, 40, "  <input-file>                          the input file to read from");
-        hf.printWrapped(w, 80, 40, "  [<output-file>]                       the output file to write, StdOut if omitted");
+        hf.printWrapped(w, 80, 42, "  <input-file>                            the input file to read from");
+        hf.printWrapped(w, 80, 42, "  [<output-file>]                         the output file to write, StdOut if omitted");
         hf.printOptions(w, 80, getCliOpts(), 2, 2);
         w.flush();
         w.close();
@@ -220,7 +220,7 @@ public class Main {
 
         o.addOption(OptionBuilder
                 .withLongOpt("package")
-                .withDescription("package declaration (will use default (empty) package if absent")
+                .withDescription("package declaration (will use default (empty) package if absent)")
                 .hasArgs(1)
                 .withArgName("package")
                 .isRequired(false)
@@ -267,30 +267,30 @@ public class Main {
 
         o.addOption(OptionBuilder
                 .withLongOpt("constantCase")
-                .withDescription("case to use for URI constants")
+                .withDescription("case to use for URI constants, possible values: LOWER_UNDERSCORE, LOWER_CAMEL, UPPER_CAMEL, UPPER_UNDERSCORE")
                 .hasArgs(1)
-                .withArgName("prefConstantCase")
+                .withArgName("constantCase")
                 .isRequired(false)
                 .create('c'));
 
         o.addOption(OptionBuilder
                 .withLongOpt("stringConstantCase")
-                .withDescription("case to use for String constants")
+                .withDescription("case to use for String constants, see constantCase")
                 .hasArgs(1)
-                .withArgName("prefConstantCase")
+                .withArgName("constantCase")
                 .isRequired(false)
                 .create('C'));
 
         o.addOption(OptionBuilder
                 .withLongOpt("stringConstantSuffix")
-                .withDescription("suffix to create string constants (e.g. _STRING")
+                .withDescription("suffix to create string constants (e.g. _STRING)")
                 .hasArgs(1)
                 .withArgName("suffix")
                 .create('S'));
 
         o.addOption(OptionBuilder
                 .withLongOpt("stringConstantPrefix")
-                .withDescription("prefix to create string constants (e.g. _")
+                .withDescription("prefix to create string constants (e.g. _)")
                 .hasArgs(1)
                 .withArgName("prefix")
                 .create('P'));

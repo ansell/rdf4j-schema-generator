@@ -5,38 +5,46 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
 ## How To
 
 1. Download the latest version [here](https://github.com/tkurz/sesame-vocab-builder/releases).
-2. Run jar from command line (Java 7 required): `java -jar vocab-builder-cli-{VERSION}-exe.jar <input-file> [<output-file>]`
-3. Additional information can be configured using command-line parameters
+1. Run jar from command line (Java 7 required): `java -jar vocab-builder-cli-{VERSION}-exe.jar <input-file> [<output-file>]`
+1. Additional information can be configured using command-line parameters
 
 ## Command Line Options
 
 ```
-  <input-file>                          the input file to read from
-  [<output-file>]                       the output file to write, StdOut if
-                                        omitted
-  -b,--languageBundles                  generate L10N LanguageBundles
-  -c,--constantCase <prefConstantCase>  case to use for URI constants
-  -f,--format <input-format>            mime-type of the input file (will try to
-                                        guess if absent)
-  -h,--help                             print this help
-  -l,--language <prefLang>              preferred language for vocabulary labels
-  -n,--name <ns>                        the name of the namespace (will try to
-                                        guess from the input file if absent)
-  -p,--package <package>                package declaration (will use default
-                                        (empty) package if absent
-  -s,--spaces <indent>                  use spaces for indentation (tabs if
-                                        missing, 4 spaces if no number given)
-  -S,--stringConstantSuffix <suffix>    suffix to create string constants (e.g.
-                                        _STRING
-  -u,--uri <prefix>                     the prefix for the vocabulary (if not
-                                        available in the input file)
+  <input-file>                            the input file to read from
+  [<output-file>]                         the output file to write, StdOut if
+                                          omitted
+  -b,--languageBundles                    generate L10N LanguageBundles
+  -c,--constantCase <constantCase>        case to use for URI constants,
+                                          possible values: LOWER_UNDERSCORE,
+                                          LOWER_CAMEL, UPPER_CAMEL,
+                                          UPPER_UNDERSCORE
+  -C,--stringConstantCase <constantCase>  case to use for String constants, see
+                                          constantCase
+  -f,--format <input-format>              mime-type of the input file (will try
+                                          to guess if absent)
+  -h,--help                               print this help
+  -l,--language <prefLang>                preferred language for vocabulary
+                                          labels
+  -n,--name <ns>                          the name of the namespace (will try to
+                                          guess from the input file if absent)
+  -P,--stringConstantPrefix <prefix>      prefix to create string constants
+                                          (e.g. _)
+  -p,--package <package>                  package declaration (will use default
+                                          (empty) package if absent)
+  -s,--spaces <indent>                    use spaces for indentation (tabs if
+                                          missing, 4 spaces if no number given)
+  -S,--stringConstantSuffix <suffix>      suffix to create string constants
+                                          (e.g. _STRING)
+  -u,--uri <prefix>                       the prefix for the vocabulary (if not
+                                          available in the input file)
 ```
 
 ## Run from Git
 
 1. Clone from https://github.com/tkurz/sesame-vocab-builder.git
-2. Run `./sesame-vocab-builder  <input-file> <output-file>`
-3. Additional information can be configured using command-line parameters
+1. Run `./sesame-vocab-builder  <input-file> <output-file>`
+1. Additional information can be configured using command-line parameters
 
 ## Maven Plugin
 
@@ -64,6 +72,7 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
                 <createResourceBundles>true</createResourceBundles>
                 <constantCase>UPPER_UNDERSCORE</constantCase>
                 <createStringConstants>true</createStringConstants>
+                <stringConstantCase>UPPER_UNDERSCORE</stringConstantCase>
                 <stringConstantPrefix>_</stringConstantPrefix>
                 <stringConstantSuffix>_STRING</stringConstantSuffix>
                 <vocabularies>

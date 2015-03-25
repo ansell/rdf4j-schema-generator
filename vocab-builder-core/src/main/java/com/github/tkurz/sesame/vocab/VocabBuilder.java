@@ -50,9 +50,12 @@ public class VocabBuilder {
     private String indent = "\t";
     private String language = null;
     private final Model model;
-    private CaseFormat caseFormat;
+    private CaseFormat caseFormat = null;
+    private CaseFormat stringCaseFormat = null;
     private String stringPropertyPrefix, stringPropertySuffix;
+    private Set<String> createdFields = new HashSet<>();
     private static Set<String> reservedWords = Sets.newHashSet("abstract","assert","boolean","break","byte","case","catch","char","class","const","default","do","double","else","enum","extends","false","final","finally","float","for","goto","if","implements","import","instanceof","int","interface","long","native","new","null","package","private","protected","public","return","short","static","strictfp","super","switch","synchronized","this","throw","throws","transient","true","try","void","volatile","while","continue","PREFIX","NAMESPACE");
+
     /**
      * Create a new VocabularyBuilder, reading the vocab definition from the provided file
      *
@@ -189,11 +192,11 @@ public class VocabBuilder {
         Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
 
         //string constant values
-        if (StringUtils.isNotBlank(stringPropertyPrefix) || (StringUtils.isNotBlank(stringPropertySuffix))) {
+        if (stringCaseFormat != null || StringUtils.isNotBlank(stringPropertyPrefix) || (StringUtils.isNotBlank(stringPropertySuffix))) {
             // add the possibility to add a string property with the namespace for usage in
             for (String key : keys) {
-                Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
-                Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
+                final Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
+                final Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
 
                 out.println(getIndent(1) + "/**");
                 if (label != null) {
@@ -209,9 +212,10 @@ public class VocabBuilder {
                 out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
                 out.println(getIndent(1) + " */");
 
-                String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(stringPropertyPrefix),
-                        doCaseFormatting(key, CaseFormat.UPPER_UNDERSCORE),
-                        StringUtils.defaultString(stringPropertySuffix)));
+                final String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(getStringPropertyPrefix()),
+                        doCaseFormatting(key, getStringConstantCase()),
+                        StringUtils.defaultString(getStringPropertySuffix())));
+                checkField(className, nextKey);
                 out.printf(getIndent(1) + "public static final String %s = %s.NAMESPACE + \"%s\";%n",
                          nextKey, className, key);
                 out.println();
@@ -237,7 +241,8 @@ public class VocabBuilder {
             out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
             out.println(getIndent(1) + " */");
 
-            String nextKey = cleanKey(doCaseFormatting(key));
+            String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
+            checkField(className, nextKey);
             out.printf(getIndent(1) + "public static final URI %s;%n", nextKey);
             out.println();
         }
@@ -247,7 +252,7 @@ public class VocabBuilder {
         out.printf(getIndent(2) + "ValueFactory factory = ValueFactoryImpl.getInstance();%n");
         out.println();
         for (String key : keys) {
-            String nextKey = cleanKey(doCaseFormatting(key));
+            String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
             out.printf(getIndent(2) + "%s = factory.createURI(%s.NAMESPACE, \"%s\");%n", nextKey, className, key);
         }
         out.println(getIndent(1) + "}");
@@ -262,6 +267,12 @@ public class VocabBuilder {
         //class end
         out.println("}");
         out.flush();
+    }
+
+    private void checkField(String className, String fieldName) throws GenerationException {
+        if (!createdFields.add(fieldName)) {
+            throw new GenerationException(String.format("field %s.%s is defined twice", className, fieldName));
+        }
     }
 
     public void generateResourceBundle(String baseName, Path bundleDir) throws GenerationException, IOException {
@@ -306,7 +317,7 @@ public class VocabBuilder {
         bundles.put(baseName, new Properties());
         for (String key : keys) {
             final URI resource = splitUris.get(key);
-            String nextKey = cleanKey(doCaseFormatting(key));
+            String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
 
             for (URI p : LABEL_PROPERTIES) {
                 for (Value v : GraphUtil.getObjects(model, resource, p)) {
@@ -415,10 +426,6 @@ public class VocabBuilder {
         return s;
     }
 
-    private String doCaseFormatting(String key) {
-        return doCaseFormatting(key, getConstantCase());
-    }
-
     private String doCaseFormatting(String key, CaseFormat targetFormat) {
         if (targetFormat == null) {
             return key;
@@ -483,6 +490,14 @@ public class VocabBuilder {
 
     public CaseFormat getConstantCase() {
         return caseFormat;
+    }
+
+    public CaseFormat getStringConstantCase() {
+        return stringCaseFormat;
+    }
+
+    public void setStringConstantCase(CaseFormat stringCaseFormat) {
+        this.stringCaseFormat = stringCaseFormat;
     }
 
     public String getStringPropertyPrefix() {

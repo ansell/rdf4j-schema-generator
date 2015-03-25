@@ -105,13 +105,29 @@ public class Main {
             } else {
                 builder.setStringPropertySuffix(null);
             }
+            if (cli.hasOption('P')) {
+                builder.setStringPropertyPrefix(cli.getOptionValue('P'));
+            } else {
+                builder.setStringPropertyPrefix(null);
+            }
             if (cli.hasOption('c')) {
                 try {
-                    CaseFormat caseFormat = CaseFormat.valueOf(cli.getOptionValue('c'));
+                    final CaseFormat caseFormat = CaseFormat.valueOf(cli.getOptionValue('c'));
                     if (caseFormat == null) {
                         throw new ParseException("Did not recognise constantCase: Must be one of " + Arrays.asList(CaseFormat.values()));
                     }
                     builder.setConstantCase(caseFormat);
+                } catch (IllegalArgumentException e) {
+                    throw new ParseException("Did not recognise constantCase: Must be one of " + Arrays.asList(CaseFormat.values()));
+                }
+            }
+            if (cli.hasOption('C')) {
+                try {
+                    final CaseFormat caseFormat = CaseFormat.valueOf(cli.getOptionValue('C'));
+                    if (caseFormat == null) {
+                        throw new ParseException("Did not recognise constantCase: Must be one of " + Arrays.asList(CaseFormat.values()));
+                    }
+                    builder.setStringConstantCase(caseFormat);
                 } catch (IllegalArgumentException e) {
                     throw new ParseException("Did not recognise constantCase: Must be one of " + Arrays.asList(CaseFormat.values()));
                 }
@@ -258,11 +274,26 @@ public class Main {
                 .create('c'));
 
         o.addOption(OptionBuilder
+                .withLongOpt("stringConstantCase")
+                .withDescription("case to use for String constants")
+                .hasArgs(1)
+                .withArgName("prefConstantCase")
+                .isRequired(false)
+                .create('C'));
+
+        o.addOption(OptionBuilder
                 .withLongOpt("stringConstantSuffix")
                 .withDescription("suffix to create string constants (e.g. _STRING")
                 .hasArgs(1)
                 .withArgName("suffix")
                 .create('S'));
+
+        o.addOption(OptionBuilder
+                .withLongOpt("stringConstantPrefix")
+                .withDescription("prefix to create string constants (e.g. _")
+                .hasArgs(1)
+                .withArgName("prefix")
+                .create('P'));
 
         o.addOption(OptionBuilder
                 .withLongOpt("help")

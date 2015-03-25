@@ -95,6 +95,9 @@ public class VocabularyBuilderMojo extends AbstractMojo {
     @Parameter(property = "constantCase")
     private CaseFormat constantCase;
 
+    @Parameter(property = "stringConstantCase", defaultValue = "UPPER_UNDERSCORE")
+    private CaseFormat stringConstantCase;
+
     @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
 
@@ -248,10 +251,12 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                         // when no string constant prefix set, use a single underscore by default
                         builder.setStringPropertyPrefix(stringConstantPrefix);
                         builder.setStringPropertySuffix(stringConstantSuffix);
+                        builder.setStringConstantCase(stringConstantCase);
                     } else {
                         // be sure to not generate String constants
                         builder.setStringPropertyPrefix(null);
                         builder.setStringPropertySuffix(null);
+                        builder.setStringConstantCase(null);
                     }
                     final Path vFile = target.resolve(fName);
                     final String className = vFile.getFileName().toString().replaceFirst("\\.java$", "");

@@ -85,13 +85,18 @@ public class VocabularyBuilderMojo extends AbstractMojo {
     @Parameter(property = "createResourceBundles", defaultValue = "false")
     private boolean createResourceBundles;
 
-    @Parameter(property = "createStringConstants", defaultValue = "false")
+    @Parameter(property = "createStringConstants", defaultValue = "true")
     private boolean createStringConstants;
-    @Parameter(property = "stringConstantPrefix")
+    @Parameter(property = "stringConstantPrefix", defaultValue = "")
     private String stringConstantPrefix;
-    
+    @Parameter(property = "stringConstantSuffix", defaultValue = "_STRING")
+    private String stringConstantSuffix;
+
     @Parameter(property = "constantCase")
     private CaseFormat constantCase;
+
+    @Parameter(property = "stringConstantCase", defaultValue = "UPPER_UNDERSCORE")
+    private CaseFormat stringConstantCase;
 
     @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
@@ -223,7 +228,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     if (vocab.getPrefix() != null) {
                         builder.setPrefix(vocab.getPrefix());
                     }
-                    
+
                     builder.setName(vocab.getName());
 
                     String fName;
@@ -240,15 +245,18 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                         target = target.resolve(builder.getPackageName().replaceAll("\\.", "/"));
                         Files.createDirectories(target);
                     }
-                    // when string constant generation set, specify a prefix
-                    if ( createStringConstants ) {
-                    	// when prefix set, the builder will generate string constants in addition to the URI's
-                    	// when no string constant prefix set, use a single underscore by default
-                    	builder.setStringPropertyPrefix((stringConstantPrefix==null? "_": stringConstantPrefix));
-                    }
-                    else {
-                    	// be sure to not generate String constants
-                    	builder.setStringPropertyPrefix(null);
+                    // when string constant generation set, specify prefix and suffix
+                    if (createStringConstants) {
+                        // when prefix set, the builder will generate string constants in addition to the URI's
+                        // when no string constant prefix set, use a single underscore by default
+                        builder.setStringPropertyPrefix(stringConstantPrefix);
+                        builder.setStringPropertySuffix(stringConstantSuffix);
+                        builder.setStringConstantCase(stringConstantCase);
+                    } else {
+                        // be sure to not generate String constants
+                        builder.setStringPropertyPrefix(null);
+                        builder.setStringPropertySuffix(null);
+                        builder.setStringConstantCase(null);
                     }
                     final Path vFile = target.resolve(fName);
                     final String className = vFile.getFileName().toString().replaceFirst("\\.java$", "");

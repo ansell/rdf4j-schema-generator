@@ -50,9 +50,12 @@ public class VocabBuilder {
     private String indent = "\t";
     private String language = null;
     private final Model model;
-    private CaseFormat caseFormat;
-    private String stringPropertyPrefix;
+    private CaseFormat caseFormat = null;
+    private CaseFormat stringCaseFormat = null;
+    private String stringPropertyPrefix, stringPropertySuffix;
+    private Set<String> createdFields = new HashSet<>();
     private static Set<String> reservedWords = Sets.newHashSet("abstract","assert","boolean","break","byte","case","catch","char","class","const","default","do","double","else","enum","extends","false","final","finally","float","for","goto","if","implements","import","instanceof","int","interface","long","native","new","null","package","private","protected","public","return","short","static","strictfp","super","switch","synchronized","this","throw","throws","transient","true","try","void","volatile","while","continue","PREFIX","NAMESPACE");
+
     /**
      * Create a new VocabularyBuilder, reading the vocab definition from the provided file
      *
@@ -91,6 +94,7 @@ public class VocabBuilder {
         if (StringUtils.isBlank(cName)) {
             throw new GenerationException("could not detect name, please set explicitly");
         }
+        //noinspection ConstantConditions
         cName = WordUtils.capitalize(cName.replaceAll("\\W+", " ")).replaceAll("\\s+", "");
 
         generate(cName, new PrintWriter(outputStream));
@@ -183,11 +187,42 @@ public class VocabBuilder {
         out.printf(getIndent(1) + "public static final String PREFIX = \"%s\";%n", name.toLowerCase());
         out.println();
 
-        //and now the resources
         List<String> keys = new ArrayList<>();
         keys.addAll(splitUris.keySet());
         Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
 
+        //string constant values
+        if (stringCaseFormat != null || StringUtils.isNotBlank(stringPropertyPrefix) || (StringUtils.isNotBlank(stringPropertySuffix))) {
+            // add the possibility to add a string property with the namespace for usage in
+            for (String key : keys) {
+                final Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
+                final Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
+
+                out.println(getIndent(1) + "/**");
+                if (label != null) {
+                    out.printf(getIndent(1) + " * %s%n", label.getLabel());
+                    out.println(getIndent(1) + " * <p>");
+                }
+                out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
+                if (comment != null) {
+                    out.println(getIndent(1) + " * <p>");
+                    out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
+                }
+                out.println(getIndent(1) + " *");
+                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
+                out.println(getIndent(1) + " */");
+
+                final String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(getStringPropertyPrefix()),
+                        doCaseFormatting(key, getStringConstantCase()),
+                        StringUtils.defaultString(getStringPropertySuffix())));
+                checkField(className, nextKey);
+                out.printf(getIndent(1) + "public static final String %s = %s.NAMESPACE + \"%s\";%n",
+                         nextKey, className, key);
+                out.println();
+            }
+        }
+
+        //and now the resources
         for (String key : keys) {
             Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
             Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
@@ -200,33 +235,15 @@ public class VocabBuilder {
             out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
             if (comment != null) {
                 out.println(getIndent(1) + " * <p>");
-                out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n\t * ", false));
+                out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
             }
             out.println(getIndent(1) + " *");
             out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
             out.println(getIndent(1) + " */");
 
-            String nextKey = cleanKey(doCaseFormatting(key));
+            String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
+            checkField(className, nextKey);
             out.printf(getIndent(1) + "public static final URI %s;%n", nextKey);
-            // add the possibility to add a string property with the namespace for usage in
-            // 
-            if (stringPropertyPrefix!=null && stringPropertyPrefix.length() > 0 ) {
-                out.println(getIndent(1) + "/**");
-                if (label != null) {
-                    out.printf(getIndent(1) + " * %s%n", label.getLabel());
-                    out.println(getIndent(1) + " * <p>");
-                }
-                out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
-                if (comment != null) {
-                    out.println(getIndent(1) + " * <p>");
-                    out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n\t * ", false));
-                }
-                out.println(getIndent(1) + " *");
-                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
-                out.println(getIndent(1) + " */");
-
-            	out.printf(getIndent(1) + "public static final String %s = %s + \"%s\";%n", stringPropertyPrefix + nextKey, className + ".NAMESPACE", key );
-            }
             out.println();
         }
 
@@ -235,8 +252,8 @@ public class VocabBuilder {
         out.printf(getIndent(2) + "ValueFactory factory = ValueFactoryImpl.getInstance();%n");
         out.println();
         for (String key : keys) {
-            String nextKey = cleanKey(doCaseFormatting(key));
-            out.printf(getIndent(2) + "%s = factory.createURI(%s, \"%s\");%n", nextKey, className + ".NAMESPACE", key);
+            String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
+            out.printf(getIndent(2) + "%s = factory.createURI(%s.NAMESPACE, \"%s\");%n", nextKey, className, key);
         }
         out.println(getIndent(1) + "}");
         out.println();
@@ -250,6 +267,12 @@ public class VocabBuilder {
         //class end
         out.println("}");
         out.flush();
+    }
+
+    private void checkField(String className, String fieldName) throws GenerationException {
+        if (!createdFields.add(fieldName)) {
+            throw new GenerationException(String.format("field %s.%s is defined twice", className, fieldName));
+        }
     }
 
     public void generateResourceBundle(String baseName, Path bundleDir) throws GenerationException, IOException {
@@ -294,7 +317,7 @@ public class VocabBuilder {
         bundles.put(baseName, new Properties());
         for (String key : keys) {
             final URI resource = splitUris.get(key);
-            String nextKey = cleanKey(doCaseFormatting(key));
+            String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
 
             for (URI p : LABEL_PROPERTIES) {
                 for (Value v : GraphUtil.getObjects(model, resource, p)) {
@@ -403,8 +426,8 @@ public class VocabBuilder {
         return s;
     }
 
-    private String doCaseFormatting(String key) {
-        if (caseFormat == null) {
+    private String doCaseFormatting(String key, CaseFormat targetFormat) {
+        if (targetFormat == null) {
             return key;
         } else {
             CaseFormat originalFormat = CaseFormat.LOWER_CAMEL;
@@ -417,7 +440,7 @@ public class VocabBuilder {
             } else if (key.contains("-")) {
                 originalFormat = CaseFormat.LOWER_HYPHEN;
             }
-            return originalFormat.to(caseFormat, key);
+            return originalFormat.to(targetFormat, key);
         }
     }
 
@@ -469,11 +492,27 @@ public class VocabBuilder {
         return caseFormat;
     }
 
-	public String getStringPropertyPrefix() {
-		return stringPropertyPrefix;
+    public CaseFormat getStringConstantCase() {
+        return stringCaseFormat;
+    }
+
+    public void setStringConstantCase(CaseFormat stringCaseFormat) {
+        this.stringCaseFormat = stringCaseFormat;
+    }
+
+    public String getStringPropertyPrefix() {
+        return stringPropertyPrefix;
+    }
+
+    public void setStringPropertyPrefix(String stringPropertyPrefix) {
+        this.stringPropertyPrefix = stringPropertyPrefix;
+    }
+
+    public String getStringPropertySuffix() {
+		return stringPropertySuffix;
 	}
 
-	public void setStringPropertyPrefix(String stringPropertyPrefix) {
-		this.stringPropertyPrefix = stringPropertyPrefix;
+	public void setStringPropertySuffix(String stringPropertySuffix) {
+		this.stringPropertySuffix = stringPropertySuffix;
 	}
 }

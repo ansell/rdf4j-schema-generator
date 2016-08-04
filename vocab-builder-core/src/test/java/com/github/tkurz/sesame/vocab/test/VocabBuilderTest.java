@@ -13,17 +13,17 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Model;
-import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.*;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParserRegistry;
-import org.openrdf.rio.Rio;
-import org.openrdf.rio.UnsupportedRDFormatException;
+import org.eclipse.rdf4j.model.Literal;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.vocabulary.*;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFParserRegistry;
+import org.eclipse.rdf4j.rio.Rio;
+import org.eclipse.rdf4j.rio.UnsupportedRDFormatException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -59,7 +59,7 @@ public class VocabBuilderTest {
                 // Ignore to drop this format from the list
             }
         }
-        assertFalse("No RDFFormats found with RDFParser implementations on classpath", result.isEmpty());
+        assertFalse("No RDFFormats found with RDFParser and RDFWriter implementations on classpath", result.isEmpty());
         return result;
     }
 
@@ -68,15 +68,15 @@ public class VocabBuilderTest {
 
     private Path testDir;
 
-    private URI testOntologyUri;
+    private IRI testOntologyUri;
 
-    private URI testProperty1;
+    private IRI testProperty1;
 
-    private URI testProperty2;
+    private IRI testProperty2;
 
-    private URI testProperty3;
+    private IRI testProperty3;
 
-    private URI testProperty4;
+    private IRI testProperty4;
 
     private Literal testProperty1Description;
 
@@ -93,6 +93,7 @@ public class VocabBuilderTest {
     private Path inputPath;
 
     public VocabBuilderTest(RDFFormat format) {
+    	System.out.println("Running VocabBuilderTest for format: " + format);
         this.format = format;
     }
 
@@ -100,14 +101,14 @@ public class VocabBuilderTest {
     public void setUp() throws Exception {
         testDir = tempDir.newFolder("vocabbuildertest").toPath();
 
-        ValueFactory vf = ValueFactoryImpl.getInstance();
+        ValueFactory vf = SimpleValueFactory.getInstance();
 
         String ns = "http://example.com/ns/ontology#";
-        testOntologyUri = vf.createURI(ns);
-        testProperty1 = vf.createURI(ns, "property1");
-        testProperty2 = vf.createURI(ns, "property_2");
-        testProperty3 = vf.createURI(ns, "property-3");
-        testProperty4 = vf.createURI(ns, "propertyLocalised4");
+        testOntologyUri = vf.createIRI(ns);
+        testProperty1 = vf.createIRI(ns, "property1");
+        testProperty2 = vf.createIRI(ns, "property_2");
+        testProperty3 = vf.createIRI(ns, "property-3");
+        testProperty4 = vf.createIRI(ns, "propertyLocalised4");
         testProperty1Description = vf.createLiteral("property 1 description");
         testProperty2Description = vf.createLiteral("property 2 description");
         testProperty3Description = vf.createLiteral("property 3 description");
@@ -156,7 +157,7 @@ public class VocabBuilderTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Files.copy(javaFilePath, out);
         String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
-        assertTrue(result.contains(testProperty4DescriptionFr.getLabel()));
+        assertTrue(result, result.contains(testProperty4DescriptionFr.getLabel()));
         assertFalse(result.contains(testProperty4DescriptionEn.getLabel()));
         assertTrue(result.contains("\"property_2\""));
         assertTrue(result.contains("\"property-3\""));

@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.openrdf.rio.RDFParseException;
+import org.eclipse.rdf4j.rio.RDFParseException;
 
 import java.io.BufferedReader;
 import java.io.File;

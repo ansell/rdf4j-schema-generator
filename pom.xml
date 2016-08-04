@@ -49,11 +49,11 @@
     </scm>
 
     <properties>
-        <jackson.version>2.3.3</jackson.version>
+        <jackson.version>2.6.3</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <sesame.version>2.7.11</sesame.version>
-        <slf4j.version>1.7.7</slf4j.version>
+        <rdf4j.version>2.0M3</rdf4j.version>
+        <slf4j.version>1.7.21</slf4j.version>
     </properties>
 
     <prerequisites>
@@ -66,10 +66,10 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.1</version>
+                    <version>3.5.1</version>
                     <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
+                        <source>1.8</source>
+                        <target>1.8</target>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -116,14 +116,14 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.openrdf.sesame</groupId>
-                <artifactId>sesame-model</artifactId>
-                <version>${sesame.version}</version>
+                <groupId>org.eclipse.rdf4j</groupId>
+                <artifactId>rdf4j-model</artifactId>
+                <version>${rdf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.openrdf.sesame</groupId>
-                <artifactId>sesame-rio-api</artifactId>
-                <version>${sesame.version}</version>
+                <groupId>org.eclipse.rdf4j</groupId>
+                <artifactId>rdf4j-rio-api</artifactId>
+                <version>${rdf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-cli</groupId>
@@ -143,61 +143,61 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.3.3</version>
+                <version>4.5.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient-cache</artifactId>
-                <version>4.3.3</version>
+                <version>4.5.2</version>
             </dependency>
             <dependency>
-                <groupId>org.openrdf.sesame</groupId>
-                <artifactId>sesame-rio-rdfxml</artifactId>
-                <version>${sesame.version}</version>
+                <groupId>org.eclipse.rdf4j</groupId>
+                <artifactId>rdf4j-rio-rdfxml</artifactId>
+                <version>${rdf4j.version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>org.openrdf.sesame</groupId>
-                <artifactId>sesame-rio-ntriples</artifactId>
-                <version>${sesame.version}</version>
+                <groupId>org.eclipse.rdf4j</groupId>
+                <artifactId>rdf4j-rio-ntriples</artifactId>
+                <version>${rdf4j.version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>org.openrdf.sesame</groupId>
-                <artifactId>sesame-rio-nquads</artifactId>
-                <version>${sesame.version}</version>
+                <groupId>org.eclipse.rdf4j</groupId>
+                <artifactId>rdf4j-rio-nquads</artifactId>
+                <version>${rdf4j.version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>org.openrdf.sesame</groupId>
-                <artifactId>sesame-rio-turtle</artifactId>
-                <version>${sesame.version}</version>
+                <groupId>org.eclipse.rdf4j</groupId>
+                <artifactId>rdf4j-rio-turtle</artifactId>
+                <version>${rdf4j.version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>org.openrdf.sesame</groupId>
-                <artifactId>sesame-rio-trig</artifactId>
-                <version>${sesame.version}</version>
+                <groupId>org.eclipse.rdf4j</groupId>
+                <artifactId>rdf4j-rio-trig</artifactId>
+                <version>${rdf4j.version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>org.openrdf.sesame</groupId>
-                <artifactId>sesame-rio-rdfjson</artifactId>
-                <version>${sesame.version}</version>
+                <groupId>org.eclipse.rdf4j</groupId>
+                <artifactId>rdf4j-rio-rdfjson</artifactId>
+                <version>${rdf4j.version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.jsonld-java</groupId>
-                <artifactId>jsonld-java-sesame</artifactId>
-                <version>0.3</version>
+                <groupId>org.eclipse.rdf4j</groupId>
+                <artifactId>rdf4j-rio-jsonld</artifactId>
+                <version>${rdf4j.version}</version>
                 <scope>runtime</scope>
             </dependency>
-            <dependency>
+            <!-- dependency> Disable until updated Semargl available
                 <groupId>org.semarglproject</groupId>
                 <artifactId>semargl-sesame</artifactId>
                 <version>0.6.1</version>
                 <scope>runtime</scope>
-            </dependency>
+            </dependency -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
@@ -227,13 +227,13 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.11</version>
+                <version>4.12</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>16.0.1</version>
+                <version>19.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

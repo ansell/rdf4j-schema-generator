@@ -10,8 +10,8 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.openrdf.model.util.GraphUtilException;
-import org.openrdf.rio.*;
+import org.eclipse.rdf4j.model.util.GraphUtilException;
+import org.eclipse.rdf4j.rio.*;
 
 import com.google.common.base.CaseFormat;
 
@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -67,16 +68,18 @@ public class Main {
                     throw new ParseException("too many arguments");
             }
 
-            RDFFormat format = Rio.getParserFormatForMIMEType(cli.getOptionValue('f', null));
+            Optional<RDFFormat> format = Rio.getParserFormatForMIMEType(cli.getOptionValue('f', null));
 
             final VocabBuilder builder;
             if (input.startsWith("http://")) {
                 URL url = new URL(input);
 
-                //try to guess format
-                format = RDFFormat.forFileName(url.getFile());
-
-                tempFile = Files.createTempFile("vocab-builder", "." + (format != null ? format.getDefaultFileExtension() : "cache"));
+                if(!format.isPresent()) {
+	                // try to guess format if they didn't specify it
+	                format = Rio.getParserFormatForFileName(url.getFile());
+                }
+                
+                tempFile = Files.createTempFile("vocab-builder", "." + (format.isPresent() ? format.get().getDefaultFileExtension() : "cache"));
 
                 try {
                     fetchVocab(url, tempFile);
@@ -84,10 +87,12 @@ public class Main {
                     throw new ParseException("Invalid input URL: " + e.getMessage());
                 }
 
-                builder = new VocabBuilder(tempFile.toString(), format);
-            } else
-                builder = new VocabBuilder(input, format);
-
+                // Default to Turtle if we didn't guess the format or have it specified
+                builder = new VocabBuilder(tempFile.toString(), format.orElse(RDFFormat.TURTLE));
+            } else {
+                // Default to Turtle if we didn't have the format specified
+                builder = new VocabBuilder(input, format.orElse(RDFFormat.TURTLE));
+            }
             if (cli.hasOption('p')) {
                 builder.setPackageName(cli.getOptionValue('p'));
             }

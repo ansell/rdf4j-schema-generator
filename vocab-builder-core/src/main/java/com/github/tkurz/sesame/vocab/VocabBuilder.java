@@ -1,18 +1,16 @@
 package com.github.tkurz.sesame.vocab;
 
 import com.google.common.collect.Sets;
-import info.aduna.io.MavenUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
-import org.openrdf.model.*;
-import org.openrdf.model.impl.URIImpl;
-import org.openrdf.model.util.GraphUtil;
-import org.openrdf.model.util.GraphUtilException;
-import org.openrdf.model.vocabulary.*;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
-import org.openrdf.rio.Rio;
+import org.eclipse.rdf4j.common.io.MavenUtil;
+import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.vocabulary.*;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFParseException;
+import org.eclipse.rdf4j.rio.Rio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +40,8 @@ public class VocabBuilder {
 
     private static final Logger log = LoggerFactory.getLogger(VocabBuilder.class);
 
-    private static final URI[] COMMENT_PROPERTIES = new URI[]{RDFS.COMMENT, DCTERMS.DESCRIPTION, SKOS.DEFINITION, DC.DESCRIPTION};
-    private static final URI[] LABEL_PROPERTIES = new URI[]{RDFS.LABEL, DCTERMS.TITLE, DC.TITLE, SKOS.PREF_LABEL, SKOS.ALT_LABEL};
+    private static final IRI[] COMMENT_PROPERTIES = new IRI[]{RDFS.COMMENT, DCTERMS.DESCRIPTION, SKOS.DEFINITION, DC.DESCRIPTION};
+    private static final IRI[] LABEL_PROPERTIES = new IRI[]{RDFS.LABEL, DCTERMS.TITLE, DC.TITLE, SKOS.PREF_LABEL, SKOS.ALT_LABEL};
     private String name = null;
     private String prefix = null;
     private String packageName = null;
@@ -65,7 +63,7 @@ public class VocabBuilder {
      * @throws RDFParseException   if the format of the vocab could not be detected or is unknown.
      */
     public VocabBuilder(String filename, String format) throws IOException, RDFParseException {
-        this(filename, format != null ? Rio.getParserFormatForMIMEType(format) : null);
+        this(filename, format != null ? Rio.getParserFormatForMIMEType(format).orElse(null) : null);
     }
 
     public VocabBuilder(String filename, RDFFormat format) throws IOException, RDFParseException {
@@ -73,7 +71,7 @@ public class VocabBuilder {
         if (!Files.exists(file)) throw new FileNotFoundException(filename);
 
         if (format == null) {
-            format = Rio.getParserFormatForFileName(filename);
+            format = Rio.getParserFormatForFileName(filename).orElse(null);
             log.trace("detected input format from filename {}: {}", filename, format);
         }
 
@@ -89,7 +87,7 @@ public class VocabBuilder {
         }
     }
 
-    public void generate(OutputStream outputStream) throws GenerationException, IOException, GraphUtilException {
+    public void generate(OutputStream outputStream) throws GenerationException, IOException {
         String cName = getName();
         if (StringUtils.isBlank(cName)) {
             throw new GenerationException("could not detect name, please set explicitly");
@@ -100,7 +98,7 @@ public class VocabBuilder {
         generate(cName, new PrintWriter(outputStream));
     }
 
-    public void generate(Path output) throws IOException, GraphUtilException, GenerationException {
+    public void generate(Path output) throws IOException, GenerationException {
         final String className = output.getFileName().toString().replaceFirst("\\.java$", "");
         try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(output, StandardCharsets.UTF_8))) {
             generate(className, out);
@@ -110,7 +108,7 @@ public class VocabBuilder {
     /**
      *
      */
-    public void generate(String className, PrintWriter out) throws IOException, GraphUtilException, GenerationException {
+    public void generate(String className, PrintWriter out) throws IOException, GenerationException {
         log.trace("classname: {}", className);
         if (StringUtils.isBlank(name)) {
             name = className;
@@ -122,13 +120,13 @@ public class VocabBuilder {
         }
 
         Pattern pattern = Pattern.compile(Pattern.quote(getPrefix()) + "(.+)");
-        ConcurrentMap<String, URI> splitUris = new ConcurrentHashMap<>();
+        ConcurrentMap<String, IRI> splitUris = new ConcurrentHashMap<>();
         for (Resource nextSubject : model.subjects()) {
-            if (nextSubject instanceof URI) {
+            if (nextSubject instanceof IRI) {
                 Matcher matcher = pattern.matcher(nextSubject.stringValue());
                 if (matcher.find()) {
                     String k = matcher.group(1);
-                    URI putIfAbsent = splitUris.putIfAbsent(k, (URI) nextSubject);
+                    IRI putIfAbsent = splitUris.putIfAbsent(k, (IRI) nextSubject);
                     if (putIfAbsent != null) {
                         log.warn("Conflicting keys found: uri={} key={} existing={}",
                                 nextSubject.stringValue(), k, putIfAbsent);
@@ -144,12 +142,12 @@ public class VocabBuilder {
             out.printf("package %s;%n%n", getPackageName());
         }
         //imports
-        out.println("import org.openrdf.model.URI;");
-        out.println("import org.openrdf.model.ValueFactory;");
-        out.println("import org.openrdf.model.impl.ValueFactoryImpl;");
+        out.println("import org.eclipse.rdf4j.model.IRI;");
+        out.println("import org.eclipse.rdf4j.model.ValueFactory;");
+        out.println("import org.eclipse.rdf4j.model.impl.SimpleValueFactory;");
         out.println();
 
-        final URI pfx = new URIImpl(prefix);
+        final IRI pfx = SimpleValueFactory.getInstance().createIRI(prefix);
         Literal oTitle = getFirstExistingObjectLiteral(model, pfx, getPreferredLanguage(), LABEL_PROPERTIES);
         Literal oDescr = getFirstExistingObjectLiteral(model, pfx, getPreferredLanguage(), COMMENT_PROPERTIES);
         Set<Value> oSeeAlso = model.filter(pfx, RDFS.SEEALSO, null).objects();
@@ -169,7 +167,7 @@ public class VocabBuilder {
         if (!oSeeAlso.isEmpty()) {
             out.println(" *");
             for (Value s : oSeeAlso) {
-                if (s instanceof URI) {
+                if (s instanceof IRI) {
                     out.printf(" * @see <a href=\"%s\">%s</a>%n", s.stringValue(), s.stringValue());
                 }
             }
@@ -243,17 +241,17 @@ public class VocabBuilder {
 
             String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
             checkField(className, nextKey);
-            out.printf(getIndent(1) + "public static final URI %s;%n", nextKey);
+            out.printf(getIndent(1) + "public static final IRI %s;%n", nextKey);
             out.println();
         }
 
         //static init
         out.println(getIndent(1) + "static {");
-        out.printf(getIndent(2) + "ValueFactory factory = ValueFactoryImpl.getInstance();%n");
+        out.printf(getIndent(2) + "ValueFactory factory = SimpleValueFactory.getInstance();%n");
         out.println();
         for (String key : keys) {
             String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
-            out.printf(getIndent(2) + "%s = factory.createURI(%s.NAMESPACE, \"%s\");%n", nextKey, className, key);
+            out.printf(getIndent(2) + "%s = factory.createIRI(%s.NAMESPACE, \"%s\");%n", nextKey, className, key);
         }
         out.println(getIndent(1) + "}");
         out.println();
@@ -297,13 +295,13 @@ public class VocabBuilder {
 
     public HashMap<String, Properties> generateResourceBundle(String baseName) throws GenerationException {
         Pattern pattern = Pattern.compile(Pattern.quote(getPrefix()) + "(.+)");
-        HashMap<String, URI> splitUris = new HashMap<>();
+        HashMap<String, IRI> splitUris = new HashMap<>();
         for (Resource nextSubject : model.subjects()) {
-            if (nextSubject instanceof URI) {
+            if (nextSubject instanceof IRI) {
                 Matcher matcher = pattern.matcher(nextSubject.stringValue());
                 if (matcher.find()) {
                     String k = matcher.group(1);
-                    splitUris.put(k, (URI) nextSubject);
+                    splitUris.put(k, (IRI) nextSubject);
                 }
             }
         }
@@ -316,22 +314,22 @@ public class VocabBuilder {
         // Default we have for sure
         bundles.put(baseName, new Properties());
         for (String key : keys) {
-            final URI resource = splitUris.get(key);
+            final IRI resource = splitUris.get(key);
             String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
 
-            for (URI p : LABEL_PROPERTIES) {
-                for (Value v : GraphUtil.getObjects(model, resource, p)) {
+            for (IRI p : LABEL_PROPERTIES) {
+                for (Value v : model.filter(resource, p, null).objects()) {
                     if (v instanceof Literal) {
                         final Literal lit = (Literal) v;
-                        final String lang = lit.getLanguage();
+                        final Optional<String> lang = lit.getLanguage();
                         final Properties bundle;
-                        if (lang == null) {
+                        if (!lang.isPresent()) {
                             bundle = bundles.get(baseName);
-                        } else if (bundles.containsKey(baseName + "_" + lang)) {
-                            bundle = bundles.get(baseName + "_" + lang);
+                        } else if (bundles.containsKey(baseName + "_" + lang.get())) {
+                            bundle = bundles.get(baseName + "_" + lang.get());
                         } else {
                             bundle = new Properties();
-                            bundles.put(baseName + "_" + lang, bundle);
+                            bundles.put(baseName + "_" + lang.get(), bundle);
                         }
 
                         if (!bundle.containsKey(nextKey + ".label")) {
@@ -341,19 +339,19 @@ public class VocabBuilder {
                 }
             }
 
-            for (URI p : COMMENT_PROPERTIES) {
-                for (Value v : GraphUtil.getObjects(model, resource, p)) {
+            for (IRI p : COMMENT_PROPERTIES) {
+                for (Value v : model.filter(resource, p, null).objects()) {
                     if (v instanceof Literal) {
                         final Literal lit = (Literal) v;
-                        final String lang = lit.getLanguage();
+                        final Optional<String> lang = lit.getLanguage();
                         final Properties bundle;
-                        if (lang == null) {
+                        if (!lang.isPresent()) {
                             bundle = bundles.get(baseName);
-                        } else if (bundles.containsKey(baseName + "_" + lang)) {
-                            bundle = bundles.get(baseName + "_" + lang);
+                        } else if (bundles.containsKey(baseName + "_" + lang.get())) {
+                            bundle = bundles.get(baseName + "_" + lang.get());
                         } else {
                             bundle = new Properties();
-                            bundles.put(baseName + "_" + lang, bundle);
+                            bundles.put(baseName + "_" + lang.get(), bundle);
                         }
 
                         if (!bundle.containsKey(nextKey + ".comment")) {
@@ -387,8 +385,8 @@ public class VocabBuilder {
         return StringUtils.repeat(getIndent(), level);
     }
 
-    private Literal getFirstExistingObjectLiteral(Model model, Resource subject, String lang, URI... predicates) throws GraphUtilException {
-        for (URI predicate : predicates) {
+    private Literal getFirstExistingObjectLiteral(Model model, Resource subject, String lang, IRI... predicates) {
+        for (IRI predicate : predicates) {
             Literal literal = getOptionalObjectLiteral(model, subject, predicate, lang);
             if (literal != null) {
                 return literal;
@@ -398,15 +396,16 @@ public class VocabBuilder {
     }
 
     private Literal getOptionalObjectLiteral(Model model, Resource subject,
-                                             URI predicate, String lang) {
-        Set<Value> objects = GraphUtil.getObjects(model, subject, predicate);
+                                             IRI predicate, String lang) {
+        Set<Value> objects = model.filter(subject, predicate, null).objects();
 
         Literal result = null;
 
         for (Value nextValue : objects) {
             if (nextValue instanceof Literal) {
                 final Literal literal = (Literal) nextValue;
-                if (result == null || (lang != null && lang.equals(literal.getLanguage()))) {
+                Optional<String> nextLang = literal.getLanguage();
+                if (result == null || (lang != null && nextLang.isPresent() && lang.equals(nextLang.get()))) {
                     result = literal;
                 }
             }

@@ -6,9 +6,11 @@
 #     chmod +x sesame-vocab-builder
 #
 
-if [ ! -d "vocab-builder-cli/target/appassembler/bin" ]; then
-    mvn -quiet clean install
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+if [ ! -d "${DIR}/vocab-builder-cli/target/appassembler/bin" ]; then
+    (cd ${DIR} && mvn -quiet clean install -DskipTests)
 fi
 
-chmod u+x vocab-builder-cli/target/appassembler/bin/*
-vocab-builder-cli/target/appassembler/bin/sesame-vocab-builder "$@"
+chmod u+x `ls ${DIR}/vocab-builder-cli/target/appassembler/bin/*`
+$DIR/vocab-builder-cli/target/appassembler/bin/sesame-vocab-builder "$@"

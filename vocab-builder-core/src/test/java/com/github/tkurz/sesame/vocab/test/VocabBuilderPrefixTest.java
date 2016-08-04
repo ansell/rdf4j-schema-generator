@@ -7,8 +7,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.openrdf.model.util.GraphUtilException;
-import org.openrdf.rio.RDFParseException;
+import org.eclipse.rdf4j.model.util.GraphUtilException;
+import org.eclipse.rdf4j.rio.RDFParseException;
 
 import java.io.File;
 import java.io.IOException;

@@ -2,7 +2,7 @@ package com.github.tkurz.sesame.vocab.test.vocabularies;
 
 import com.github.tkurz.sesame.vocab.test.AbstractVocabSpecificTest;
 import org.junit.Assume;
-import org.openrdf.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFFormat;
 
 import java.io.IOException;
 import java.io.InputStream;

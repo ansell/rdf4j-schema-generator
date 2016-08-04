@@ -54,8 +54,8 @@ public class VocabularyBuilderSpecialTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Files.copy(javaFilePath, out);
         String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
-        assertTrue(result.contains("public static final URI hasTarget"));
-        assertTrue(result.contains("public static final URI _default"));
+        assertTrue(result.contains("public static final IRI hasTarget"));
+        assertTrue(result.contains("public static final IRI _default"));
     }
 
 }

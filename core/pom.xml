@@ -3,27 +3,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.tkurz.sesame</groupId>
-        <artifactId>vocab-builder</artifactId>
-        <version>1.5-SNAPSHOT</version>
+        <groupId>com.github.ansell.rdf4j-schema-generator</groupId>
+        <artifactId>schema-generator-parent</artifactId>
+        <version>0.1-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>vocab-builder-core</artifactId>
-    <name>Sesame Vocabulary Builder :: Core</name>
+    <artifactId>schema-generator-core</artifactId>
+    <name>RDF4J Schema Generator :: Core</name>
 
     <prerequisites>
-        <maven>3.0.4</maven>
+        <maven>3.0.5</maven>
     </prerequisites>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>
@@ -93,11 +84,11 @@
             <artifactId>rdf4j-rio-jsonld</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- dependency> Disabled until updated version available
+        <dependency>
             <groupId>org.semarglproject</groupId>
-            <artifactId>semargl-sesame</artifactId>
+            <artifactId>semargl-rdf4j</artifactId>
             <scope>test</scope>
-        </dependency-->
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>

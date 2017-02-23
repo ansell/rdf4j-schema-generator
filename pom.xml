@@ -2,19 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.tkurz.sesame</groupId>
-    <artifactId>vocab-builder</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <groupId>com.github.ansell.rdf4j-schema-generator</groupId>
+    <artifactId>rdf4j-schema-generator-parent</artifactId>
+    <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
-
-    <name>Sesame Vocabulary Builder</name>
-    <url>https://github.com/tkurz/sesame-vocab-builder</url>
+    <name>RDF4J Schema Generator</name>
+    <url>https://github.com/ansell/rdf4j-schema-generator</url>
 
     <licenses>
         <license>
@@ -42,22 +36,21 @@
     </developers>
 
     <scm>
-        <url>https://github.com/tkurz/sesame-vocab-builder.git</url>
-        <connection>scm:git:git@github.com:tkurz/sesame-vocab-builder.git</connection>
-        <developerConnection>scm:git:git@github.com:tkurz/sesame-vocab-builder.git</developerConnection>
-        <tag>HEAD</tag>
+        <url>https://github.com/ansell/rdf4j-schema-generator.git</url>
+        <connection>scm:git:git@github.com:ansell/rdf4j-schema-generator.git</connection>
+        <developerConnection>scm:git:git@github.com:ansell/rdf4j-schema-generator.git</developerConnection>
     </scm>
 
     <properties>
-        <jackson.version>2.6.3</jackson.version>
+        <jackson.version>2.8.7</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <rdf4j.version>2.0M3</rdf4j.version>
-        <slf4j.version>1.7.21</slf4j.version>
+        <rdf4j.version>2.2</rdf4j.version>
+        <slf4j.version>1.7.23</slf4j.version>
     </properties>
 
     <prerequisites>
-        <maven>3.0.4</maven>
+        <maven>3.0.5</maven>
     </prerequisites>
 
     <build>
@@ -99,16 +92,6 @@
                     <artifactId>appassembler-maven-plugin</artifactId>
                     <version>1.8</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5</version>
-                    <configuration>
-                        <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <pushChanges>false</pushChanges>
-                        <tagNameFormat>vocabulary-builder-@{project.version}</tagNameFormat>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -143,12 +126,12 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.5.2</version>
+                <version>4.5.3</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient-cache</artifactId>
-                <version>4.5.2</version>
+                <version>4.5.3</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.rdf4j</groupId>
@@ -192,12 +175,12 @@
                 <version>${rdf4j.version}</version>
                 <scope>runtime</scope>
             </dependency>
-            <!-- dependency> Disable until updated Semargl available
+            <dependency>
                 <groupId>org.semarglproject</groupId>
-                <artifactId>semargl-sesame</artifactId>
-                <version>0.6.1</version>
+                <artifactId>semargl-rdf4j</artifactId>
+                <version>0.7</version>
                 <scope>runtime</scope>
-            </dependency -->
+            </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
@@ -233,14 +216,14 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>19.0</version>
+                <version>21.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <modules>
-        <module>vocab-builder-core</module>
-        <module>vocab-builder-cli</module>
-        <module>vocab-builder-maven-plugin</module>
+        <module>core</module>
+        <module>cli</module>
+        <module>maven-plugin</module>
     </modules>
 </project>

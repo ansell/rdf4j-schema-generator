@@ -3,16 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.tkurz.sesame</groupId>
-        <artifactId>vocab-builder</artifactId>
-        <version>1.5-SNAPSHOT</version>
+        <groupId>com.github.ansell.rdf4j-schema-generator</groupId>
+        <artifactId>rdf4j-schema-generator</artifactId>
+        <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>vocab-builder-cli</artifactId>
-    <name>Sesame Vocabulary Builder :: CLI</name>
+    <artifactId>schema-generator-cli</artifactId>
+    <name>RDF4J Schema Generator :: CLI</name>
 
     <prerequisites>
-        <maven>3.0.4</maven>
+        <maven>3.0.5</maven>
     </prerequisites>
 
     <build>
@@ -40,7 +40,7 @@
                     <archive>
                         <index>true</index>
                         <manifest>
-                            <mainClass>com.github.tkurz.sesame.vocab.Main</mainClass>
+                            <mainClass>com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGenerator</mainClass>
                         </manifest>
                         <manifestEntries>
                             <mode>development</mode>
@@ -86,8 +86,8 @@
                 <configuration>
                     <programs>
                         <program>
-                            <mainClass>com.github.tkurz.sesame.vocab.Main</mainClass>
-                            <name>sesame-vocab-builder</name>
+                            <mainClass>com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGenerator</mainClass>
+                            <id>rdf4j-schema-generator</id>
                         </program>
                     </programs>
                 </configuration>
@@ -97,8 +97,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.tkurz.sesame</groupId>
-            <artifactId>vocab-builder-core</artifactId>
+            <groupId>com.github.ansell.rdf4j-schema-generator</groupId>
+            <artifactId>schema-generator-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -155,10 +155,10 @@
             <artifactId>rdf4j-rio-jsonld</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!-- dependency> Disabled until updated version available
+        <dependency>
             <groupId>org.semarglproject</groupId>
-            <artifactId>semargl-sesame</artifactId>
+            <artifactId>semargl-rdf4j</artifactId>
             <scope>runtime</scope>
-        </dependency -->
+        </dependency>
     </dependencies>
 </project>

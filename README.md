@@ -1,11 +1,13 @@
-# Sesame Vocabulary Builder
+# RDF4J Schema Generator
 
-Sesame Vocabulary Builder provides a command line tool and maven plugin that allows to create constants for RDF primitives for a given namespace from RDF ontology files.
+[![Build Status](https://travis-ci.org/ansell/rdf4j-schema-generator.svg?branch=master)](https://travis-ci.org/ansell/rdf4j-schema-generator) [![Coverage Status](https://coveralls.io/repos/ansell/rdf4j-schema-generator/badge.svg?branch=master)](https://coveralls.io/r/ansell/rdf4j-schema-generator?branch=master)
+
+RDF4J Schema Generator provides a command line tool and maven plugin that allows to create constants for RDF primitives for a given namespace from RDF ontology files.
 
 ## How To
 
-1. Download the latest version [here](https://github.com/tkurz/sesame-vocab-builder/releases).
-1. Run jar from command line (Java 7 required): `java -jar vocab-builder-cli-{VERSION}-exe.jar <input-file> [<output-file>]`
+1. Clone from https://github.com/ansell/rdf4j-schema-generator.git
+1. Run `./rdf4j-schema-generator <input-file> <output-file>`
 1. Additional information can be configured using command-line parameters
 
 ## Command Line Options
@@ -42,19 +44,15 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
 
 ## Run from Git
 
-1. Clone from https://github.com/tkurz/sesame-vocab-builder.git
-1. Run `./sesame-vocab-builder  <input-file> <output-file>`
-1. Additional information can be configured using command-line parameters
-
 ## Maven Plugin
 
 ```xml
 <build>
     <plugins>
         <plugin>
-            <groupId>com.github.tkurz.sesame</groupId>
-            <artifactId>vocab-builder-maven-plugin</artifactId>
-            <version>1.3</version>
+            <groupId>com.github.ansell.rdf4j-schema-generator</groupId>
+            <artifactId>schema-generator-maven-plugin</artifactId>
+            <version>0.1</version>
             <executions>
                 <execution>
                     <id>generate-vocabularies</id>
@@ -65,8 +63,8 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
                 </execution>
             </executions>
             <configuration>
-                <output>${project.build.directory}/generated-sources/sesame-vocabs</output>
-                <packageName>com.example.sesame.vocabularies</packageName>
+                <output>${project.build.directory}/generated-sources/rdf4j-schemas</output>
+                <packageName>com.example.rdf4j.schemas</packageName>
                 <mimeType>text/turtle</mimeType>
                 <preferredLanguage>en</preferredLanguage>
                 <createResourceBundles>true</createResourceBundles>
@@ -79,7 +77,7 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
                     <vocabulary>
                         <className>LDP</className>
                         <prefix>http://www.w3.org/ns/ldp#</prefix>
-                        <file>sesame-vocab-builder-core/src/test/resources/ldp.ttl</file>
+                        <file>core/src/test/resources/ldp.ttl</file>
                     </vocabulary>
                     <vocabulary>
                         <className>RDF</className>
@@ -91,3 +89,10 @@ Sesame Vocabulary Builder provides a command line tool and maven plugin that all
     </plugins>
 </build>
 ```
+
+# Changelog
+
+## 2017-02-23
+* Rebranded to rdf4j-schema-generator
+* Converted to use RDF4J
+* Version dropped to 0.1 for active development

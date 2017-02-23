@@ -2,18 +2,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.tkurz.sesame</groupId>
-        <artifactId>vocab-builder</artifactId>
-        <version>1.5-SNAPSHOT</version>
+        <groupId>com.github.ansell.rdf4j-schema-generator</groupId>
+        <artifactId>schema-generator</artifactId>
+        <version>0.1-SNAPSHOT</version>
     </parent>
 
     <prerequisites>
-        <maven>3.0.4</maven>
+        <maven>3.0.5</maven>
     </prerequisites>
 
-    <artifactId>vocab-builder-maven-plugin</artifactId>
+    <artifactId>schema-generator-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <name>Sesame Vocabulary Builder :: Maven Plugin</name>
+    <name>RDF4J Schema Generator :: Maven Plugin</name>
 
     <build>
         <plugins>
@@ -22,7 +22,7 @@
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.4</version>
                 <configuration>
-                    <goalPrefix>vocab-builder</goalPrefix>
+                    <goalPrefix>schema-generator</goalPrefix>
                 </configuration>
                 <executions>
                     <execution>
@@ -47,8 +47,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.tkurz.sesame</groupId>
-            <artifactId>vocab-builder-core</artifactId>
+            <groupId>com.github.ansell.rdf4j-schema-generator</groupId>
+            <artifactId>schema-generator-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -124,11 +124,11 @@
             <artifactId>rdf4j-rio-jsonld</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!-- dependency> Disabled until updated version available
+        <dependency>
             <groupId>org.semarglproject</groupId>
-            <artifactId>semargl-sesame</artifactId>
+            <artifactId>semargl-rdf4j</artifactId>
             <scope>runtime</scope>
-        </dependency-->
+        </dependency>
 
         <!-- Tests -->
         <dependency>

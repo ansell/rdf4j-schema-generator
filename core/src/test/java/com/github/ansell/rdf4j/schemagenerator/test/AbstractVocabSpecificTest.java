@@ -1,25 +1,28 @@
-package com.github.tkurz.sesame.vocab.test;
+package com.github.ansell.rdf4j.schemagenerator.test;
 
 
-import com.github.tkurz.sesame.vocab.GenerationException;
-import com.github.tkurz.sesame.vocab.VocabBuilder;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import com.github.ansell.rdf4j.schemagenerator.GenerationException;
+import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
+
 import org.eclipse.rdf4j.model.util.GraphUtilException;
+import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFParseException;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.InputStream;
 import java.nio.file.Path;
 
-public class VocabBuilderCompileTest {
+public abstract class AbstractVocabSpecificTest {
 
     @Rule
     public TemporaryFolder temp = new TemporaryFolder();
@@ -28,13 +31,13 @@ public class VocabBuilderCompileTest {
 
     @Before
     public void setUp() throws IOException {
-        File input = temp.newFile("ldp.ttl");
-        FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/ldp.ttl"), input);
+        File input = temp.newFile(String.format("%s.%s", getBasename(), getFormat().getDefaultFileExtension()));
+        FileUtils.copyInputStreamToFile(getInputStream(), input);
 
-        output = temp.newFile("LPD.java").toPath();
+        output = temp.newFile(String.format("%S.java", getBasename())).toPath();
 
         try {
-            VocabBuilder vb = new VocabBuilder(input.getAbsolutePath(), (String) null);
+            VocabBuilder vb = new VocabBuilder(input.getAbsolutePath(), getFormat());
             vb.generate(output);
             System.out.println(output);
         } catch (GenerationException e) {
@@ -47,9 +50,14 @@ public class VocabBuilderCompileTest {
 
     }
 
+    protected abstract InputStream getInputStream();
+
+    protected abstract String getBasename();
+
+    protected abstract RDFFormat getFormat();
 
     @Test
-    public void testVocabularyCompilation() throws ClassNotFoundException, MalformedURLException {
+    public void testCompilation() {
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
         int result = compiler.run(null, null, null, output.toString());

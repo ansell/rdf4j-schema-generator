@@ -1,6 +1,6 @@
-package com.github.tkurz.sesame.vocab.test;
+package com.github.ansell.rdf4j.schemagenerator.test;
 
-import com.github.tkurz.sesame.vocab.VocabBuilder;
+import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
 import com.google.common.io.Resources;
 import org.junit.After;
 import org.junit.Before;

@@ -1,4 +1,4 @@
-package com.github.tkurz.sesame.vocab;
+package com.github.ansell.rdf4j.schemagenerator;
 
 /**
  * @author Jakob Frank (jakob@apache.org)

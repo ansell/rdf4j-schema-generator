@@ -1,9 +1,9 @@
 /**
  *
  */
-package com.github.tkurz.sesame.vocab.test;
+package com.github.ansell.rdf4j.schemagenerator.test;
 
-import com.github.tkurz.sesame.vocab.VocabBuilder;
+import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
 import com.google.common.base.CaseFormat;
 import org.junit.After;
 import org.junit.Before;
@@ -139,7 +139,7 @@ public class VocabBuilderTest {
     }
 
     /**
-     * Test method for {@link com.github.tkurz.sesame.vocab.VocabBuilder#generate(java.nio.file.Path)}.
+     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.VocabBuilder#generate(java.nio.file.Path)}.
      */
     @Test
     public final void testRun() throws Exception {
@@ -166,7 +166,7 @@ public class VocabBuilderTest {
     }
 
     /**
-     * Test method for {@link com.github.tkurz.sesame.vocab.VocabBuilder#generate(java.nio.file.Path)}.
+     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.VocabBuilder#generate(java.nio.file.Path)}.
      */
     @Test
     public final void testUpperUnderscoreCase() throws Exception {
@@ -189,7 +189,7 @@ public class VocabBuilderTest {
     }
 
     /**
-     * Test method for {@link com.github.tkurz.sesame.vocab.VocabBuilder#generate(java.nio.file.Path)}.
+     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.VocabBuilder#generate(java.nio.file.Path)}.
      */
     @Test
     public final void testNoExplicitCase() throws Exception {

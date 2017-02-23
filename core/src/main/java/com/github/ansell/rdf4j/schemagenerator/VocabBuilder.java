@@ -1,4 +1,4 @@
-package com.github.tkurz.sesame.vocab;
+package com.github.ansell.rdf4j.schemagenerator;
 
 import com.google.common.collect.Sets;
 

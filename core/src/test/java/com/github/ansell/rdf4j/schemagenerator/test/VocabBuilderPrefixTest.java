@@ -1,12 +1,13 @@
-package com.github.tkurz.sesame.vocab.test;
-
-import com.github.tkurz.sesame.vocab.GenerationException;
-import com.github.tkurz.sesame.vocab.VocabBuilder;
+package com.github.ansell.rdf4j.schemagenerator.test;
 
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import com.github.ansell.rdf4j.schemagenerator.GenerationException;
+import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
+
 import org.eclipse.rdf4j.model.util.GraphUtilException;
 import org.eclipse.rdf4j.rio.RDFParseException;
 

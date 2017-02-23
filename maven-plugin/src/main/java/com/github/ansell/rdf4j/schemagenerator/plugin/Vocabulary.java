@@ -1,4 +1,4 @@
-package com.github.tkurz.sesame.vocab.plugin;
+package com.github.ansell.rdf4j.schemagenerator.plugin;
 
 import java.io.File;
 import java.net.URL;

@@ -1,4 +1,4 @@
-package com.github.tkurz.sesame.vocab;
+package com.github.rdf4j.schemagenerator;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
@@ -13,6 +13,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.eclipse.rdf4j.model.util.GraphUtilException;
 import org.eclipse.rdf4j.rio.*;
 
+import com.github.ansell.rdf4j.schemagenerator.GenerationException;
+import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
 import com.google.common.base.CaseFormat;
 
 import java.io.File;
@@ -37,7 +39,7 @@ import java.util.Set;
  * @author Thomas Kurz (tkurz@apache.org)
  * @author Jakob Frank (jakob@apache.org)
  */
-public class Main {
+public class RDF4JSchemaGenerator {
 
     public static void main(String[] args) {
         Path tempFile = null;
@@ -203,7 +205,7 @@ public class Main {
             hf.printWrapped(w, 80, error);
             w.println();
         }
-        hf.printWrapped(w, 80, 12, "usage: Main [options...] <input-file> [<output-file>]");
+        hf.printWrapped(w, 80, 12, "usage: RDF4JSchemaGenerator [options...] <input-file> [<output-file>]");
         hf.printWrapped(w, 80, 42, "  <input-file>                            the input file to read from");
         hf.printWrapped(w, 80, 42, "  [<output-file>]                         the output file to write, StdOut if omitted");
         hf.printOptions(w, 80, getCliOpts(), 2, 2);
@@ -342,7 +344,7 @@ public class Main {
     private static Properties getBuildProperties() {
         Properties p = new Properties();
         try {
-            p.load(Main.class.getResourceAsStream("/build.properties"));
+            p.load(RDF4JSchemaGenerator.class.getResourceAsStream("/build.properties"));
         } catch (IOException e) {
             // ignore
         }

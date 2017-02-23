@@ -1,7 +1,7 @@
-package com.github.tkurz.sesame.vocab.plugin;
+package com.github.ansell.rdf4j.schemagenerator.plugin;
 
-import com.github.tkurz.sesame.vocab.GenerationException;
-import com.github.tkurz.sesame.vocab.VocabBuilder;
+import com.github.ansell.rdf4j.schemagenerator.GenerationException;
+import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
 import com.google.common.base.CaseFormat;
 
 import org.apache.commons.io.FileUtils;

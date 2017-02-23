@@ -1,7 +1,9 @@
-package com.github.tkurz.sesame.vocab.test.vocabularies;
+package com.github.ansell.rdf4j.schemagenerator.test.vocabularies;
 
-import com.github.tkurz.sesame.vocab.test.AbstractVocabSpecificTest;
 import org.junit.Assume;
+
+import com.github.ansell.rdf4j.schemagenerator.test.AbstractVocabSpecificTest;
+
 import org.eclipse.rdf4j.rio.RDFFormat;
 
 import java.io.IOException;

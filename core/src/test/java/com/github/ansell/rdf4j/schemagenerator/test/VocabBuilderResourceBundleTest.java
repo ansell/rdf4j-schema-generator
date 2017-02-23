@@ -1,7 +1,5 @@
-package com.github.tkurz.sesame.vocab.test;
+package com.github.ansell.rdf4j.schemagenerator.test;
 
-import com.github.tkurz.sesame.vocab.GenerationException;
-import com.github.tkurz.sesame.vocab.VocabBuilder;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -9,6 +7,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import com.github.ansell.rdf4j.schemagenerator.GenerationException;
+import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
+
 import org.eclipse.rdf4j.rio.RDFParseException;
 
 import java.io.BufferedReader;

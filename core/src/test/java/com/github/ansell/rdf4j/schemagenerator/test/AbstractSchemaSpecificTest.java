@@ -30,24 +30,16 @@ public abstract class AbstractSchemaSpecificTest {
     private Path output;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws Exception {
         File input = temp.newFile(String.format("%s.%s", getBasename(), getFormat().getDefaultFileExtension()));
         FileUtils.copyInputStreamToFile(getInputStream(), input);
 
         output = temp.newFile(String.format("%S.java", getBasename())).toPath();
 
-        try {
-            RDF4JSchemaGeneratorCore vb = new RDF4JSchemaGeneratorCore(input.getAbsolutePath(), getFormat());
-            vb.generate(output);
-            System.out.println(output);
-        } catch (GenerationException e) {
-            Assert.fail("Could not generate schema " + e.getMessage());
-        } catch (RDFParseException e) {
-            Assert.fail("Could not parse test-file: " + e.getMessage());
-        } catch (GraphUtilException e) {
-            Assert.fail("Could not read schema: " + e.getMessage());
-        }
-
+        RDF4JSchemaGeneratorCore vb = new RDF4JSchemaGeneratorCore(input.getAbsolutePath(), getFormat());
+        vb.setPrefix(getPrefix());
+        vb.generate(output);
+        System.out.println(output);
     }
 
     protected abstract InputStream getInputStream();
@@ -56,8 +48,10 @@ public abstract class AbstractSchemaSpecificTest {
 
     protected abstract RDFFormat getFormat();
 
+    protected abstract String getPrefix();
+
     @Test
-    public void testCompilation() {
+    public void testCompilation() throws Exception {
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
         int result = compiler.run(null, null, null, output.toString());

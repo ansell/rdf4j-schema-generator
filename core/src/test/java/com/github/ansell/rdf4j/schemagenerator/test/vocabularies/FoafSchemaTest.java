@@ -31,4 +31,9 @@ public class FoafSchemaTest extends AbstractSchemaSpecificTest {
     protected RDFFormat getFormat() {
         return RDFFormat.RDFXML;
     }
+    
+    @Override
+    protected String getPrefix() {
+    	return "http://xmlns.com/foaf/0.1/";
+    }
 }

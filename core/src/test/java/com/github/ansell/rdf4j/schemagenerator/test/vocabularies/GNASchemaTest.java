@@ -22,4 +22,9 @@ public class GNASchemaTest extends AbstractSchemaSpecificTest {
     protected RDFFormat getFormat() {
         return RDFFormat.RDFXML;
     }
+    
+    @Override
+    protected String getPrefix() {
+    	return "http://rs.gbif.org/terms/1.0/";
+    }
 }

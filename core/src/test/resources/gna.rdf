@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Discussion document: version 2012-04-04. Not for production!
+ Dag Endresen, Global Biodiversity Information Facility (GBIF).
+
+ NOTE: the global names architecture vocabulary (gna) namespace is temporary developed in 
+  the sandbox of the GBIF Resources Registry at "http://rs.gbif.org/sandbox/terms/gbif/gna.rdf", 
+  and will be moved to the official namespace URL before it is released.
+
+ We might want to concider a revision of the namespace...?
+  Possibly: http://rs.gbif.org/terms/gbif/gna#
+  Possibly: http://purl.org/gbif/gna#
+
+ We might to explore further the relationship to the TDWG Ontolgy available at
+  "http://rs.tdwg.org/ontology/voc/".
+
+ This GNA Vocabulary is developed using the Vocabulary Wiki available at
+  "http://kos.gbif.org/wiki/GNA". Input and feedback, in particular using the 
+  Wiki site, is most welcome.
+-->
+
+<!DOCTYPE rdf:RDF [
+  <!ENTITY tdwg        "http://rs.tdwg.org/ontology/voc/">
+  <!ENTITY gna         "http://rs.gbif.org/terms/1.0/">
+  <!ENTITY gnaBase    "http://rs.gbif.org/terms/1.0/">
+]>
+
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:vs="http://www.w3.org/2003/06/sw-vocab-status/ns#"
+  xmlns:vann="http://purl.org/vocab/vann/"
+  xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
+  xmlns:tdwg="&tdwg;"
+  xmlns:gna="&gna;"
+  xml:base="&gnaBase;"
+>
+
+
+  <skos:ConceptScheme rdf:about="&gnaBase;">
+    <rdfs:label xml:lang="en">Global Names Architecture</rdfs:label>
+    <rdfs:comment xml:lang="en">This SKOS vocabulary provides the definitions for terms used by the Global Names Architecture.</rdfs:comment>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <dcterms:hasVersion rdf:resource="http://rs.gbif.org/sandbox/terms/gbif/gna"/>
+    <owl:versionInfo xml:lang="en">Draft discussion version, released 4 Apr 2012</owl:versionInfo>
+    <dcterms:creator rdf:resource="&gnaBase;/institute#GBIF"/>
+    <dcterms:contributor rdf:resource="&gnaBase;/institute#TDWG"/>
+    <dcterms:contributor rdf:resource="&gnaBase;/person#DavidRemsen"/>
+    <dcterms:contributor rdf:resource="&gnaBase;/person#MarkusDoring"/>
+    <dcterms:contributor rdf:resource="&gnaBase;/person#TimRobertson"/>
+    <dcterms:contributor rdf:resource="&gnaBase;/person#DagEndresen"/>
+    <dcterms:publisher rdf:resource="&gnaBase;/institute#GBIF"/>
+    <dcterms:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/"/>
+    <dcterms:rights xml:lang="en">Creative Commons Public Domain license; see http://creativecommons.org/publicdomain/zero/1.0/. You are free to copy, distribute and transmit the work; to remix/adapt the work (e.g. to import the ontology and create specializations of its elements), all without asking permissions. If you wish to provide attribution you may include the statement: "This work is based on the TDWG Species Interaction Vocabulary".</dcterms:rights>
+    <dcterms:accessRights>public</dcterms:accessRights>
+    <vann:preferredNamespaceUri>&gna;</vann:preferredNamespaceUri>
+    <vann:preferredNamespacePrefix>gna</vann:preferredNamespacePrefix>
+    <foaf:homepage rdf:resource="http://code.google.com/p/gbif-ecat/"/>
+    <skos:relatedMatch rdf:resource="http://rs.tdwg.org/ontology/voc/"/>
+    <skos:scopeNote>This list of concepts provides a controlled value vocabulary for the implementation of the Global Names Architecture (GNA).</skos:scopeNote>
+    <dcterms:bibliographicCitation>GBIF (2012). Global Names Architecture: Vocabulary of terms. Global Biodiversity Information Facility. Available at "http://code.google.com/p/gbif-ecat/".</dcterms:bibliographicCitation>
+    <skos:editorialNote xml:lang="en">Notice that the base URI of the Global Names Architecture Vocabulary is "http://rs.gbif.org/terms/gbif/gna#". Please make sure that you are only using element identifiers in this namespace, e.g. "http://rs.gbif.org/terms/gbif/gna#CONCEPT. There may be copies of the ontology file on the Web which can be retrieved from other locations, but those locations should not be used as the basis of identifiers. This is the first draft vocabulary scheduled to be deprecated and replaced.</skos:editorialNote>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/GNA"/>
+  </skos:ConceptScheme>
+
+
+<!-- ### Collection of Terms ###
+ Labelled collections can be used to group the terms under this sub-heading.
+
+  // Each group of terms (skos:Collection) could use the following properties.
+  @rdf:about 			(provides the identifier for the group of terms) [@rdf:ID]
+  rdfs:label 			(human readable label to be used for the group of terms)
+  rdfs:comment			(description of the group of terms)
+  skos:relatedMatch		(when the grouping concept has a related match to another concept [in another conceptScheme])
+  skos:exactMatch		(when the grouping concept has an exact match to another concept [in another conceptScheme])
+  skos:closeMatch		(when the grouping concept has a close match to another concept [in another conceptScheme])
+  skos:narrowMatch		(when the grouping concept has a narower hierarchal match to another concept [in another conceptScheme])
+  skos:related			(when the grouping concept has a related match to another concept)
+  skos:narrower			(when the grouping concept has a narrower hierarchal match to another concept)
+  skos:member			(list terms to be organized in each group) [on term here using rdf:isPartOf]
+ -->
+
+  <skos:Collection rdf:about="&gna;Description">
+    <rdfs:label xml:lang="en">Taxon Description</rdfs:label>
+    <rdfs:comment xml:lang="en">Darwin Core Taxon extension to exchange simple text or paragraph based taxon descriptions. Not suitable for structured descriptions and keys, but useful for creating species pages.</rdfs:comment>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <dc:subject>checklist</dc:subject>
+    <skos:member rdf:resource="dcterms:description"/>
+    <skos:member rdf:resource="dcterms:type"/>
+    <skos:member rdf:resource="dcterms:source"/>
+    <skos:member rdf:resource="dcterms:language"/>
+    <skos:member rdf:resource="dcterms:created"/>
+    <skos:member rdf:resource="dcterms:creator"/>
+    <skos:member rdf:resource="dcterms:contributor"/>
+    <skos:member rdf:resource="dcterms:audience"/>
+    <skos:member rdf:resource="dcterms:license"/>
+    <skos:member rdf:resource="dcterms:rightsHolder"/>
+  </skos:Collection>
+
+  <skos:Collection rdf:about="&gna;Distribution">
+    <rdfs:label xml:lang="en">Species Distribution</rdfs:label>
+    <rdfs:comment xml:lang="en">Geographic distribution of a taxon.</rdfs:comment>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:member rdf:resource="dwc:alocationID"/>
+    <skos:member rdf:resource="dwc:locality"/>
+    <skos:member rdf:resource="dwc:countryCode"/>
+    <skos:member rdf:resource="dwc:lifeStage"/>
+    <skos:member rdf:resource="dwc:occurrenceStatus"/>
+    <skos:member rdf:resource="http://iucn.org/terms/threatStatus"/>
+    <skos:member rdf:resource="dwc:establishmentMeans"/>
+    <skos:member rdf:resource="&gna;appendixCITES"/>
+    <skos:member rdf:resource="dwc:eventDate"/>
+    <skos:member rdf:resource="dwc:startDayOfYear"/>
+    <skos:member rdf:resource="dwc:endDayOfYear"/>
+    <skos:member rdf:resource="dcterms:source"/>
+    <skos:member rdf:resource="dwc:occurrenceRemarks"/>
+  </skos:Collection>
+
+  <skos:Collection rdf:about="&gna;Identifier">
+    <rdfs:label xml:lang="en">Alternative Identifiers</rdfs:label>
+    <rdfs:comment xml:lang="en">Alternative identifiers for a taxon or occurrence.</rdfs:comment>
+    <dcterms:subject rdf:resource="dwc:Occurrence"/>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:member rdf:resource="dcterms:identifier"/>
+    <skos:member rdf:resource="dcterms:title"/>
+    <skos:member rdf:resource="dcterms:subject"/>
+    <skos:member rdf:resource="dcterms:format"/>
+  </skos:Collection>
+
+  <skos:Collection rdf:about="&gna;Image">
+    <rdfs:label xml:lang="en">Simple Images</rdfs:label>
+    <rdfs:comment xml:lang="en">Terms for exchanging metadata, in particular links, for species or occurrence images.</rdfs:comment>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <dcterms:subject rdf:resource="dwc:Occurrence"/>
+    <skos:member rdf:resource="dcterms:identifier"/>
+    <skos:member rdf:resource="dcterms:references"/>
+    <skos:member rdf:resource="dcterms:title"/>
+    <skos:member rdf:resource="dcterms:description"/>
+    <skos:member rdf:resource="dcterms:spatial"/>
+    <skos:member rdf:resource="geo:latitude"/>
+    <skos:member rdf:resource="geo:longitude"/>
+    <skos:member rdf:resource="dcterms:format"/>
+    <skos:member rdf:resource="dcterms:created"/>
+    <skos:member rdf:resource="dcterms:creator"/>
+    <skos:member rdf:resource="dcterms:contributor"/>
+    <skos:member rdf:resource="dcterms:publisher"/>
+    <skos:member rdf:resource="dcterms:audience"/>
+    <skos:member rdf:resource="dcterms:license"/>
+    <skos:member rdf:resource="dcterms:rightsHolder"/>
+  </skos:Collection>
+
+  <skos:Collection rdf:about="&gna;Reference">
+    <rdfs:label xml:lang="en">Literature References</rdfs:label>
+    <rdfs:comment xml:lang="en">Bibliography, i.e. list of literature references. For example a taxon, occurrence or specimen.</rdfs:comment>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <dcterms:subject rdf:resource="dwc:Occurrence"/>
+    <skos:member rdf:resource="dcterms:identifier"/>
+    <skos:member rdf:resource="dcterms:bibliographicCitation"/>
+    <skos:member rdf:resource="dcterms:title"/>
+    <skos:member rdf:resource="dcterms:creator"/>
+    <skos:member rdf:resource="dcterms:date"/>
+    <skos:member rdf:resource="dcterms:source"/>
+    <skos:member rdf:resource="dcterms:description"/>
+    <skos:member rdf:resource="dcterms:subject"/>
+    <skos:member rdf:resource="dcterms:language"/>
+    <skos:member rdf:resource="dcterms:rights"/>
+    <skos:member rdf:resource="dwc:taxonRemarks"/>
+    <skos:member rdf:resource="dcterms:type"/>
+  </skos:Collection>
+
+  <skos:Collection rdf:about="&gna;SpeciesProfile">
+    <rdfs:label xml:lang="en">Species Profile</rdfs:label>
+    <rdfs:comment xml:lang="en">Terms for basic species characteristics in addition to textural description which are covered by the description terms.</rdfs:comment>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:member rdf:resource="&gna;isMarine"/>
+    <skos:member rdf:resource="&gna;isFreshwater"/>
+    <skos:member rdf:resource="&gna;isTerrestrial"/>
+    <skos:member rdf:resource="&gna;isHybrid"/>
+    <skos:member rdf:resource="&gna;isExtinct"/>
+    <skos:member rdf:resource="&gna;livingPeriod"/>
+    <skos:member rdf:resource="&gna;ageInDays"/>
+    <skos:member rdf:resource="&gna;sizeInMillimeters"/>
+    <skos:member rdf:resource="&gna;massInGrams"/>
+    <skos:member rdf:resource="&gna;lifeForm"/>
+    <skos:member rdf:resource="dwc:habitat"/>
+    <skos:member rdf:resource="dwc:sex"/>
+  </skos:Collection>
+
+  <skos:Collection rdf:about="&gna;TypesAndSpecimen">
+    <rdfs:label xml:lang="en">Types and Specimen</rdfs:label>
+    <rdfs:comment xml:lang="en">Terms for description of specimens and types, including type specimens, type species and type genera and simple specimens unrelated to types.</rdfs:comment>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:member rdf:resource="dwc:typeStatus"/>
+    <skos:member rdf:resource="&gna;typeDesignationType"/>
+    <skos:member rdf:resource="&gna;typeDesignatedBy"/>
+    <skos:member rdf:resource="dwc:scientificName"/>
+    <skos:member rdf:resource="dwc:taxonRank"/>
+    <skos:member rdf:resource="dcterms:bibliographicCitation"/>
+    <skos:member rdf:resource="dwc:occurrenceID"/>
+    <skos:member rdf:resource="dwc:institutionCode"/>
+    <skos:member rdf:resource="dwc:collectionCode"/>
+    <skos:member rdf:resource="dwc:catalogNumber"/>
+    <skos:member rdf:resource="dwc:locality"/>
+    <skos:member rdf:resource="dwc:sex"/>
+    <skos:member rdf:resource="dwc:recordedBy"/>
+    <skos:member rdf:resource="dcterms:source"/>
+    <skos:member rdf:resource="dwc:verbatimEventDate"/>
+    <skos:member rdf:resource="&gna;verbatimLabel"/>
+    <skos:member rdf:resource="dwc:verbatimLongitude"/>
+    <skos:member rdf:resource="dwc:verbatimLatitude"/>
+  </skos:Collection>
+
+  <skos:Collection rdf:about="&gna;VernacularName">
+    <rdfs:label xml:lang="en">Vernacular Names</rdfs:label>
+    <rdfs:comment xml:lang="en">Terms for providing a list of vernacular names for a scientific taxon name.</rdfs:comment>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:member rdf:resource="dwc:vernacularName"/>
+    <skos:member rdf:resource="dcterms:source"/>
+    <skos:member rdf:resource="dcterms:language"/>
+    <skos:member rdf:resource="dcterms:temporal"/>
+    <skos:member rdf:resource="dwc:locationID"/>
+    <skos:member rdf:resource="dwc:locality"/>
+    <skos:member rdf:resource="dwc:countryCode"/>
+    <skos:member rdf:resource="dwc:sex"/>
+    <skos:member rdf:resource="dwc:lifeStage"/>
+    <skos:member rdf:resource="&gna;isPlural"/>
+    <skos:member rdf:resource="&gna;isPreferredName"/>
+    <skos:member rdf:resource="&gna;organismPart"/>
+    <skos:member rdf:resource="dwc:taxonRemarks"/>
+  </skos:Collection>
+
+
+
+<!-- ### INDIVIDUAL CONCEPTS ###
+ Some vocabularies simply use "rdf:Description" for all of the RDF "molecules"... 
+ SKOS:Concept seems appropriate because SKOS is designed to express thesauri and terminology.
+ SKOS was designed with re-usability in mind, the terms has minimal semantic restrictions declared.
+ And minimum restrictions makes for maximum RE-USABILITY - and the rationale for using SKOS.
+
+  // Each concept (skos:Concept) is described by the following properties.
+  @rdf:about 			(provides the identifier for the concept) [@rdf:ID]
+  skos:prefLabel 		(human readable name or label)
+  skos:altLabel 		(for synonym labels)
+  skos:definition 		(brief definition)
+  skos:note 			(notes on how to use for each concept)
+  skos:scopeNote 		(what the concept does and does not cover)
+  dcterms:issued 		(date when the concept was first published)
+  dcterms:modified 		(modification date)
+  vann:termGroup		(used for organizing terms into groups, collection or category of terms)
+  skos:inScheme			(terms belong to an identifiable vocabulary of terms)    
+  rdfs:isDefinedBy 		(terms are defined by an identifiable vocabulary or resource)
+  vs:term_status 		(all terms here are still considered "unstable", and under development)
+  rdfs:seeAlso  		(link to other documentation resources)
+
+  // Cross-walk between terms and concepts in other concept schemes.
+  skos:relatedMatch		(when the term has a related match to another concept [in another conceptScheme])
+  skos:exactMatch		(when the term has an exact match to another concept [in another conceptScheme])
+  skos:closeMatch		(when the term has a close match to another concept [in another conceptScheme])
+  skos:narrowMatch		(when the term has a narower hierarchal match to another concept [in another conceptScheme])
+  skos:broadMatch       (when the term has a broader hierarchal match to another concept [in another conceptScheme])
+  skos:related			(when the term has a related match to another concept [in the same conceptScheme])
+  skos:narrower			(when the term has a narrower hierarchal match to another concept)
+  skos:broader			(when the term has a broader hierarchal match to another concept)
+
+  // Potentially useful properties.
+  dcterms:source 		(link to the source description)
+  dcterms:isReplacedBy 	(when a term is deprecated and replaced)
+  dcterms:replaces 		(can be used if the TERM replaces a previous TERM)
+  dcterms:isPartOf 		(could perhaps be used here for organizing terms into groups, collection or category of terms [?])
+  rdf:type 				(type is here implicit when using skos:Concept for the "RDF molecules")
+  rdf:datatype          (can rdf:datatype be used to recommend a controlled value vocabulary for a term...?)
+
+  dcterms:hasVersion 	(terms can be versioned individually)
+  dcterms:identifier 	(we could potentially also provide other identifiers than the URI here, eg. DOI, LSID)
+  rdfs:label 			(human readable name for the term, same as skos:prefLabel)
+  rdfs:domain			(defines the resources used as subjects when a concept is used as an annotation property)
+  rdfs:range			(defines the resources used as objects when a concept is used as an annotation property)
+  rdfs:subPropertyOf 	(when the term can be seen as instance of a broader vocabulary term [Property])
+  rdfs:subClassOf 		(when the term can be seen as instance of a broader vocabulary term [Class])
+  owl:equivalentProperty
+-->
+
+
+  <skos:Concept rdf:about="&gna;appendixCITES">
+    <skos:prefLabel xml:lang="en">CITES appendix</skos:prefLabel>
+    <skos:definition xml:lang="en">The CITES (Convention on International Trade in Endangered Species of Wild Fauna and Flora) Appendix number the taxa is listed. It is possible to have different appendix numbers for different areas, but 'global' as an area is also valid if its the same worldwide.</skos:definition>
+    <skos:example>II</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;Distribution"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/distribution.xml#appendixCITES"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/vocabulary/un/cites_appendix.xml"/>
+    <skos:relatedMatch rdf:resource="http://www.cites.org/eng/app/index.shtml"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:appendixCITES"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;isMarine">
+    <skos:prefLabel xml:lang="en">Species is marine</skos:prefLabel>
+    <skos:definition xml:lang="en">A boolean flag indicating whether the taxon is a marine organism, i.e. can be found in or above sea water.</skos:definition>
+    <skos:example>TRUE</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;SpeciesProfile"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/speciesprofile.xml#isMarine"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:isMarine"/>
+    <gna:recommendedControlledVocabulary rdf:resource="http://rs.gbif.org/vocabulary/basic/boolean.xml"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;isTerrestrial">
+    <skos:prefLabel xml:lang="en">Species is terrestrial</skos:prefLabel>
+    <skos:definition xml:lang="en">A boolean flag indicating the taxon is a terrestrial organism, i.e. occurs on land as opposed to the sea.</skos:definition>
+    <skos:example>TRUE</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;SpeciesProfile"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/speciesprofile.xml#isTerrestrial"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:isTerrestrial"/>
+    <gna:recommendedControlledVocabulary rdf:resource="http://rs.gbif.org/vocabulary/basic/boolean.xml"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;isHybrid">
+    <skos:prefLabel xml:lang="en">Species is hybrid</skos:prefLabel>
+    <skos:definition xml:lang="en">Flag indicating a hybrid organism. This does not have to be reflected in the name, but can be based on other studies like chromosome numbers etc.</skos:definition>
+    <skos:example>TRUE</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;SpeciesProfile"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/speciesprofile.xml#isHybrid"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:isHybrid"/>
+    <gna:recommendedControlledVocabulary rdf:resource="http://rs.gbif.org/vocabulary/basic/boolean.xml"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;isExtinct">
+    <skos:prefLabel xml:lang="en">Species is extinct</skos:prefLabel>
+    <skos:definition xml:lang="en">Flag indicating an extinct organism.</skos:definition>
+    <skos:example>TRUE</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;SpeciesProfile"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/speciesprofile.xml#isExtinct"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:isExtinct"/>
+    <gna:recommendedControlledVocabulary rdf:resource="http://rs.gbif.org/vocabulary/basic/boolean.xml"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;livingPeriod">
+    <skos:prefLabel xml:lang="en">Living period</skos:prefLabel>
+    <skos:definition xml:lang="en">The (geological) time a currently extinct organism is known to have lived.</skos:definition>
+    <skos:note xml:lang="en">For geological times of fossils ideally based on a vocabulary like http://en.wikipedia.org/wiki/Geologic_column.</skos:note>
+    <skos:example>TRUE</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;SpeciesProfile"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/speciesprofile.xml#livingPeriod"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:livingPeriod"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;ageInDays">
+    <skos:prefLabel xml:lang="en">Age in days</skos:prefLabel>
+    <skos:definition xml:lang="en">Maximum observed age of an organism given as number of days.</skos:definition>
+    <skos:example>5</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;SpeciesProfile"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/speciesprofile.xml#ageInDays"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:ageInDays"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;sizeInMillimeters">
+    <skos:prefLabel xml:lang="en">Size in millimeters</skos:prefLabel>
+    <skos:definition xml:lang="en">Maximum observed size of an organism in millimeter. Can be either height, length or width, whichever is greater.</skos:definition>
+    <skos:example>1500</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;SpeciesProfile"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/speciesprofile.xml#sizeInMillimeters"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:sizeInMillimeters"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;massInGrams">
+    <skos:prefLabel xml:lang="en">Mass in grams</skos:prefLabel>
+    <skos:definition xml:lang="en">Maximum observed weight of an organism in grams.</skos:definition>
+    <skos:example>12</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;SpeciesProfile"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/speciesprofile.xml#massInGrams"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:massInGrams"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;lifeForm">
+    <skos:prefLabel xml:lang="en">Lifeform</skos:prefLabel>
+    <skos:definition xml:lang="en">A term describing the growth or lifeform of an organism.</skos:definition>
+    <skos:note>Should be based on a vocabulary like Raunkiær for plants: http://en.wikipedia.org/wiki/Raunkiær_plant_life-form.</skos:note>
+    <skos:example>Phanerophyte </skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;SpeciesProfile"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/speciesprofile.xml#lifeForm"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:lifeForm"/>
+    <gna:recommendedControlledVocabulary rdf:resource="http://rs.gbif.org/vocabulary/gbif/life_form.xml"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;typeDesignatedBy">
+    <skos:prefLabel xml:lang="en">Type designated by</skos:prefLabel>
+    <skos:definition xml:lang="en">The citation of the publication where the type designation is found.</skos:definition>
+    <skos:example>Vachal, J. (1897) Éclaircissements sur de genre Scrapter et description d’une espéce nouvelle de Dufourea. Bulletin de la Société Entomologique de France, 1897, 61–64.</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;TypesAndSpecimen"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/typesandspecimen.xml#typeDesignatedBy"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:typeDesignatedBy"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;typeDesignationType">
+    <skos:prefLabel xml:lang="en">Type designation justification</skos:prefLabel>
+    <skos:definition xml:lang="en">The reason why this specimen or name is designated as a type.</skos:definition>
+    <skos:example>monotypy, original designation, tautonomy</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;TypesAndSpecimen"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/typesandspecimen.xml#typeDesignationType"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:typeDesignationType"/>
+    <gna:recommendedControlledVocabulary rdf:resource="http://rs.gbif.org/vocabulary/gbif/life_form.xml"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;verbatimLabel">
+    <skos:prefLabel xml:lang="en">Verbatim label</skos:prefLabel>
+    <skos:definition xml:lang="en">The full, verbatim text from the specimen label.</skos:definition>
+    <skos:example>(no example)</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;TypesAndSpecimen"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/typesandspecimen.xml#verbatimLabel"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:verbatimLabel"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;isPlural">
+    <skos:prefLabel xml:lang="en">Name in plural form</skos:prefLabel>
+    <skos:definition xml:lang="en">This value is true if the vernacular name it qualifies refers to a plural form of the name.</skos:definition>
+    <skos:example>The term "Schoolies" is the plural form of a name used along the coastal Northeastern U.S. for groups of juvenile fish of the species, Morone saxatilis.</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;VernacularName"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/vernacularname.xml#isPlural"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:isPlural"/>
+    <gna:recommendedControlledVocabulary rdf:resource="http://rs.gbif.org/vocabulary/basic/boolean.xml"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;isPreferredName">
+    <skos:prefLabel xml:lang="en">Is the preferred name</skos:prefLabel>
+    <skos:definition xml:lang="en">This term is true if the source citing the use of this vernacular name indicates the usage has some preference or specific standing over other possible vernacular names used for the species.</skos:definition>
+    <skos:example>TRUE</skos:example>
+    <skos:note>Some organisations have attempted to assign specific and unique vernacular names for particular taxon groups in a systematic attempt to bring order and consistency to the use of these names. For example, the American Ornithological Union assigns the name "Pearl Kite" for the taxon, Gampsonyx swainsonii. The value of isPreferredName for this record would be true.</skos:note>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;VernacularName"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/vernacularname.xml#isPreferredName"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:isPreferredName"/>
+    <gna:recommendedControlledVocabulary rdf:resource="http://rs.gbif.org/vocabulary/basic/boolean.xml"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="&gna;organismPart">
+    <skos:prefLabel xml:lang="en">Organism part</skos:prefLabel>
+    <skos:definition xml:lang="en">The part of the organism to which the vernacular name refers. Best practice is to utilise a controlled vocabulary for this term although it is likely that multiple controlled lists for different organism groups may be the best implementation for this term.</skos:definition>
+    <skos:example>The spice "Mace", is derived from the "aril" of the plant Myristica fragrans while the spice "nutmeg" is derived from the "seed." "Seed" and "Aril" represent two different values for organismPart.</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <skos:inScheme rdf:resource="&gna;"/>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vann:termGroup rdf:resource="&gna;VernacularName"/>
+    <vs:term_status>unstable</vs:term_status>
+    <dcterms:subject rdf:resource="dwc:Taxon"/>
+    <skos:relatedMatch rdf:resource="http://rs.gbif.org/extension/gbif/1.0/vernacularname.xml#organismPart"/>
+    <skos:scopeNote rdf:resource="http://kos.gbif.org/wiki/Gna:organismPart"/>
+  </skos:Concept>
+
+
+<!--
+ Does anybody know a suitable RDF property in use to recommend a controlled vocabulary 
+ for a term... Eg. using rdf:datatype does not quite feel right.
+-->
+
+  <skos:Concept rdf:about="&gna;recommendedControlledVocabulary">
+    <skos:prefLabel xml:lang="en">Recommended controlled vocabulary</skos:prefLabel>
+    <skos:definition xml:lang="en">Annotation property for terms with a best practice guideline for a recommended controlled vocabulary to be used.</skos:definition>
+    <skos:example>http://purl.org/dc/terms/DCMIType</skos:example>
+    <dcterms:issued>2012-04-04</dcterms:issued>
+    <dcterms:modified>2012-04-04</dcterms:modified>
+    <rdfs:isDefinedBy rdf:resource="&gna;"/>
+    <vs:term_status>unstable</vs:term_status>
+    <skos:relatedMatch rdf:resource="http://purl.org/dc/terms/DCMIType"/>
+  </skos:Concept>
+
+
+<!-- ### Agents, Organization and Person ###
+ Providing information about the organization and the persons who contributed
+ to creating or maintaining the Vocabulary of Terms is a good practice.
+ When using dcterms:creator, :contributor, :publisher etc these have rdfs:range 
+ dcterms:Agent and will therefore specify the values to be non-literal resources.
+
+ foaf:organization and foaf:Person entities are described by:
+  foaf:name					(full name, institute or person)
+  foaf:nickname				(reporting institute acronyms here)
+  dcterms:identifier		(eg. from the Biodiversity Collections Index [BCI])
+  @rdf:datatype				(datatype property, BCI-ID)
+  foaf:homepage				(institute home page, www)
+  foaf:member				(list persons affiliated)
+  foaf:mbox					(mailbox)
+  foaf:mbox_sha1sum			(md5 hash sum based on the mailbox [md5 -s email])
+ -->
+
+  <foaf:Organization rdf:about="&gnaBase;/institute#GBIF">
+    <foaf:name>Global Biodiversity Information Facility</foaf:name>
+    <foaf:nickname>GBIF</foaf:nickname>
+    <geo:lat>55.70261</geo:lat>
+    <geo:long>12.55967</geo:long>
+    <geo:alt>13.9</geo:alt>
+    <foaf:homepage rdf:resource="http://www.gbif.org/"/>
+    <foaf:member rdf:resource="&gnaBase;/person#DagEndresen"/>
+    <foaf:member rdf:resource="&gnaBase;/person#DavidRemsen"/>
+    <foaf:member rdf:resource="&gnaBase;/person#MarkusDoring"/>
+    <foaf:member rdf:resource="&gnaBase;/person#TimRobertson"/>
+  </foaf:Organization>
+
+  <foaf:Organization rdf:about="&gnaBase;/institute#TDWG">
+    <foaf:name>Biodiversity Information Standards</foaf:name>
+    <foaf:nickname>TDWG</foaf:nickname>
+    <foaf:homepage rdf:resource="http://www.tdwg.org/"/>
+  </foaf:Organization>
+
+  <foaf:Person rdf:about="&gnaBase;/person#DagEndresen">
+    <foaf:name>Dag Endresen</foaf:name>
+    <foaf:homepage rdf:resource="http://community.gbif.org/pg/profile/dag.endresen"/>
+    <foaf:mbox rdf:resource="mailto:dag.endresen@gmail.com"/>
+    <foaf:mbox_sha1sum rdf:resource="a8e8e5b95a36957148199894431c3ab2"/>
+  </foaf:Person>
+
+  <foaf:Person rdf:about="&gnaBase;/person#DavidRemsen">
+    <foaf:name>David Remsen</foaf:name>
+    <foaf:mbox_sha1sum rdf:resource="1c2f594b3e1a6501e6f47469440b403a"/>
+  </foaf:Person>
+
+  <foaf:Person rdf:about="&gnaBase;/person#MarkusDoring">
+    <foaf:name>Markus Döring</foaf:name>
+    <foaf:mbox_sha1sum rdf:resource="d4ac18d1619a0d570c629c67a84905ed"/>
+  </foaf:Person>
+
+  <foaf:Person rdf:about="&gnaBase;/person#TimRobertson">
+    <foaf:name>Tim Robertson</foaf:name>
+    <foaf:mbox_sha1sum rdf:resource="eebfe70782eddbd0e4c77a144ef6b9d6"/>
+  </foaf:Person>
+
+</rdf:RDF>

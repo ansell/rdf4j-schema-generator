@@ -417,6 +417,7 @@ public class RDF4JSchemaGeneratorCore {
         s = s.replaceAll("#", "");
         s = s.replaceAll("\\.", "_");
         s = s.replaceAll("-", "_");
+        s = s.replaceAll("/", "_");
 
         if(reservedWords.contains(s)) {
             s = "_" + s;

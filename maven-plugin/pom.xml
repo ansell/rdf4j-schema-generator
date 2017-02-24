@@ -20,7 +20,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.4</version>
                 <configuration>
                     <goalPrefix>schema-generator</goalPrefix>
                 </configuration>
@@ -41,6 +40,18 @@
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
     </build>
 
@@ -48,7 +59,7 @@
     <dependencies>
         <dependency>
             <groupId>com.github.ansell.rdf4j-schema-generator</groupId>
-            <artifactId>schema-generator-core</artifactId>
+            <artifactId>schema-generator</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

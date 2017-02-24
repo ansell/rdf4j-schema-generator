@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.github.ansell.rdf4j.schemagenerator.GenerationException;
-import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
+import com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore;
 
 import org.eclipse.rdf4j.model.util.GraphUtilException;
 import org.eclipse.rdf4j.rio.RDFParseException;
@@ -23,7 +23,7 @@ import java.nio.file.StandardCopyOption;
  * <p/>
  * Author: Thomas Kurz (tkurz@apache.org)
  */
-public class VocabBuilderPrefixTest {
+public class SchemaGeneratorPrefixTest {
 
     @Rule
     public TemporaryFolder temp = new TemporaryFolder();
@@ -40,7 +40,7 @@ public class VocabBuilderPrefixTest {
 
         try {
             //test without settings
-            VocabBuilder vb = new VocabBuilder(input.getAbsolutePath(), (String) null);
+            RDF4JSchemaGeneratorCore vb = new RDF4JSchemaGeneratorCore(input.getAbsolutePath(), (String) null);
             vb.generate(output);
 
             int count = Files.readAllLines(output, StandardCharsets.UTF_8).size();
@@ -48,7 +48,7 @@ public class VocabBuilderPrefixTest {
             Assert.assertEquals("prefix was not set properly", 34, count);
 
             //test with settings
-            vb = new VocabBuilder(input.getAbsolutePath(), (String) null);
+            vb = new RDF4JSchemaGeneratorCore(input.getAbsolutePath(), (String) null);
             vb.setPrefix("http://schema.org/");
             vb.generate(output);
 

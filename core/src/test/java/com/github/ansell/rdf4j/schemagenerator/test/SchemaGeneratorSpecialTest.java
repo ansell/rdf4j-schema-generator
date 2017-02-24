@@ -1,6 +1,6 @@
 package com.github.ansell.rdf4j.schemagenerator.test;
 
-import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
+import com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore;
 import com.google.common.io.Resources;
 import org.junit.After;
 import org.junit.Before;
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
  * <p/>
  * Author: Thomas Kurz (tkurz@apache.org)
  */
-public class VocabularyBuilderSpecialTest {
+public class SchemaGeneratorSpecialTest {
 
     @Rule
     public TemporaryFolder tempDir = new TemporaryFolder();
@@ -43,7 +43,7 @@ public class VocabularyBuilderSpecialTest {
         Path outputPath = testDir.resolve("output");
         Files.createDirectories(outputPath);
 
-        VocabBuilder testBuilder = new VocabBuilder(Resources.getResource("oa.ttl").getPath(), "text/turtle");
+        RDF4JSchemaGeneratorCore testBuilder = new RDF4JSchemaGeneratorCore(Resources.getResource("oa.ttl").getPath(), "text/turtle");
 
         Path javaFilePath = outputPath.resolve("OA.java");
         testBuilder.generate(javaFilePath);

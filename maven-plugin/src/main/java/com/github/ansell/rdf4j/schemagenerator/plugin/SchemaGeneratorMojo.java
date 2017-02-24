@@ -1,7 +1,7 @@
 package com.github.ansell.rdf4j.schemagenerator.plugin;
 
 import com.github.ansell.rdf4j.schemagenerator.GenerationException;
-import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
+import com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore;
 import com.google.common.base.CaseFormat;
 
 import org.apache.commons.io.FileUtils;
@@ -41,7 +41,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.*;
 
 /**
- * Maven Plugin to generate Sesame Vocabulary Classes.
+ * Maven Plugin to generate RDF4J Vocabulary Classes.
  *
  * @author Jakob Frank (jakob@apache.org)
  */
@@ -49,19 +49,19 @@ import java.util.*;
         defaultPhase = LifecyclePhase.GENERATE_SOURCES,
         requiresDependencyResolution = ResolutionScope.COMPILE,
         requiresProject = true)
-public class VocabularyBuilderMojo extends AbstractMojo {
+public class SchemaGeneratorMojo extends AbstractMojo {
 
-    @Parameter(property = "output", defaultValue = "${project.build.directory}/generated-sources/sesame-vocabs")
+    @Parameter(property = "output", defaultValue = "${project.build.directory}/generated-sources/rdf4j-schemas")
     private File outputDirectory;
 
-    @Parameter(property = "bundleOutput", defaultValue = "${project.build.directory}/generated-resources/sesame-vocabs")
+    @Parameter(property = "bundleOutput", defaultValue = "${project.build.directory}/generated-resources/rdf4j-schemas")
     private File bundleOutputDirectory;
 
-    @Parameter(property = "remoteCacheDir", defaultValue = "${project.build.directory}/vocab-builder-maven-plugin.cache")
+    @Parameter(property = "remoteCacheDir", defaultValue = "${project.build.directory}/schema-generator-maven-plugin.cache")
     private File remoteCacheDir;
 
-    @Parameter
-    private List<Vocabulary> vocabularies;
+    @Parameter(property = "schemas")
+    private List<SchemaConfig> schemas;
 
     @Parameter(property = "url")
     private URL url;
@@ -116,14 +116,14 @@ public class VocabularyBuilderMojo extends AbstractMojo {
             final Path output = outputDirectory.toPath();
             final Path bundleOutput = bundleOutputDirectory.toPath();
 
-            if (vocabularies == null) {
-                vocabularies = new ArrayList<>();
+            if (schemas == null) {
+                schemas = new ArrayList<>();
             }
 
             if (url != null) {
-                vocabularies.add(0, Vocabulary.create(url, name, className));
+                schemas.add(0, SchemaConfig.create(url, name, className));
             } else if (file != null) {
-                vocabularies.add(0, Vocabulary.create(file, name, className));
+                schemas.add(0, SchemaConfig.create(file, name, className));
             }
 
 
@@ -132,25 +132,25 @@ public class VocabularyBuilderMojo extends AbstractMojo {
 
 
             final Log log = getLog();
-            log.info(String.format("Generating %d vocabularies", vocabularies.size()));
+            log.info(String.format("Generating %d schemas", schemas.size()));
 
-            for (Vocabulary vocab : vocabularies) {
-                final String displayName = vocab.getName() != null ? vocab.getName() : vocab.getClassName();
+            for (SchemaConfig nextSchema : schemas) {
+                final String displayName = nextSchema.getName() != null ? nextSchema.getName() : nextSchema.getClassName();
                 if (displayName == null) {
-                    log.error("Incomplete Configuration: Vocabulary without className or name");
-                    throw new MojoExecutionException("Incomplete Configuration: Vocabulary without className or name");
+                    log.error("Incomplete Configuration: Schema without className or name");
+                    throw new MojoExecutionException("Incomplete Configuration: Schema without className or name");
                 }
                 try {
                     String language = preferredLanguage;
-                    if (vocab.getPreferredLanguage() != null) {
-                        language = vocab.getPreferredLanguage();
+                    if (nextSchema.getPreferredLanguage() != null) {
+                        language = nextSchema.getPreferredLanguage();
                     }
 
-                    String mime = vocab.getMimeType();
+                    String mime = nextSchema.getMimeType();
 
                     if (mime == null) {
-                        if (vocab.getUrl() != null) {
-                            Optional<RDFFormat> guess = Rio.getParserFormatForFileName(vocab.getUrl().toString());
+                        if (nextSchema.getUrl() != null) {
+                            Optional<RDFFormat> guess = Rio.getParserFormatForFileName(nextSchema.getUrl().toString());
                             if (guess.isPresent()) {
                                 mime = guess.get().getDefaultMIMEType();
                             }
@@ -158,8 +158,8 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     }
                     
                     if (mime == null) {
-                        if (vocab.getFile() != null) {
-                            Optional<RDFFormat> guess = Rio.getParserFormatForFileName(vocab.getFile().toString());
+                        if (nextSchema.getFile() != null) {
+                            Optional<RDFFormat> guess = Rio.getParserFormatForFileName(nextSchema.getFile().toString());
                             if (guess.isPresent()) {
                                 mime = guess.get().getDefaultMIMEType();
                             }
@@ -170,39 +170,39 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                         mime = mimeType;
                     }
 
-                    final VocabBuilder builder;
-                    if (vocab.getUrl() != null) {
+                    final RDF4JSchemaGeneratorCore builder;
+                    if (nextSchema.getUrl() != null) {
                         if (mavenSession.isOffline()) {
-                            log.info(String.format("Offline-Mode: Skipping generation of %s from %s", displayName, vocab.getUrl()));
+                            log.info(String.format("Offline-Mode: Skipping generation of %s from %s", displayName, nextSchema.getUrl()));
                             continue;
                         } else {
                             try {
 
-                                File cache = fetchVocab(vocab.getUrl(), displayName, vocab);
+                                File cache = fetchSchema(nextSchema.getUrl(), displayName, nextSchema);
                                 if (cache != null) {
-                                    builder = new VocabBuilder(cache.getAbsolutePath(), mime);
+                                    builder = new RDF4JSchemaGeneratorCore(cache.getAbsolutePath(), mime);
                                 } else {
-                                    log.info(String.format("Skipping %s, vocabulary is did not change", displayName));
+                                    log.info(String.format("Skipping %s, schema is did not change", displayName));
                                     continue;
                                 }
                             } catch (IOException e) {
-                                final String msg = String.format("Error fetching remote vocabulary %s: %s", displayName, e.getMessage());
+                                final String msg = String.format("Error fetching remote schema %s: %s", displayName, e.getMessage());
                                 log.error(msg);
                                 throw new MojoFailureException(msg, e);
                             }
                         }
-                    } else if (vocab.getFile() != null) {
+                    } else if (nextSchema.getFile() != null) {
                         // Incremental builds can skip this file if the following returns true
-                        if (!buildContext.hasDelta(vocab.getFile())) {
-                            log.debug(String.format("Skipping %s, vocabulary is did not change", displayName));
+                        if (!buildContext.hasDelta(nextSchema.getFile())) {
+                            log.debug(String.format("Skipping %s, schema is did not change", displayName));
                             continue;
                         }
-                        log.info(String.format("Generating %s vocabulary", displayName));
-                        buildContext.removeMessages(vocab.getFile());
+                        log.info(String.format("Generating %s schema", displayName));
+                        buildContext.removeMessages(nextSchema.getFile());
 
-                        builder = new VocabBuilder(vocab.getFile().getAbsolutePath(), mime);
+                        builder = new RDF4JSchemaGeneratorCore(nextSchema.getFile().getAbsolutePath(), mime);
                     } else {
-                        final String msg = String.format("Incomplete Configuration for %s: Vocabulary without URL or FILE param!", displayName);
+                        final String msg = String.format("Incomplete Configuration for %s: Schema without URL or FILE param!", displayName);
                         log.error(msg);
                         throw new MojoExecutionException(msg);
                     }
@@ -210,9 +210,9 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     log.debug(String.format("    Setting default preferred language: %s", language));
                     builder.setPreferredLanguage(language);
 
-                    if (vocab.getPackageName() != null) {
-                        log.debug(String.format("    Setting package: %s", vocab.getPackageName()));
-                        builder.setPackageName(vocab.getPackageName());
+                    if (nextSchema.getPackageName() != null) {
+                        log.debug(String.format("    Setting package: %s", nextSchema.getPackageName()));
+                        builder.setPackageName(nextSchema.getPackageName());
                     } else if (packageName != null) {
                         log.debug(String.format("    Setting default package: %s", packageName));
                         builder.setPackageName(packageName);
@@ -220,27 +220,27 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                         log.warn(String.format("%s is using discouraged default package", displayName));
                     }
 
-                    if (vocab.getConstantCase() != null) {
-                        log.debug(String.format("    Setting constant case: %s", vocab.getConstantCase()));
-                        builder.setConstantCase(vocab.getConstantCase());
+                    if (nextSchema.getConstantCase() != null) {
+                        log.debug(String.format("    Setting constant case: %s", nextSchema.getConstantCase()));
+                        builder.setConstantCase(nextSchema.getConstantCase());
                     } else {
                         log.debug(String.format("    Setting default constant case: %s", constantCase));
                         builder.setConstantCase(constantCase);
                     }
 
-                    if (vocab.getPrefix() != null) {
-                        builder.setPrefix(vocab.getPrefix());
+                    if (nextSchema.getPrefix() != null) {
+                        builder.setPrefix(nextSchema.getPrefix());
                     }
 
-                    builder.setName(vocab.getName());
+                    builder.setName(nextSchema.getName());
 
                     String fName;
-                    if (vocab.getClassName() != null) {
-                        fName = vocab.getClassName() + ".java";
-                    } else if (vocab.getName() != null) {
-                        fName = StringUtils.capitalize(vocab.getName()) + ".java";
+                    if (nextSchema.getClassName() != null) {
+                        fName = nextSchema.getClassName() + ".java";
+                    } else if (nextSchema.getName() != null) {
+                        fName = StringUtils.capitalize(nextSchema.getName()) + ".java";
                     } else {
-                        throw new MojoExecutionException("Incomplete Configuration: Vocabulary without className or name");
+                        throw new MojoExecutionException("Incomplete Configuration: Schema without className or name");
                     }
 
                     Path target = output;
@@ -268,13 +268,13 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                                     buildContext.newFileOutputStream(vFile.toFile()), StandardCharsets.UTF_8)
                     )) {
                         if (builder.getPackageName() != null) {
-                            log.info(String.format("    Generating vocabulary class: %s.%s", builder.getPackageName(), className));
+                            log.info(String.format("    Generating schema class: %s.%s", builder.getPackageName(), className));
                         } else {
-                            log.info(String.format("    Generating vocabulary class: %s", className));
+                            log.info(String.format("    Generating schema class: %s", className));
                         }
                         builder.generate(className, out);
                     }
-                    if (vocab.isCreateResourceBundlesSet() && vocab.isCreateResourceBundles() || createResourceBundles) {
+                    if (nextSchema.isCreateResourceBundlesSet() && nextSchema.isCreateResourceBundles() || createResourceBundles) {
                         Path bundleTarget = bundleOutput;
                         if (builder.getPackageName() != null) {
                             bundleTarget = bundleTarget.resolve(builder.getPackageName().replaceAll("\\.", "/"));
@@ -299,24 +299,24 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     log.info(String.format("Generated %s", displayName));
 
                 } catch (RDFParseException e) {
-                    throw new MojoFailureException(String.format("Could not parse vocabulary %s: %s", displayName, e.getMessage()));
+                    throw new MojoFailureException(String.format("Could not parse schema %s: %s", displayName, e.getMessage()));
                 } catch (GenerationException e) {
-                    throw new MojoFailureException(String.format("Could not generate vocabulary %s: %s", displayName, e.getMessage()));
+                    throw new MojoFailureException(String.format("Could not generate schema %s: %s", displayName, e.getMessage()));
                 } catch (URISyntaxException e) {
-                    throw new MojoFailureException(String.format("Invalid URL for vocabulary %s: %s", displayName, vocab.getUrl()));
+                    throw new MojoFailureException(String.format("Invalid URL for schema %s: %s", displayName, nextSchema.getUrl()));
                 }
             }
             if (project != null) {
                 log.debug(String.format("Adding %s as additional compile source", output.toString()));
                 project.addCompileSourceRoot(output.toString());
             }
-            log.info("Vocabulary generation complete");
+            log.info("Schema generation complete");
         } catch (IOException e) {
-            throw new MojoExecutionException("Could not write Vocabularies", e);
+            throw new MojoExecutionException("Could not write Schemas", e);
         }
     }
 
-    private File fetchVocab(URL url, final String displayName, final Vocabulary vocab) throws URISyntaxException, IOException {
+    private File fetchSchema(URL url, final String displayName, final SchemaConfig nextSchema) throws URISyntaxException, IOException {
         final HttpClientBuilder clientBuilder = HttpClientBuilder.create()
                 .setUserAgent(
                         String.format("%s:%s/%s (%s) %s:%s/%s (%s)",
@@ -339,8 +339,8 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                     final Log log = getLog();
                     // Check the mime-type
                     String mime = mimeType;
-                    if (vocab.getMimeType() != null) {
-                        mime = vocab.getMimeType();
+                    if (nextSchema.getMimeType() != null) {
+                        mime = nextSchema.getMimeType();
                     }
                     if (mime == null) {
                         mime = getHeaderValue(response, HttpHeaders.CONTENT_TYPE);
@@ -369,7 +369,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
                             log.debug(String.format("%tF %<tT is after %tF %<tT, no action required", new Date(fileTime.toMillis()), remoteDate));
                             return null;
                         } else {
-                            log.debug(String.format("remote file is newer - need to rebuild vocabulary"));
+                            log.debug(String.format("remote file is newer - need to rebuild schema"));
                         }
                     } else {
                         log.debug(String.format("No Cache-File %s, need to fetch", cacheFile));
@@ -377,7 +377,7 @@ public class VocabularyBuilderMojo extends AbstractMojo {
 
                     final File cf = cacheFile.toFile();
                     FileUtils.copyInputStreamToFile(response.getEntity().getContent(), cf);
-                    log.info(String.format("Fetched vocabulary definition for %s from %s", displayName, request.getURI()));
+                    log.info(String.format("Fetched schema definition for %s from %s", displayName, request.getURI()));
                     return cf;
                 }
 

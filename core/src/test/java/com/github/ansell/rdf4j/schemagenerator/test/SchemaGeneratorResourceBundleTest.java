@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.github.ansell.rdf4j.schemagenerator.GenerationException;
-import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
+import com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore;
 
 import org.eclipse.rdf4j.rio.RDFParseException;
 
@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Properties;
 
-public class VocabBuilderResourceBundleTest {
+public class SchemaGeneratorResourceBundleTest {
 
     @Rule
     public TemporaryFolder temp = new TemporaryFolder();
@@ -37,7 +37,7 @@ public class VocabBuilderResourceBundleTest {
         output = temp.newFolder("bundleDir").toPath();
 
         try {
-            VocabBuilder vb = new VocabBuilder(input.getAbsolutePath(), (String) null);
+            RDF4JSchemaGeneratorCore vb = new RDF4JSchemaGeneratorCore(input.getAbsolutePath(), (String) null);
             vb.generateResourceBundle("RDFS", output);
         } catch (GenerationException e) {
             Assert.fail("Could not generate vocab " + e.getMessage());

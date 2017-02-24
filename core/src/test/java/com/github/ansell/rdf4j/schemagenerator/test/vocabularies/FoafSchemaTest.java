@@ -2,7 +2,7 @@ package com.github.ansell.rdf4j.schemagenerator.test.vocabularies;
 
 import org.junit.Assume;
 
-import com.github.ansell.rdf4j.schemagenerator.test.AbstractVocabSpecificTest;
+import com.github.ansell.rdf4j.schemagenerator.test.AbstractSchemaSpecificTest;
 
 import org.eclipse.rdf4j.rio.RDFFormat;
 
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class FoafVocabTest extends AbstractVocabSpecificTest {
+public class FoafSchemaTest extends AbstractSchemaSpecificTest {
 
     @Override
     protected InputStream getInputStream() {

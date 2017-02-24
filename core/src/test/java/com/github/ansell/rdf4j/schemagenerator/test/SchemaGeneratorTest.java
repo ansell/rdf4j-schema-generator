@@ -3,7 +3,7 @@
  */
 package com.github.ansell.rdf4j.schemagenerator.test;
 
-import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
+import com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore;
 import com.google.common.base.CaseFormat;
 import org.junit.After;
 import org.junit.Before;
@@ -37,12 +37,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests for {@link VocabBuilder}
+ * Tests for {@link RDF4JSchemaGeneratorCore}
  *
  * @author Peter Ansell p_ansell@yahoo.com
  */
 @RunWith(Parameterized.class)
-public class VocabBuilderTest {
+public class SchemaGeneratorTest {
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
@@ -92,14 +92,14 @@ public class VocabBuilderTest {
 
     private Path inputPath;
 
-    public VocabBuilderTest(RDFFormat format) {
-    	System.out.println("Running VocabBuilderTest for format: " + format);
+    public SchemaGeneratorTest(RDFFormat format) {
+    	System.out.println("Running SchemaGeneratorTest for format: " + format);
         this.format = format;
     }
 
     @Before
     public void setUp() throws Exception {
-        testDir = tempDir.newFolder("vocabbuildertest").toPath();
+        testDir = tempDir.newFolder("schema-generator-test").toPath();
 
         ValueFactory vf = SimpleValueFactory.getInstance();
 
@@ -139,14 +139,14 @@ public class VocabBuilderTest {
     }
 
     /**
-     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.VocabBuilder#generate(java.nio.file.Path)}.
+     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore#generate(java.nio.file.Path)}.
      */
     @Test
     public final void testRun() throws Exception {
         Path outputPath = testDir.resolve("output");
         Files.createDirectories(outputPath);
 
-        VocabBuilder testBuilder = new VocabBuilder(inputPath.toAbsolutePath().toString(), format);
+        RDF4JSchemaGeneratorCore testBuilder = new RDF4JSchemaGeneratorCore(inputPath.toAbsolutePath().toString(), format);
 
         testBuilder.setPreferredLanguage("fr");
 
@@ -166,14 +166,14 @@ public class VocabBuilderTest {
     }
 
     /**
-     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.VocabBuilder#generate(java.nio.file.Path)}.
+     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore#generate(java.nio.file.Path)}.
      */
     @Test
     public final void testUpperUnderscoreCase() throws Exception {
         Path outputPath = testDir.resolve("output");
         Files.createDirectories(outputPath);
 
-        VocabBuilder testBuilder = new VocabBuilder(inputPath.toAbsolutePath().toString(), format);
+        RDF4JSchemaGeneratorCore testBuilder = new RDF4JSchemaGeneratorCore(inputPath.toAbsolutePath().toString(), format);
 
         testBuilder.setConstantCase(CaseFormat.UPPER_UNDERSCORE);
 
@@ -189,14 +189,14 @@ public class VocabBuilderTest {
     }
 
     /**
-     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.VocabBuilder#generate(java.nio.file.Path)}.
+     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore#generate(java.nio.file.Path)}.
      */
     @Test
     public final void testNoExplicitCase() throws Exception {
         Path outputPath = testDir.resolve("output");
         Files.createDirectories(outputPath);
 
-        VocabBuilder testBuilder = new VocabBuilder(inputPath.toAbsolutePath().toString(), format);
+        RDF4JSchemaGeneratorCore testBuilder = new RDF4JSchemaGeneratorCore(inputPath.toAbsolutePath().toString(), format);
 
         testBuilder.setConstantCase(null);
 

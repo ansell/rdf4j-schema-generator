@@ -6,11 +6,11 @@ import java.net.URL;
 import com.google.common.base.CaseFormat;
 
 /**
- * Configuration for a Vocabulary to be generated.
+ * Configuration for a Schema to be generated.
  *
  * @author Jakob Frank (jakob@apache.org)
  */
-public class Vocabulary {
+public class SchemaConfig {
 
     private URL url;
     private File file;
@@ -99,16 +99,16 @@ public class Vocabulary {
         return caseFormat;
     }
 
-    public static Vocabulary create(URL url, String name, String className) {
-        Vocabulary v = new Vocabulary();
+    public static SchemaConfig create(URL url, String name, String className) {
+        SchemaConfig v = new SchemaConfig();
         v.url = url;
         v.name = name;
         v.className = className;
         return v;
     }
 
-    public static Vocabulary create(File file, String name, String className) {
-        Vocabulary v = new Vocabulary();
+    public static SchemaConfig create(File file, String name, String className) {
+        SchemaConfig v = new SchemaConfig();
         v.file = file;
         v.name = name;
         v.className = className;

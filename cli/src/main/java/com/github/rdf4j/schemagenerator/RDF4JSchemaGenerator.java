@@ -10,11 +10,10 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.eclipse.rdf4j.model.util.GraphUtilException;
 import org.eclipse.rdf4j.rio.*;
 
 import com.github.ansell.rdf4j.schemagenerator.GenerationException;
-import com.github.ansell.rdf4j.schemagenerator.VocabBuilder;
+import com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore;
 import com.google.common.base.CaseFormat;
 
 import java.io.File;
@@ -33,11 +32,11 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * ...
- * <p/>
+ * The Command Line Interface for the RDF4J Schema Generator.
  *
  * @author Thomas Kurz (tkurz@apache.org)
  * @author Jakob Frank (jakob@apache.org)
+ * @author Peter Ansell p_ansell@yahoo.com
  */
 public class RDF4JSchemaGenerator {
 
@@ -72,7 +71,7 @@ public class RDF4JSchemaGenerator {
 
             Optional<RDFFormat> format = Rio.getParserFormatForMIMEType(cli.getOptionValue('f', null));
 
-            final VocabBuilder builder;
+            final RDF4JSchemaGeneratorCore builder;
             if (input.startsWith("http://")) {
                 URL url = new URL(input);
 
@@ -81,19 +80,19 @@ public class RDF4JSchemaGenerator {
 	                format = Rio.getParserFormatForFileName(url.getFile());
                 }
                 
-                tempFile = Files.createTempFile("vocab-builder", "." + (format.isPresent() ? format.get().getDefaultFileExtension() : "cache"));
+                tempFile = Files.createTempFile("schema-generator", "." + (format.isPresent() ? format.get().getDefaultFileExtension() : "cache"));
 
                 try {
-                    fetchVocab(url, tempFile);
+                    fetchSchema(url, tempFile);
                 } catch (URISyntaxException e) {
                     throw new ParseException("Invalid input URL: " + e.getMessage());
                 }
 
                 // Default to Turtle if we didn't guess the format or have it specified
-                builder = new VocabBuilder(tempFile.toString(), format.orElse(RDFFormat.TURTLE));
+                builder = new RDF4JSchemaGeneratorCore(tempFile.toString(), format.orElse(RDFFormat.TURTLE));
             } else {
                 // Default to Turtle if we didn't have the format specified
-                builder = new VocabBuilder(input, format.orElse(RDFFormat.TURTLE));
+                builder = new RDF4JSchemaGeneratorCore(input, format.orElse(RDFFormat.TURTLE));
             }
             if (cli.hasOption('p')) {
                 builder.setPackageName(cli.getOptionValue('p'));
@@ -179,8 +178,6 @@ public class RDF4JSchemaGenerator {
             System.err.println("Could not read input-file: " + e.getMessage());
         } catch (IOException e) {
             System.err.println("Error during file-access: " + e.getMessage());
-        } catch (GraphUtilException e) {
-            e.printStackTrace();
         } catch (GenerationException e) {
             System.err.println(e.getMessage());
         } finally {
@@ -243,7 +240,7 @@ public class RDF4JSchemaGenerator {
 
         o.addOption(OptionBuilder
                 .withLongOpt("uri")
-                .withDescription("the prefix for the vocabulary (if not available in the input file)")
+                .withDescription("the prefix for the schema (if not available in the input file)")
                 .hasArgs(1)
                 .withArgName("prefix")
                 .isRequired(false)
@@ -266,7 +263,7 @@ public class RDF4JSchemaGenerator {
 
         o.addOption(OptionBuilder
                 .withLongOpt("language")
-                .withDescription("preferred language for vocabulary labels")
+                .withDescription("preferred language for schema labels")
                 .hasArgs(1)
                 .withArgName("prefLang")
                 .isRequired(false)
@@ -312,8 +309,8 @@ public class RDF4JSchemaGenerator {
         return o;
     }
 
-    private static File fetchVocab(URL url, final Path tempFile) throws URISyntaxException, IOException {
-        System.out.printf("Fetching remote vocabulary <%s>%n", url);
+    private static File fetchSchema(URL url, final Path tempFile) throws URISyntaxException, IOException {
+        System.out.printf("Fetching remote schema <%s>%n", url);
         final Properties buildProperties = getBuildProperties();
         final HttpClientBuilder clientBuilder = HttpClientBuilder.create()
                 .setUserAgent(

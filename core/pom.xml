@@ -9,7 +9,7 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>schema-generator-core</artifactId>
+    <artifactId>schema-generator</artifactId>
     <name>RDF4J Schema Generator :: Core</name>
 
     <prerequisites>
@@ -95,4 +95,21 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    
+    <build>
+    	<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+    	</plugins>
+    </build>
 </project>

@@ -50,7 +50,11 @@ public class RDF4JSchemaGeneratorCore {
     private final Model model;
     private CaseFormat caseFormat = null;
     private CaseFormat stringCaseFormat = null;
-    private String stringPropertyPrefix, stringPropertySuffix;
+    private CaseFormat localNameStringCaseFormat = null;
+    private String stringPropertyPrefix;
+    private String stringPropertySuffix;
+    private String localNameStringPropertyPrefix;
+    private String localNameStringPropertySuffix;
     private Set<String> createdFields = new HashSet<>();
     private static Set<String> reservedWords = Sets.newHashSet("abstract","assert","boolean","break","byte","case","catch","char","class","const","default","do","double","else","enum","extends","false","final","finally","float","for","goto","if","implements","import","instanceof","int","interface","long","native","new","null","package","private","protected","public","return","short","static","strictfp","super","switch","synchronized","this","throw","throws","transient","true","try","void","volatile","while","continue","PREFIX","NAMESPACE");
 
@@ -500,6 +504,14 @@ public class RDF4JSchemaGeneratorCore {
         this.stringCaseFormat = stringCaseFormat;
     }
 
+    public CaseFormat getLocalNameStringConstantCase() {
+        return localNameStringCaseFormat;
+    }
+
+    public void setLocalNameStringConstantCase(CaseFormat localNameStringCaseFormat) {
+        this.localNameStringCaseFormat = localNameStringCaseFormat;
+    }
+
     public String getStringPropertyPrefix() {
         return stringPropertyPrefix;
     }
@@ -514,5 +526,21 @@ public class RDF4JSchemaGeneratorCore {
 
 	public void setStringPropertySuffix(String stringPropertySuffix) {
 		this.stringPropertySuffix = stringPropertySuffix;
+	}
+
+    public String getLocalNameStringPropertyPrefix() {
+        return localNameStringPropertyPrefix;
+    }
+
+    public void setLocalNameStringPropertyPrefix(String localNameStringPropertyPrefix) {
+        this.localNameStringPropertyPrefix = localNameStringPropertyPrefix;
+    }
+
+    public String getLocalNameStringPropertySuffix() {
+		return localNameStringPropertySuffix;
+	}
+
+	public void setLocalNameStringPropertySuffix(String localNameStringPropertySuffix) {
+		this.localNameStringPropertySuffix = localNameStringPropertySuffix;
 	}
 }

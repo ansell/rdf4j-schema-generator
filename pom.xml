@@ -8,6 +8,7 @@
     <packaging>pom</packaging>
 
     <name>RDF4J Schema Generator</name>
+    <description>Generates RDF4J Vocabulary classes from RDFS or OWL Schemas</description>
     <url>https://github.com/ansell/rdf4j-schema-generator</url>
 
     <licenses>

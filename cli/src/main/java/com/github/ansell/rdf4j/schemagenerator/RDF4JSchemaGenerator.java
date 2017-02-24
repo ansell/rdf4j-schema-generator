@@ -1,4 +1,4 @@
-package com.github.rdf4j.schemagenerator;
+package com.github.ansell.rdf4j.schemagenerator;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;

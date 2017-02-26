@@ -95,7 +95,7 @@ public class SchemaGeneratorMojo extends AbstractMojo {
     private boolean createLocalNameStringConstants;
     @Parameter(property = "localNameStringConstantPrefix", defaultValue = "")
     private String localNameStringConstantPrefix;
-    @Parameter(property = "stringConstantSuffix", defaultValue = "_LOCALNAME")
+    @Parameter(property = "localNameStringConstantSuffix", defaultValue = "_LOCALNAME")
     private String localNameStringConstantSuffix;
 
     @Parameter(property = "constantCase")

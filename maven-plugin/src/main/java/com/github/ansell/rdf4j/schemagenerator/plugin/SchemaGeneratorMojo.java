@@ -81,21 +81,31 @@ public class SchemaGeneratorMojo extends AbstractMojo {
     @Parameter(property = "preferredLanguage")
     private String preferredLanguage;
 
-    @Parameter(property = "createResourceBundles", defaultValue = "false")
-    private boolean createResourceBundles;
+    @Parameter(property = "createResourceBundles", defaultValue = "true")
+    private boolean createResourceBundles = true;
 
     @Parameter(property = "createStringConstants", defaultValue = "true")
-    private boolean createStringConstants;
+    private boolean createStringConstants = true;
     @Parameter(property = "stringConstantPrefix", defaultValue = "")
-    private String stringConstantPrefix;
+    private String stringConstantPrefix = "";
     @Parameter(property = "stringConstantSuffix", defaultValue = "_STRING")
-    private String stringConstantSuffix;
+    private String stringConstantSuffix = "_STRING";
 
-    @Parameter(property = "constantCase")
-    private CaseFormat constantCase;
+    @Parameter(property = "createLocalNameStringConstants", defaultValue = "true")
+    private boolean createLocalNameStringConstants = true;
+    @Parameter(property = "localNameStringConstantPrefix", defaultValue = "")
+    private String localNameStringConstantPrefix = "";
+    @Parameter(property = "localNameStringConstantSuffix", defaultValue = "_LOCALNAME")
+    private String localNameStringConstantSuffix = "_LOCALNAME";
+
+    @Parameter(property = "constantCase", defaultValue = "UPPER_UNDERSCORE")
+    private CaseFormat constantCase = CaseFormat.UPPER_UNDERSCORE;
 
     @Parameter(property = "stringConstantCase", defaultValue = "UPPER_UNDERSCORE")
-    private CaseFormat stringConstantCase;
+    private CaseFormat stringConstantCase = CaseFormat.UPPER_UNDERSCORE;
+
+    @Parameter(property = "localNameStringConstantCase", defaultValue = "UPPER_UNDERSCORE")
+    private CaseFormat localNameStringConstantCase = CaseFormat.UPPER_UNDERSCORE;
 
     @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
@@ -260,6 +270,18 @@ public class SchemaGeneratorMojo extends AbstractMojo {
                         builder.setStringPropertyPrefix(null);
                         builder.setStringPropertySuffix(null);
                         builder.setStringConstantCase(null);
+                    }
+                    // when string constant generation set, specify prefix and suffix
+                    if (createLocalNameStringConstants) {
+                        // when prefix set, the builder will generate string constants for the local names
+                        builder.setLocalNameStringPropertyPrefix(localNameStringConstantPrefix);
+                        builder.setLocalNameStringPropertySuffix(localNameStringConstantSuffix);
+                        builder.setLocalNameStringConstantCase(localNameStringConstantCase);
+                    } else {
+                        // be sure to not generate String constants
+                        builder.setLocalNameStringPropertyPrefix(null);
+                        builder.setLocalNameStringPropertySuffix(null);
+                        builder.setLocalNameStringConstantCase(null);
                     }
                     final Path vFile = target.resolve(fName);
                     final String className = vFile.getFileName().toString().replaceFirst("\\.java$", "");

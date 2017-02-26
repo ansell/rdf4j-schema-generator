@@ -48,9 +48,13 @@ public class RDF4JSchemaGeneratorCore {
     private String indent = "\t";
     private String language = null;
     private final Model model;
-    private CaseFormat caseFormat = null;
-    private CaseFormat stringCaseFormat = null;
-    private String stringPropertyPrefix, stringPropertySuffix;
+    private CaseFormat caseFormat;
+    private CaseFormat stringCaseFormat;
+    private CaseFormat localNameStringCaseFormat;
+    private String stringPropertyPrefix;
+    private String stringPropertySuffix;
+    private String localNameStringPropertyPrefix;
+    private String localNameStringPropertySuffix;
     private Set<String> createdFields = new HashSet<>();
     private static Set<String> reservedWords = Sets.newHashSet("abstract","assert","boolean","break","byte","case","catch","char","class","const","default","do","double","else","enum","extends","false","final","finally","float","for","goto","if","implements","import","instanceof","int","interface","long","native","new","null","package","private","protected","public","return","short","static","strictfp","super","switch","synchronized","this","throw","throws","transient","true","try","void","volatile","while","continue","PREFIX","NAMESPACE");
 
@@ -220,6 +224,44 @@ public class RDF4JSchemaGeneratorCore {
             }
         }
 
+        //string constant values
+        if (localNameStringCaseFormat != null || StringUtils.isNotBlank(localNameStringPropertyPrefix) || (StringUtils.isNotBlank(localNameStringPropertySuffix))) {
+            // add the possibility to add a string property with the namespace for usage in
+            for (String key : keys) {
+                final Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
+                final Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
+                final String localNameKey;
+                try {
+                	localNameKey = splitUris.get(key).getLocalName();
+                } catch (Exception e) {
+                	log.error("Could not get localName for: {}", key);
+                	continue;
+                }
+                
+                out.println(getIndent(1) + "/**");
+                if (label != null) {
+                    out.printf(getIndent(1) + " * %s%n", label.getLabel());
+                    out.println(getIndent(1) + " * <p>");
+                }
+                out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
+                if (comment != null) {
+                    out.println(getIndent(1) + " * <p>");
+                    out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
+                }
+                out.println(getIndent(1) + " *");
+                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
+                out.println(getIndent(1) + " */");
+
+                final String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(getLocalNameStringPropertyPrefix()),
+                        doCaseFormatting(localNameKey, getLocalNameStringConstantCase()),
+                        StringUtils.defaultString(getLocalNameStringPropertySuffix())));
+                checkField(className, nextKey);
+                out.printf(getIndent(1) + "public static final String %s = \"%s\";%n",
+                         nextKey, localNameKey);
+                out.println();
+            }
+        }
+
         //and now the resources
         for (String key : keys) {
             Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
@@ -268,6 +310,7 @@ public class RDF4JSchemaGeneratorCore {
     }
 
     private void checkField(String className, String fieldName) throws GenerationException {
+    	log.debug("checkField: {} {}", className, fieldName);
         if (!createdFields.add(fieldName)) {
             throw new GenerationException(String.format("field %s.%s is defined twice", className, fieldName));
         }
@@ -500,6 +543,14 @@ public class RDF4JSchemaGeneratorCore {
         this.stringCaseFormat = stringCaseFormat;
     }
 
+    public CaseFormat getLocalNameStringConstantCase() {
+        return localNameStringCaseFormat;
+    }
+
+    public void setLocalNameStringConstantCase(CaseFormat localNameStringCaseFormat) {
+        this.localNameStringCaseFormat = localNameStringCaseFormat;
+    }
+
     public String getStringPropertyPrefix() {
         return stringPropertyPrefix;
     }
@@ -514,5 +565,21 @@ public class RDF4JSchemaGeneratorCore {
 
 	public void setStringPropertySuffix(String stringPropertySuffix) {
 		this.stringPropertySuffix = stringPropertySuffix;
+	}
+
+    public String getLocalNameStringPropertyPrefix() {
+        return localNameStringPropertyPrefix;
+    }
+
+    public void setLocalNameStringPropertyPrefix(String localNameStringPropertyPrefix) {
+        this.localNameStringPropertyPrefix = localNameStringPropertyPrefix;
+    }
+
+    public String getLocalNameStringPropertySuffix() {
+		return localNameStringPropertySuffix;
+	}
+
+	public void setLocalNameStringPropertySuffix(String localNameStringPropertySuffix) {
+		this.localNameStringPropertySuffix = localNameStringPropertySuffix;
 	}
 }

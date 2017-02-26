@@ -29,24 +29,15 @@ public class SchemaGeneratorCompileTest {
     private Path output;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws Exception {
         File input = temp.newFile("ldp.ttl");
         FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/ldp.ttl"), input);
 
         output = temp.newFile("LPD.java").toPath();
 
-        try {
-            RDF4JSchemaGeneratorCore vb = new RDF4JSchemaGeneratorCore(input.getAbsolutePath(), (String) null);
-            vb.generate(output);
-            System.out.println(output);
-        } catch (GenerationException e) {
-            Assert.fail("Could not generate vocab " + e.getMessage());
-        } catch (RDFParseException e) {
-            Assert.fail("Could not parse test-file: " + e.getMessage());
-        } catch (GraphUtilException e) {
-            Assert.fail("Could not read vocabulary: " + e.getMessage());
-        }
-
+        RDF4JSchemaGeneratorCore vb = new RDF4JSchemaGeneratorCore(input.getAbsolutePath(), (String) null);
+        vb.generate(output);
+        System.out.println(output);
     }
 
 

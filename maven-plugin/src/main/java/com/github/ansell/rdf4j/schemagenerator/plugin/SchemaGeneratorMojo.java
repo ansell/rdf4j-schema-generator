@@ -82,30 +82,30 @@ public class SchemaGeneratorMojo extends AbstractMojo {
     private String preferredLanguage;
 
     @Parameter(property = "createResourceBundles", defaultValue = "true")
-    private boolean createResourceBundles;
+    private boolean createResourceBundles = true;
 
     @Parameter(property = "createStringConstants", defaultValue = "true")
-    private boolean createStringConstants;
+    private boolean createStringConstants = true;
     @Parameter(property = "stringConstantPrefix", defaultValue = "")
-    private String stringConstantPrefix;
+    private String stringConstantPrefix = "";
     @Parameter(property = "stringConstantSuffix", defaultValue = "_STRING")
-    private String stringConstantSuffix;
+    private String stringConstantSuffix = "_STRING";
 
     @Parameter(property = "createLocalNameStringConstants", defaultValue = "true")
-    private boolean createLocalNameStringConstants;
+    private boolean createLocalNameStringConstants = true;
     @Parameter(property = "localNameStringConstantPrefix", defaultValue = "")
-    private String localNameStringConstantPrefix;
+    private String localNameStringConstantPrefix = "";
     @Parameter(property = "localNameStringConstantSuffix", defaultValue = "_LOCALNAME")
-    private String localNameStringConstantSuffix;
+    private String localNameStringConstantSuffix = "_LOCALNAME";
 
-    @Parameter(property = "constantCase")
-    private CaseFormat constantCase;
+    @Parameter(property = "constantCase", defaultValue = "UPPER_UNDERSCORE")
+    private CaseFormat constantCase = CaseFormat.UPPER_UNDERSCORE;
 
     @Parameter(property = "stringConstantCase", defaultValue = "UPPER_UNDERSCORE")
-    private CaseFormat stringConstantCase;
+    private CaseFormat stringConstantCase = CaseFormat.UPPER_UNDERSCORE;
 
     @Parameter(property = "localNameStringConstantCase", defaultValue = "UPPER_UNDERSCORE")
-    private CaseFormat localNameStringConstantCase;
+    private CaseFormat localNameStringConstantCase = CaseFormat.UPPER_UNDERSCORE;
 
     @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;

@@ -48,9 +48,9 @@ public class RDF4JSchemaGeneratorCore {
     private String indent = "\t";
     private String language = null;
     private final Model model;
-    private CaseFormat caseFormat = null;
-    private CaseFormat stringCaseFormat = null;
-    private CaseFormat localNameStringCaseFormat = null;
+    private CaseFormat caseFormat;
+    private CaseFormat stringCaseFormat;
+    private CaseFormat localNameStringCaseFormat;
     private String stringPropertyPrefix;
     private String stringPropertySuffix;
     private String localNameStringPropertyPrefix;

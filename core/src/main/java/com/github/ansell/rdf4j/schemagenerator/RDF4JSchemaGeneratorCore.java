@@ -310,6 +310,7 @@ public class RDF4JSchemaGeneratorCore {
     }
 
     private void checkField(String className, String fieldName) throws GenerationException {
+    	log.debug("checkField: {} {}", className, fieldName);
         if (!createdFields.add(fieldName)) {
             throw new GenerationException(String.format("field %s.%s is defined twice", className, fieldName));
         }

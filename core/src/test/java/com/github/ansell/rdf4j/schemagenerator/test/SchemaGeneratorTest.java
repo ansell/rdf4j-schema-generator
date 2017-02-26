@@ -211,4 +211,96 @@ public class SchemaGeneratorTest {
         assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
     }
 
+    /**
+     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore#generate(java.nio.file.Path)}.
+     */
+    @Test
+    public final void testUpperUnderscoreCaseString() throws Exception {
+        Path outputPath = testDir.resolve("output");
+        Files.createDirectories(outputPath);
+
+        RDF4JSchemaGeneratorCore testBuilder = new RDF4JSchemaGeneratorCore(inputPath.toAbsolutePath().toString(), format);
+
+        testBuilder.setStringConstantCase(CaseFormat.UPPER_UNDERSCORE);
+
+        Path javaFilePath = outputPath.resolve("Test.java");
+        testBuilder.generate(javaFilePath);
+        assertTrue("Java file was not found", Files.exists(javaFilePath));
+        assertTrue("Java file was empty", Files.size(javaFilePath) > 0);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Files.copy(javaFilePath, out);
+        String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
+        assertTrue("Did not find expected key case", result.contains("PROPERTY_LOCALISED4 = "));
+        assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
+    }
+
+    /**
+     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore#generate(java.nio.file.Path)}.
+     */
+    @Test
+    public final void testNoExplicitCaseString() throws Exception {
+        Path outputPath = testDir.resolve("output");
+        Files.createDirectories(outputPath);
+
+        RDF4JSchemaGeneratorCore testBuilder = new RDF4JSchemaGeneratorCore(inputPath.toAbsolutePath().toString(), format);
+
+        testBuilder.setStringConstantCase(null);
+
+        Path javaFilePath = outputPath.resolve("Test.java");
+        testBuilder.generate(javaFilePath);
+        assertTrue("Java file was not found", Files.exists(javaFilePath));
+        assertTrue("Java file was empty", Files.size(javaFilePath) > 0);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Files.copy(javaFilePath, out);
+        String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
+        assertTrue("Did not find expected key case", result.contains("propertyLocalised4 = "));
+        assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
+    }
+
+    /**
+     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore#generate(java.nio.file.Path)}.
+     */
+    @Test
+    public final void testUpperUnderscoreCaseLocalName() throws Exception {
+        Path outputPath = testDir.resolve("output");
+        Files.createDirectories(outputPath);
+
+        RDF4JSchemaGeneratorCore testBuilder = new RDF4JSchemaGeneratorCore(inputPath.toAbsolutePath().toString(), format);
+
+        testBuilder.setLocalNameStringConstantCase(CaseFormat.UPPER_UNDERSCORE);
+
+        Path javaFilePath = outputPath.resolve("Test.java");
+        testBuilder.generate(javaFilePath);
+        assertTrue("Java file was not found", Files.exists(javaFilePath));
+        assertTrue("Java file was empty", Files.size(javaFilePath) > 0);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Files.copy(javaFilePath, out);
+        String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
+        assertTrue("Did not find expected key case", result.contains("PROPERTY_LOCALISED4 = "));
+        assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
+    }
+
+    /**
+     * Test method for {@link com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore#generate(java.nio.file.Path)}.
+     */
+    @Test
+    public final void testNoExplicitCaseLocalName() throws Exception {
+        Path outputPath = testDir.resolve("output");
+        Files.createDirectories(outputPath);
+
+        RDF4JSchemaGeneratorCore testBuilder = new RDF4JSchemaGeneratorCore(inputPath.toAbsolutePath().toString(), format);
+
+        testBuilder.setLocalNameStringConstantCase(null);
+
+        Path javaFilePath = outputPath.resolve("Test.java");
+        testBuilder.generate(javaFilePath);
+        assertTrue("Java file was not found", Files.exists(javaFilePath));
+        assertTrue("Java file was empty", Files.size(javaFilePath) > 0);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Files.copy(javaFilePath, out);
+        String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
+        assertTrue("Did not find expected key case", result.contains("propertyLocalised4 = "));
+        assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
+    }
+
 }

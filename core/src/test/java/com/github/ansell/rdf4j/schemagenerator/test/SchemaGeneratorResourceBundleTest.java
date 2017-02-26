@@ -8,10 +8,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.github.ansell.rdf4j.schemagenerator.GenerationException;
 import com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore;
-
-import org.eclipse.rdf4j.rio.RDFParseException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,21 +27,14 @@ public class SchemaGeneratorResourceBundleTest {
     private Path output;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws Exception {
         File input = temp.newFile("rdfs.ttl");
         FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/rdfs.ttl"), input);
 
         output = temp.newFolder("bundleDir").toPath();
 
-        try {
-            RDF4JSchemaGeneratorCore vb = new RDF4JSchemaGeneratorCore(input.getAbsolutePath(), (String) null);
-            vb.generateResourceBundle("RDFS", output);
-        } catch (GenerationException e) {
-            Assert.fail("Could not generate vocab " + e.getMessage());
-        } catch (RDFParseException e) {
-            Assert.fail("Could not parse test-file: " + e.getMessage());
-        }
-
+        RDF4JSchemaGeneratorCore vb = new RDF4JSchemaGeneratorCore(input.getAbsolutePath(), (String) null);
+        vb.generateResourceBundle("RDFS", output);
     }
 
     @Test

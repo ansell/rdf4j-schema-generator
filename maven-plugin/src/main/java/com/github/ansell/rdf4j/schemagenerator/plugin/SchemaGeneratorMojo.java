@@ -81,7 +81,7 @@ public class SchemaGeneratorMojo extends AbstractMojo {
     @Parameter(property = "preferredLanguage")
     private String preferredLanguage;
 
-    @Parameter(property = "createResourceBundles", defaultValue = "false")
+    @Parameter(property = "createResourceBundles", defaultValue = "true")
     private boolean createResourceBundles;
 
     @Parameter(property = "createStringConstants", defaultValue = "true")
@@ -270,6 +270,18 @@ public class SchemaGeneratorMojo extends AbstractMojo {
                         builder.setStringPropertyPrefix(null);
                         builder.setStringPropertySuffix(null);
                         builder.setStringConstantCase(null);
+                    }
+                    // when string constant generation set, specify prefix and suffix
+                    if (createLocalNameStringConstants) {
+                        // when prefix set, the builder will generate string constants for the local names
+                        builder.setLocalNameStringPropertyPrefix(localNameStringConstantPrefix);
+                        builder.setLocalNameStringPropertySuffix(localNameStringConstantSuffix);
+                        builder.setLocalNameStringConstantCase(localNameStringConstantCase);
+                    } else {
+                        // be sure to not generate String constants
+                        builder.setLocalNameStringPropertyPrefix(null);
+                        builder.setLocalNameStringPropertySuffix(null);
+                        builder.setLocalNameStringConstantCase(null);
                     }
                     final Path vFile = target.resolve(fName);
                     final String className = vFile.getFileName().toString().replaceFirst("\\.java$", "");

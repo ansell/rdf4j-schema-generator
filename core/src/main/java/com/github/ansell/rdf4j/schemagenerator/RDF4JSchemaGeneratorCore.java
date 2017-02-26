@@ -224,6 +224,44 @@ public class RDF4JSchemaGeneratorCore {
             }
         }
 
+        //string constant values
+        if (localNameStringCaseFormat != null || StringUtils.isNotBlank(localNameStringPropertyPrefix) || (StringUtils.isNotBlank(localNameStringPropertySuffix))) {
+            // add the possibility to add a string property with the namespace for usage in
+            for (String key : keys) {
+                final Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
+                final Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
+                final String localNameKey;
+                try {
+                	localNameKey = splitUris.get(key).getLocalName();
+                } catch (Exception e) {
+                	log.error("Could not get localName for: {}", key);
+                	continue;
+                }
+                
+                out.println(getIndent(1) + "/**");
+                if (label != null) {
+                    out.printf(getIndent(1) + " * %s%n", label.getLabel());
+                    out.println(getIndent(1) + " * <p>");
+                }
+                out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
+                if (comment != null) {
+                    out.println(getIndent(1) + " * <p>");
+                    out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
+                }
+                out.println(getIndent(1) + " *");
+                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
+                out.println(getIndent(1) + " */");
+
+                final String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(getLocalNameStringPropertyPrefix()),
+                        doCaseFormatting(localNameKey, getLocalNameStringConstantCase()),
+                        StringUtils.defaultString(getLocalNameStringPropertySuffix())));
+                checkField(className, nextKey);
+                out.printf(getIndent(1) + "public static final String %s = \"%s\";%n",
+                         nextKey, localNameKey);
+                out.println();
+            }
+        }
+
         //and now the resources
         for (String key : keys) {
             Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);

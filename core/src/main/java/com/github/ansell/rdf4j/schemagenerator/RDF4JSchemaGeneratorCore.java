@@ -19,6 +19,7 @@ import org.eclipse.rdf4j.rio.Rio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.rdf4j.schemagenerator.internal.SchemaRecordImpl;
 import com.google.common.base.CaseFormat;
 
 import java.io.*;
@@ -191,29 +192,31 @@ public class RDF4JSchemaGeneratorCore {
         out.printf(getIndent(1) + "public static final String PREFIX = \"%s\";%n", name.toLowerCase());
         out.println();
 
-        List<String> keys = new ArrayList<>();
-        keys.addAll(splitUris.keySet());
+        final List<String> keys = new ArrayList<>(splitUris.keySet());
         Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
 
+        final List<SchemaRecord> stringConstants = new ArrayList<>();
+        
         //string constant values
         if (stringCaseFormat != null || StringUtils.isNotBlank(stringPropertyPrefix) || (StringUtils.isNotBlank(stringPropertySuffix))) {
             // add the possibility to add a string property with the namespace for usage in
-            for (String key : keys) {
-                final Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
-                final Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
+            for (final String key : keys) {
+                final IRI nextIRI = splitUris.get(key);
+				final Literal comment = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), COMMENT_PROPERTIES);
+                final Literal label = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), LABEL_PROPERTIES);
 
                 out.println(getIndent(1) + "/**");
                 if (label != null) {
                     out.printf(getIndent(1) + " * %s%n", label.getLabel());
                     out.println(getIndent(1) + " * <p>");
                 }
-                out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
+                out.printf(getIndent(1) + " * {@code %s}.%n", nextIRI.stringValue());
                 if (comment != null) {
                     out.println(getIndent(1) + " * <p>");
                     out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
                 }
                 out.println(getIndent(1) + " *");
-                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
+                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", nextIRI, key);
                 out.println(getIndent(1) + " */");
 
                 final String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(getStringPropertyPrefix()),
@@ -223,18 +226,22 @@ public class RDF4JSchemaGeneratorCore {
                 out.printf(getIndent(1) + "public static final String %s = %s.NAMESPACE + \"%s\";%n",
                          nextKey, className, key);
                 out.println();
+                stringConstants.add(new SchemaRecordImpl(nextIRI, nextKey, key, label, comment));
             }
         }
 
+        List<SchemaRecord> localNameStringConstants = new ArrayList<>();
+        
         //string constant values
         if (localNameStringCaseFormat != null || StringUtils.isNotBlank(localNameStringPropertyPrefix) || (StringUtils.isNotBlank(localNameStringPropertySuffix))) {
             // add the possibility to add a string property with the namespace for usage in
-            for (String key : keys) {
-                final Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
-                final Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
+            for (final String key : keys) {
+                final IRI nextIRI = splitUris.get(key);
+				final Literal comment = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), COMMENT_PROPERTIES);
+                final Literal label = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), LABEL_PROPERTIES);
                 final String localNameKey;
                 try {
-                	localNameKey = splitUris.get(key).getLocalName();
+                	localNameKey = nextIRI.getLocalName();
                 } catch (Exception e) {
                 	log.error("Could not get localName for: {}", key);
                 	continue;
@@ -245,13 +252,13 @@ public class RDF4JSchemaGeneratorCore {
                     out.printf(getIndent(1) + " * %s%n", label.getLabel());
                     out.println(getIndent(1) + " * <p>");
                 }
-                out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
+                out.printf(getIndent(1) + " * {@code %s}.%n", nextIRI.stringValue());
                 if (comment != null) {
                     out.println(getIndent(1) + " * <p>");
                     out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
                 }
                 out.println(getIndent(1) + " *");
-                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
+                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", nextIRI, key);
                 out.println(getIndent(1) + " */");
 
                 final String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(getLocalNameStringPropertyPrefix()),
@@ -261,32 +268,37 @@ public class RDF4JSchemaGeneratorCore {
                 out.printf(getIndent(1) + "public static final String %s = \"%s\";%n",
                          nextKey, localNameKey);
                 out.println();
+                localNameStringConstants.add(new SchemaRecordImpl(nextIRI, nextKey, key, label, comment));
             }
         }
 
+        List<SchemaRecord> iriConstants = new ArrayList<>();
+        
         //and now the resources
-        for (String key : keys) {
-            Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
-            Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
+        for (final String key : keys) {
+            final IRI nextIRI = splitUris.get(key);
+			final Literal comment = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), COMMENT_PROPERTIES);
+            final Literal label = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), LABEL_PROPERTIES);
 
             out.println(getIndent(1) + "/**");
             if (label != null) {
                 out.printf(getIndent(1) + " * %s%n", label.getLabel());
                 out.println(getIndent(1) + " * <p>");
             }
-            out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
+            out.printf(getIndent(1) + " * {@code %s}.%n", nextIRI.stringValue());
             if (comment != null) {
                 out.println(getIndent(1) + " * <p>");
                 out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
             }
             out.println(getIndent(1) + " *");
-            out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
+            out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", nextIRI, key);
             out.println(getIndent(1) + " */");
 
             String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
             checkField(className, nextKey);
             out.printf(getIndent(1) + "public static final IRI %s;%n", nextKey);
             out.println();
+            iriConstants.add(new SchemaRecordImpl(nextIRI, nextKey, key, label, comment));
         }
 
         //static init
@@ -326,6 +338,9 @@ public class RDF4JSchemaGeneratorCore {
         templateData.put("className", className);
         templateData.put("prefix", prefix);
         templateData.put("name", name);
+        templateData.put("stringConstants", stringConstants);
+        templateData.put("localNameStringConstants", localNameStringConstants);
+        templateData.put("iriConstants", iriConstants);
 
         try (StringWriter stringOutput = new StringWriter()) {
             

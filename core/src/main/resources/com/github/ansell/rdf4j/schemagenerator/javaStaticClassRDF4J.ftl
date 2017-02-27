@@ -35,20 +35,66 @@ public class ${className} {
     public static final String PREFIX = "${name}"; 
 
 <#if stringConstants??>
+    /**********************
+     * IRI String Constants
+     **********************/
 <#list stringConstants as stringConstant>
-
+    /**
+<#if stringConstant.getLabel().isPresent()>
+     * ${stringConstant.getLabel().get()}
+</#if>
+     */
 </#list>
 </#if>
 
 <#if localNameStringConstants??>
-<#list localNameStringConstants as localNameStringConstants>
-
+    /*****************************
+     * Local Name String Constants
+     *****************************/
+<#list localNameStringConstants as localNameStringConstant>
+    /**
+     * ${localNameStringConstant.IRI}
+     */
 </#list>
 </#if>
 
 <#if iriConstants??>
-<#list iriConstants as iriConstants>
-
+    /***************
+     * IRI Constants
+     ***************/
+<#list iriConstants as iriConstant>
+    /**
+<#if iriConstant.getLabel().isPresent()>
+     * ${iriConstant.getLabel().get().stringValue()?js_string}
+     * <p>
+</#if>
+     * {@code ${iriConstant.getIRI().stringValue()?js_string}}
+<#if iriConstant.getDescription().isPresent()>
+     * <p>
+     * ${iriConstant.getDescription().get().stringValue()?js_string}
+</#if>
+     * @see <a href="${iriConstant.getIRI().stringValue()?js_string}}">${iriConstant.getRawRecordKey()?js_string}</a>
+     */
+     public static final IRI ${iriConstant.getFormattedRecordKey()};
 </#list>
 </#if>
+
+    /**
+     * Static initializer
+     */
+    static {
+        ValueFactory vf = SimpleValueFactory.getInstance();
+<#if iriConstants??>
+        /***************
+         * IRI Constants
+         ***************/
+<#list iriConstants as iriConstant>
+        ${iriConstant.getFormattedRecordKey()} = vf.createIRI("${iriConstant.getIRI().stringValue()?j_string}");
+</#list>
+</#if>
+    }
+    
+    private ${className}() {
+        // static access only
+    }
 }

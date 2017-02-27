@@ -2,6 +2,11 @@ package com.github.ansell.rdf4j.schemagenerator;
 
 import com.google.common.collect.Sets;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.Version;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.eclipse.rdf4j.common.io.MavenUtil;
@@ -109,9 +114,6 @@ public class RDF4JSchemaGeneratorCore {
         }
     }
 
-    /**
-     *
-     */
     public void generate(String className, PrintWriter out) throws IOException, GenerationException {
         log.trace("classname: {}", className);
         if (StringUtils.isBlank(name)) {
@@ -307,6 +309,33 @@ public class RDF4JSchemaGeneratorCore {
         //class end
         out.println("}");
         out.flush();
+        
+        // Generate using Freemarker
+        Configuration cfg = new Configuration(new Version("2.3.25-incubating"));
+
+        cfg.setClassForTemplateLoading(RDF4JSchemaGeneratorCore.class, "");
+        cfg.setDefaultEncoding("UTF-8");
+
+        Template template = cfg.getTemplate("javaStaticClassRDF4J.ftl");
+
+        Map<String, Object> templateData = new HashMap<>();
+        templateData.put("packageName", packageName);
+        templateData.put("title", oTitle);
+        templateData.put("description", oDescr);
+        templateData.put("seeAlsoUrls", oSeeAlso);
+        templateData.put("className", className);
+        templateData.put("prefix", prefix);
+        templateData.put("name", name);
+
+        try (StringWriter stringOutput = new StringWriter()) {
+            
+            template.process(templateData, stringOutput);
+            System.out.println(stringOutput.getBuffer().toString());
+
+            stringOutput.flush();
+        } catch (TemplateException e) {
+        	throw new GenerationException(e);
+		}
     }
 
     private void checkField(String className, String fieldName) throws GenerationException {

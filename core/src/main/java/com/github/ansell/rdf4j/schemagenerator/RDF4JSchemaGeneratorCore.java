@@ -365,19 +365,10 @@ public class RDF4JSchemaGeneratorCore {
                     if (v instanceof Literal) {
                         final Literal lit = (Literal) v;
                         final Optional<String> lang = lit.getLanguage();
-                        final Properties bundle;
-                        if (!lang.isPresent()) {
-                            bundle = bundles.get(baseName);
-                        } else if (bundles.containsKey(baseName + "_" + lang.get())) {
-                            bundle = bundles.get(baseName + "_" + lang.get());
-                        } else {
-                            bundle = new Properties();
-                            bundles.put(baseName + "_" + lang.get(), bundle);
-                        }
-
-                        if (!bundle.containsKey(nextKey + ".label")) {
-                            bundle.put(nextKey + ".label", lit.getLabel().replaceAll("\\s+", " "));
-                        }
+                        final String nextPropertySuffix = ".label";
+                        
+                        final Properties bundle = getBundleForLangTag(baseName, bundles, lang);
+						addPropertyToBundle(nextKey, lit, nextPropertySuffix, bundle);
                     }
                 }
             }
@@ -387,19 +378,10 @@ public class RDF4JSchemaGeneratorCore {
                     if (v instanceof Literal) {
                         final Literal lit = (Literal) v;
                         final Optional<String> lang = lit.getLanguage();
-                        final Properties bundle;
-                        if (!lang.isPresent()) {
-                            bundle = bundles.get(baseName);
-                        } else if (bundles.containsKey(baseName + "_" + lang.get())) {
-                            bundle = bundles.get(baseName + "_" + lang.get());
-                        } else {
-                            bundle = new Properties();
-                            bundles.put(baseName + "_" + lang.get(), bundle);
-                        }
-
-                        if (!bundle.containsKey(nextKey + ".comment")) {
-                            bundle.put(nextKey + ".comment", lit.getLabel().replaceAll("\\s+", " "));
-                        }
+                        final String nextPropertySuffix = ".comment";
+                        
+                        final Properties bundle = getBundleForLangTag(baseName, bundles, lang);
+						addPropertyToBundle(nextKey, lit, nextPropertySuffix, bundle);
                     }
                 }
             }
@@ -423,6 +405,27 @@ public class RDF4JSchemaGeneratorCore {
         }
         return bundles;
     }
+
+	private void addPropertyToBundle(String nextKey, final Literal lit, String nextPropertySuffix,
+			final Properties bundle) {
+		if (!bundle.containsKey(nextKey + nextPropertySuffix)) {
+		    bundle.put(nextKey + nextPropertySuffix, lit.getLabel().replaceAll("\\s+", " "));
+		}
+	}
+
+	private Properties getBundleForLangTag(String baseName, HashMap<String, Properties> bundles,
+			final Optional<String> lang) {
+		final Properties bundle;
+		if (!lang.isPresent()) {
+		    bundle = bundles.get(baseName);
+		} else if (bundles.containsKey(baseName + "_" + lang.get())) {
+		    bundle = bundles.get(baseName + "_" + lang.get());
+		} else {
+		    bundle = new Properties();
+		    bundles.put(baseName + "_" + lang.get(), bundle);
+		}
+		return bundle;
+	}
 
     private String getIndent(int level) {
         return StringUtils.repeat(getIndent(), level);

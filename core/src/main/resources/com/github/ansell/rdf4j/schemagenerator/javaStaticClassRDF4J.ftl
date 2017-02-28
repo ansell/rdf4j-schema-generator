@@ -40,7 +40,7 @@ import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
  * @see <a href="${seeAlsoUrl?js_string}>${seeAlsoUrl?js_string}</a>
 </#list>
  */
-public class ${className?j_string} {
+public class ${className?j_string} <#if metaInfServicesInterface??>implements ${metaInfServicesInterface} </#if>{
 
 <@doI/>/**
 <@doI/> * {@code <${prefix?js_string}>}
@@ -100,7 +100,7 @@ public class ${className?j_string} {
 </#if>
 <@doI/>}
 
-<@doI/>private ${className?j_string}() {
-<@doI/><@doI/>// static access only
+<@doI/>public ${className?j_string}() {
+<@doI/><@doI/>// To enable service discovery to succeed, even though this is a static class
 <@doI/>}
 }

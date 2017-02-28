@@ -44,6 +44,7 @@ import java.util.*;
  * Maven Plugin to generate RDF4J Vocabulary Classes.
  *
  * @author Jakob Frank (jakob@apache.org)
+ * @author Peter Ansell p_ansell@yahoo.com
  */
 @Mojo(name = "generate",
         defaultPhase = LifecyclePhase.GENERATE_SOURCES,
@@ -54,8 +55,8 @@ public class SchemaGeneratorMojo extends AbstractMojo {
     @Parameter(property = "output", defaultValue = "${project.build.directory}/generated-sources/rdf4j-schemas")
     private File outputDirectory;
 
-    @Parameter(property = "bundleOutput", defaultValue = "${project.build.directory}/generated-resources/rdf4j-schemas")
-    private File bundleOutputDirectory;
+    @Parameter(property = "resourceOutput", defaultValue = "${project.build.directory}/generated-resources/rdf4j-schemas")
+    private File resourceOutputDirectory;
 
     @Parameter(property = "remoteCacheDir", defaultValue = "${project.build.directory}/schema-generator-maven-plugin.cache")
     private File remoteCacheDir;
@@ -86,6 +87,11 @@ public class SchemaGeneratorMojo extends AbstractMojo {
     
     @Parameter(property = "createResourceBundles", defaultValue = "true")
     private boolean createResourceBundles = true;
+    
+    @Parameter(property = "createMetaInfServices", defaultValue = "false")
+    private boolean createMetaInfServices = false;
+    @Parameter(property = "metaInfServicesInterface", defaultValue = "com.github.ansell.rdf4j.schemagenerator.Schema")
+    private String metaInfServicesInterface = "com.github.ansell.rdf4j.schemagenerator.Schema";
 
     @Parameter(property = "createStringConstants", defaultValue = "true")
     private boolean createStringConstants = true;
@@ -127,7 +133,7 @@ public class SchemaGeneratorMojo extends AbstractMojo {
         StaticLoggerBinder.getSingleton().setLog(getLog());
         try {
             final Path output = outputDirectory.toPath();
-            final Path bundleOutput = bundleOutputDirectory.toPath();
+            final Path resourceOutput = resourceOutputDirectory.toPath();
 
             if (schemas == null) {
                 schemas = new ArrayList<>();
@@ -141,7 +147,7 @@ public class SchemaGeneratorMojo extends AbstractMojo {
 
 
             Files.createDirectories(output);
-            Files.createDirectories(bundleOutput);
+            Files.createDirectories(resourceOutput);
 
 
             final Log log = getLog();
@@ -300,7 +306,7 @@ public class SchemaGeneratorMojo extends AbstractMojo {
                         builder.generate(className, out);
                     }
                     if (nextSchema.isCreateResourceBundlesSet() && nextSchema.isCreateResourceBundles() || createResourceBundles) {
-                        Path bundleTarget = bundleOutput;
+                        Path bundleTarget = resourceOutput;
                         if (builder.getPackageName() != null) {
                             bundleTarget = bundleTarget.resolve(builder.getPackageName().replaceAll("\\.", "/"));
                             Files.createDirectories(bundleTarget);
@@ -314,13 +320,31 @@ public class SchemaGeneratorMojo extends AbstractMojo {
                                         pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId(), pluginDescriptor.getVersion(), pluginDescriptor.getName()));
                             }
                         }
-
-                        Resource rsc = new Resource();
-                        rsc.setDirectory(bundleOutput.toAbsolutePath().toString());
-                        rsc.setFiltering(false);
-                        log.debug(String.format("Adding %s as additional resource folder", rsc));
-                        project.addResource(rsc);
                     }
+                    if (createMetaInfServices) {
+                        Path metaInfServicesFolderTarget = resourceOutput.resolve("META-INF").resolve("services").resolve(metaInfServicesInterface);
+                        Files.createDirectories(metaInfServicesFolderTarget);
+                        Path metaInfServicesTarget = metaInfServicesFolderTarget.resolve(metaInfServicesInterface);
+                        
+                        final Map<String, Properties> bundles = builder.generateResourceBundle(className);
+                        try (final Writer out = new OutputStreamWriter(
+                                buildContext.newFileOutputStream(metaInfServicesTarget.toFile()), StandardCharsets.UTF_8)) {
+                            log.info(String.format("    Generating META-INF/services/%s: %s", metaInfServicesInterface, nextSchema.getClassName()));
+                            if (builder.getPackageName() != null) {
+                            	out.write(builder.getPackageName());
+                            	out.write('.');
+                            }
+                            out.write(nextSchema.getClassName());
+                            out.write('\n');
+                        }
+                    }
+                    
+                    Resource rsc = new Resource();
+                    rsc.setDirectory(resourceOutput.toAbsolutePath().toString());
+                    rsc.setFiltering(false);
+                    log.debug(String.format("Adding %s as additional resource folder", rsc));
+                    project.addResource(rsc);
+                    
                     log.info(String.format("Generated %s", displayName));
 
                 } catch (RDFParseException e) {

@@ -2,9 +2,12 @@ package com.github.ansell.rdf4j.schemagenerator;
 
 import com.google.common.collect.Sets;
 
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateHashModel;
 import freemarker.template.Version;
 
 import org.apache.commons.lang3.StringUtils;
@@ -322,29 +325,34 @@ public class RDF4JSchemaGeneratorCore {
         out.println("}");
         out.flush();
         
-        // Generate using Freemarker
-        Configuration cfg = new Configuration(new Version("2.3.25-incubating"));
+        try (StringWriter stringOutput = new StringWriter();) {
+	        // Generate using Freemarker
+	        Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
+	
+	        cfg.setClassForTemplateLoading(RDF4JSchemaGeneratorCore.class, "");
+	        cfg.setDefaultEncoding("UTF-8");
+	
+	        Template template = cfg.getTemplate("javaStaticClassRDF4J.ftl");
+	
+	        Map<String, Object> templateData = new HashMap<>();
+	        templateData.put("packageName", packageName);
+	        templateData.put("title", oTitle);
+	        templateData.put("description", oDescr);
+	        templateData.put("seeAlsoUrls", oSeeAlso);
+	        templateData.put("className", className);
+	        templateData.put("prefix", prefix);
+	        templateData.put("name", name);
+	        templateData.put("stringConstants", stringConstants);
+	        templateData.put("localNameStringConstants", localNameStringConstants);
+	        templateData.put("iriConstants", iriConstants);
+	        
+	        BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_25);
+	        BeansWrapper wrapper = builder.build();
+	        TemplateHashModel staticModels = wrapper.getStaticModels();
+	        templateData.put("StringUtils", staticModels.get("org.apache.commons.lang3.StringUtils"));
+	        templateData.put("WordUtils", staticModels.get("org.apache.commons.lang3.text.WordUtils"));
 
-        cfg.setClassForTemplateLoading(RDF4JSchemaGeneratorCore.class, "");
-        cfg.setDefaultEncoding("UTF-8");
-
-        Template template = cfg.getTemplate("javaStaticClassRDF4J.ftl");
-
-        Map<String, Object> templateData = new HashMap<>();
-        templateData.put("packageName", packageName);
-        templateData.put("title", oTitle);
-        templateData.put("description", oDescr);
-        templateData.put("seeAlsoUrls", oSeeAlso);
-        templateData.put("className", className);
-        templateData.put("prefix", prefix);
-        templateData.put("name", name);
-        templateData.put("stringConstants", stringConstants);
-        templateData.put("localNameStringConstants", localNameStringConstants);
-        templateData.put("iriConstants", iriConstants);
-
-        try (StringWriter stringOutput = new StringWriter()) {
-            
-            template.process(templateData, stringOutput);
+            template.process(templateData, stringOutput); 
             System.out.println(stringOutput.getBuffer().toString());
 
             stringOutput.flush();

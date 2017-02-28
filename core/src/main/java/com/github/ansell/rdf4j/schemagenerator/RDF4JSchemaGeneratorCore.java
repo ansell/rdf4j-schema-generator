@@ -253,7 +253,7 @@ public class RDF4JSchemaGeneratorCore {
     }
 
     public void generateResourceBundle(String baseName, Path bundleDir) throws GenerationException, IOException {
-        HashMap<String, Properties> bundles = generateResourceBundle(baseName);
+        Map<String, Properties> bundles = generateResourceBundle(baseName);
 
         for (String bKey : bundles.keySet()) {
             final Properties bundle = bundles.get(bKey);
@@ -272,9 +272,9 @@ public class RDF4JSchemaGeneratorCore {
 
     }
 
-    public HashMap<String, Properties> generateResourceBundle(String baseName) throws GenerationException {
+    public Map<String, Properties> generateResourceBundle(String baseName) throws GenerationException {
         Pattern pattern = Pattern.compile(Pattern.quote(getPrefix()) + "(.+)");
-        HashMap<String, IRI> splitUris = new HashMap<>();
+        Map<String, IRI> splitUris = new HashMap<>();
         for (Resource nextSubject : model.subjects()) {
             if (nextSubject instanceof IRI) {
                 Matcher matcher = pattern.matcher(nextSubject.stringValue());
@@ -289,7 +289,7 @@ public class RDF4JSchemaGeneratorCore {
         keys.addAll(splitUris.keySet());
         Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
 
-        HashMap<String, Properties> bundles = new HashMap<>();
+        Map<String, Properties> bundles = new HashMap<>();
         // Default we have for sure
         bundles.put(baseName, new Properties());
         for (String key : keys) {
@@ -349,7 +349,7 @@ public class RDF4JSchemaGeneratorCore {
 		}
 	}
 
-	private Properties getBundleForLangTag(String baseName, HashMap<String, Properties> bundles,
+	private Properties getBundleForLangTag(String baseName, Map<String, Properties> bundles,
 			final Optional<String> lang) {
 		final Properties bundle;
 		if (!lang.isPresent()) {

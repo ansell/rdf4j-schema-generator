@@ -305,7 +305,7 @@ public class SchemaGeneratorMojo extends AbstractMojo {
                             bundleTarget = bundleTarget.resolve(builder.getPackageName().replaceAll("\\.", "/"));
                             Files.createDirectories(bundleTarget);
                         }
-                        final HashMap<String, Properties> bundles = builder.generateResourceBundle(className);
+                        final Map<String, Properties> bundles = builder.generateResourceBundle(className);
                         for (String bKey : bundles.keySet()) {
                             try (final Writer out = new OutputStreamWriter(
                                     buildContext.newFileOutputStream(bundleTarget.resolve(bKey + ".properties").toFile()), StandardCharsets.UTF_8)) {

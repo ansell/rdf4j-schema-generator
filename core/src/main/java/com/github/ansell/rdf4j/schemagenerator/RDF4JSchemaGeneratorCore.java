@@ -335,6 +335,7 @@ public class RDF4JSchemaGeneratorCore {
 	        Template template = cfg.getTemplate("javaStaticClassRDF4J.ftl");
 	
 	        Map<String, Object> templateData = new HashMap<>();
+	        templateData.put("indent", getIndent());
 	        templateData.put("packageName", packageName);
 	        templateData.put("title", oTitle);
 	        templateData.put("description", oDescr);

@@ -81,6 +81,9 @@ public class SchemaGeneratorMojo extends AbstractMojo {
     @Parameter(property = "preferredLanguage")
     private String preferredLanguage;
 
+    @Parameter(property = "templateClassPathLocation", defaultValue = "/com/github/ansell/rdf4j/schemagenerator/javaStaticClassRDF4J.ftl")
+    private String templatePath = "/com/github/ansell/rdf4j/schemagenerator/javaStaticClassRDF4J.ftl";
+    
     @Parameter(property = "createResourceBundles", defaultValue = "true")
     private boolean createResourceBundles = true;
 

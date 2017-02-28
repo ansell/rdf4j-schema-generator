@@ -2,6 +2,13 @@ package com.github.ansell.rdf4j.schemagenerator;
 
 import com.google.common.collect.Sets;
 
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.ext.beans.BeansWrapperBuilder;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateHashModel;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.eclipse.rdf4j.common.io.MavenUtil;
@@ -14,6 +21,7 @@ import org.eclipse.rdf4j.rio.Rio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.rdf4j.schemagenerator.internal.SchemaRecordImpl;
 import com.google.common.base.CaseFormat;
 
 import java.io.*;
@@ -38,10 +46,11 @@ import java.util.regex.Pattern;
  */
 public class RDF4JSchemaGeneratorCore {
 
-    private static final Logger log = LoggerFactory.getLogger(RDF4JSchemaGeneratorCore.class);
+	private static final Logger log = LoggerFactory.getLogger(RDF4JSchemaGeneratorCore.class);
 
     private static final IRI[] COMMENT_PROPERTIES = new IRI[]{RDFS.COMMENT, DCTERMS.DESCRIPTION, SKOS.DEFINITION, DC.DESCRIPTION};
     private static final IRI[] LABEL_PROPERTIES = new IRI[]{RDFS.LABEL, DCTERMS.TITLE, DC.TITLE, SKOS.PREF_LABEL, SKOS.ALT_LABEL};
+    private String templatePath = "/com/github/ansell/rdf4j/schemagenerator/javaStaticClassRDF4J.ftl";
     private String name = null;
     private String prefix = null;
     private String packageName = null;
@@ -109,9 +118,6 @@ public class RDF4JSchemaGeneratorCore {
         }
     }
 
-    /**
-     *
-     */
     public void generate(String className, PrintWriter out) throws IOException, GenerationException {
         log.trace("classname: {}", className);
         if (StringUtils.isBlank(name)) {
@@ -139,174 +145,104 @@ public class RDF4JSchemaGeneratorCore {
             }
         }
 
-        //print
-
-        //package is optional
-        if (StringUtils.isNotBlank(packageName)) {
-            out.printf("package %s;%n%n", getPackageName());
-        }
-        //imports
-        out.println("import org.eclipse.rdf4j.model.IRI;");
-        out.println("import org.eclipse.rdf4j.model.ValueFactory;");
-        out.println("import org.eclipse.rdf4j.model.impl.SimpleValueFactory;");
-        out.println();
-
         final IRI pfx = SimpleValueFactory.getInstance().createIRI(prefix);
         Literal oTitle = getFirstExistingObjectLiteral(model, pfx, getPreferredLanguage(), LABEL_PROPERTIES);
         Literal oDescr = getFirstExistingObjectLiteral(model, pfx, getPreferredLanguage(), COMMENT_PROPERTIES);
         Set<Value> oSeeAlso = model.filter(pfx, RDFS.SEEALSO, null).objects();
 
-        //class JavaDoc
-        out.println("/**");
-        if (oTitle != null) {
-            out.printf(" * %s.%n", WordUtils.wrap(oTitle.getLabel().replaceAll("\\s+", " "), 70, "\n * ", false));
-            out.println(" * <p>");
-        }
-        if (oDescr != null) {
-            out.printf(" * %s.%n", WordUtils.wrap(oDescr.getLabel().replaceAll("\\s+", " "), 70, "\n * ", false));
-            out.println(" * <p>");
-        }
-        out.printf(" * Namespace %s.%n", name);
-        out.printf(" * Prefix: {@code <%s>}%n", prefix);
-        if (!oSeeAlso.isEmpty()) {
-            out.println(" *");
-            for (Value s : oSeeAlso) {
-                if (s instanceof IRI) {
-                    out.printf(" * @see <a href=\"%s\">%s</a>%n", s.stringValue(), s.stringValue());
-                }
-            }
-        }
-        out.println(" */");
-        //class Definition
-        out.printf("public class %s {%n", className);
-        out.println();
-
-        //constants
-        out.printf(getIndent(1) + "/** {@code %s} **/%n", prefix);
-        out.printf(getIndent(1) + "public static final String NAMESPACE = \"%s\";%n", prefix);
-        out.println();
-        out.printf(getIndent(1) + "/** {@code %s} **/%n", name.toLowerCase());
-        out.printf(getIndent(1) + "public static final String PREFIX = \"%s\";%n", name.toLowerCase());
-        out.println();
-
-        List<String> keys = new ArrayList<>();
-        keys.addAll(splitUris.keySet());
+        final List<String> keys = new ArrayList<>(splitUris.keySet());
         Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
 
+        final List<SchemaRecord> stringConstants = new ArrayList<>();
+        
         //string constant values
         if (stringCaseFormat != null || StringUtils.isNotBlank(stringPropertyPrefix) || (StringUtils.isNotBlank(stringPropertySuffix))) {
             // add the possibility to add a string property with the namespace for usage in
-            for (String key : keys) {
-                final Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
-                final Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
-
-                out.println(getIndent(1) + "/**");
-                if (label != null) {
-                    out.printf(getIndent(1) + " * %s%n", label.getLabel());
-                    out.println(getIndent(1) + " * <p>");
-                }
-                out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
-                if (comment != null) {
-                    out.println(getIndent(1) + " * <p>");
-                    out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
-                }
-                out.println(getIndent(1) + " *");
-                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
-                out.println(getIndent(1) + " */");
+            for (final String key : keys) {
+                final IRI nextIRI = splitUris.get(key);
+				final Literal comment = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), COMMENT_PROPERTIES);
+                final Literal label = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), LABEL_PROPERTIES);
 
                 final String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(getStringPropertyPrefix()),
                         doCaseFormatting(key, getStringConstantCase()),
                         StringUtils.defaultString(getStringPropertySuffix())));
                 checkField(className, nextKey);
-                out.printf(getIndent(1) + "public static final String %s = %s.NAMESPACE + \"%s\";%n",
-                         nextKey, className, key);
-                out.println();
+                stringConstants.add(new SchemaRecordImpl(nextIRI, nextKey, key, label, comment));
             }
         }
 
+        List<SchemaRecord> localNameStringConstants = new ArrayList<>();
+        
         //string constant values
         if (localNameStringCaseFormat != null || StringUtils.isNotBlank(localNameStringPropertyPrefix) || (StringUtils.isNotBlank(localNameStringPropertySuffix))) {
             // add the possibility to add a string property with the namespace for usage in
-            for (String key : keys) {
-                final Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
-                final Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
+            for (final String key : keys) {
+                final IRI nextIRI = splitUris.get(key);
+				final Literal comment = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), COMMENT_PROPERTIES);
+                final Literal label = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), LABEL_PROPERTIES);
                 final String localNameKey;
                 try {
-                	localNameKey = splitUris.get(key).getLocalName();
+                	localNameKey = nextIRI.getLocalName();
                 } catch (Exception e) {
                 	log.error("Could not get localName for: {}", key);
                 	continue;
                 }
                 
-                out.println(getIndent(1) + "/**");
-                if (label != null) {
-                    out.printf(getIndent(1) + " * %s%n", label.getLabel());
-                    out.println(getIndent(1) + " * <p>");
-                }
-                out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
-                if (comment != null) {
-                    out.println(getIndent(1) + " * <p>");
-                    out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
-                }
-                out.println(getIndent(1) + " *");
-                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
-                out.println(getIndent(1) + " */");
-
                 final String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(getLocalNameStringPropertyPrefix()),
                         doCaseFormatting(localNameKey, getLocalNameStringConstantCase()),
                         StringUtils.defaultString(getLocalNameStringPropertySuffix())));
                 checkField(className, nextKey);
-                out.printf(getIndent(1) + "public static final String %s = \"%s\";%n",
-                         nextKey, localNameKey);
-                out.println();
+                localNameStringConstants.add(new SchemaRecordImpl(nextIRI, nextKey, key, label, comment));
             }
         }
 
+        List<SchemaRecord> iriConstants = new ArrayList<>();
+        
         //and now the resources
-        for (String key : keys) {
-            Literal comment = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), COMMENT_PROPERTIES);
-            Literal label = getFirstExistingObjectLiteral(model, splitUris.get(key), getPreferredLanguage(), LABEL_PROPERTIES);
-
-            out.println(getIndent(1) + "/**");
-            if (label != null) {
-                out.printf(getIndent(1) + " * %s%n", label.getLabel());
-                out.println(getIndent(1) + " * <p>");
-            }
-            out.printf(getIndent(1) + " * {@code %s}.%n", splitUris.get(key).stringValue());
-            if (comment != null) {
-                out.println(getIndent(1) + " * <p>");
-                out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
-            }
-            out.println(getIndent(1) + " *");
-            out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", splitUris.get(key), key);
-            out.println(getIndent(1) + " */");
+        for (final String key : keys) {
+            final IRI nextIRI = splitUris.get(key);
+			final Literal comment = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), COMMENT_PROPERTIES);
+            final Literal label = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), LABEL_PROPERTIES);
 
             String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
             checkField(className, nextKey);
-            out.printf(getIndent(1) + "public static final IRI %s;%n", nextKey);
-            out.println();
+            iriConstants.add(new SchemaRecordImpl(nextIRI, nextKey, key, label, comment));
         }
 
-        //static init
-        out.println(getIndent(1) + "static {");
-        out.printf(getIndent(2) + "ValueFactory factory = SimpleValueFactory.getInstance();%n");
-        out.println();
-        for (String key : keys) {
-            String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
-            out.printf(getIndent(2) + "%s = factory.createIRI(%s.NAMESPACE, \"%s\");%n", nextKey, className, key);
-        }
-        out.println(getIndent(1) + "}");
-        out.println();
-
-        //private contructor to avoid instances
-        out.printf(getIndent(1) + "private %s() {%n", className);
-        out.println(getIndent(2) + "//static access only");
-        out.println(getIndent(1) + "}");
-        out.println();
-
-        //class end
-        out.println("}");
-        out.flush();
+        try {
+	        // Generate using Freemarker
+	        Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
+	
+	        cfg.setClassForTemplateLoading(RDF4JSchemaGeneratorCore.class, "/");
+	        cfg.setDefaultEncoding("UTF-8");
+	
+	        Template template = cfg.getTemplate(getTemplatePath());
+	
+	        Map<String, Object> templateData = new HashMap<>();
+	        templateData.put("indent", getIndent());
+	        templateData.put("packageName", packageName);
+	        templateData.put("title", oTitle);
+	        templateData.put("description", oDescr);
+	        templateData.put("seeAlsoUrls", oSeeAlso);
+	        templateData.put("className", className);
+	        templateData.put("prefix", prefix);
+	        templateData.put("name", name);
+	        templateData.put("stringConstants", stringConstants);
+	        templateData.put("localNameStringConstants", localNameStringConstants);
+	        templateData.put("iriConstants", iriConstants);
+	        
+	        BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_25);
+	        BeansWrapper wrapper = builder.build();
+	        TemplateHashModel staticModels = wrapper.getStaticModels();
+	        templateData.put("StringUtils", staticModels.get("org.apache.commons.lang3.StringUtils"));
+	        templateData.put("WordUtils", staticModels.get("org.apache.commons.lang3.text.WordUtils"));
+	
+	        template.process(templateData, out); 
+        } catch (TemplateException e) {
+        	throw new GenerationException(e);
+		} finally {
+			out.flush();
+		}
     }
 
     private void checkField(String className, String fieldName) throws GenerationException {
@@ -584,5 +520,13 @@ public class RDF4JSchemaGeneratorCore {
 
 	public void setLocalNameStringPropertySuffix(String localNameStringPropertySuffix) {
 		this.localNameStringPropertySuffix = localNameStringPropertySuffix;
+	}
+
+	public String getTemplatePath() {
+		return templatePath;
+	}
+
+	public void setTemplatePath(String templatePath) {
+		this.templatePath = templatePath;
 	}
 }

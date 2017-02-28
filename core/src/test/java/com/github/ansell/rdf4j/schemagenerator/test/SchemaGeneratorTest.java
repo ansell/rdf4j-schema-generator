@@ -159,8 +159,8 @@ public class SchemaGeneratorTest {
         String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
         assertTrue(result, result.contains(testProperty4DescriptionFr.getLabel()));
         assertFalse(result.contains(testProperty4DescriptionEn.getLabel()));
-        assertTrue(result.contains("\"property_2\""));
-        assertTrue(result.contains("\"property-3\""));
+        assertTrue(result.contains("\"http://example.com/ns/ontology#property_2\""));
+        assertTrue(result.contains("\"http://example.com/ns/ontology#property-3\""));
         assertTrue(result.contains("property_2 = "));
         assertTrue(result.contains("property_3 = "));
     }
@@ -185,7 +185,7 @@ public class SchemaGeneratorTest {
         Files.copy(javaFilePath, out);
         String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
         assertTrue("Did not find expected key case", result.contains("PROPERTY_LOCALISED4 = "));
-        assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
+        assertTrue("Did not find original URI", result.contains("\"http://example.com/ns/ontology#propertyLocalised4\""));
     }
 
     /**
@@ -208,7 +208,7 @@ public class SchemaGeneratorTest {
         Files.copy(javaFilePath, out);
         String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
         assertTrue("Did not find expected key case", result.contains("propertyLocalised4 = "));
-        assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
+        assertTrue("Did not find original URI", result.contains("\"http://example.com/ns/ontology#propertyLocalised4\""));
     }
 
     /**
@@ -231,7 +231,7 @@ public class SchemaGeneratorTest {
         Files.copy(javaFilePath, out);
         String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
         assertTrue("Did not find expected key case", result.contains("PROPERTY_LOCALISED4 = "));
-        assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
+        assertTrue("Did not find original URI", result.contains("\"http://example.com/ns/ontology#propertyLocalised4\""));
     }
 
     /**
@@ -254,7 +254,7 @@ public class SchemaGeneratorTest {
         Files.copy(javaFilePath, out);
         String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
         assertTrue("Did not find expected key case", result.contains("propertyLocalised4 = "));
-        assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
+        assertTrue("Did not find original URI", result.contains("\"http://example.com/ns/ontology#propertyLocalised4\""));
     }
 
     /**
@@ -277,7 +277,7 @@ public class SchemaGeneratorTest {
         Files.copy(javaFilePath, out);
         String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
         assertTrue("Did not find expected key case", result.contains("PROPERTY_LOCALISED4 = "));
-        assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
+        assertTrue("Did not find original URI", result.contains("\"http://example.com/ns/ontology#propertyLocalised4\""));
     }
 
     /**
@@ -300,7 +300,7 @@ public class SchemaGeneratorTest {
         Files.copy(javaFilePath, out);
         String result = new String(out.toByteArray(), StandardCharsets.UTF_8);
         assertTrue("Did not find expected key case", result.contains("propertyLocalised4 = "));
-        assertTrue("Did not find original URI", result.contains("\"propertyLocalised4\""));
+        assertTrue("Did not find original URI", result.contains("\"http://example.com/ns/ontology#propertyLocalised4\""));
     }
 
 }

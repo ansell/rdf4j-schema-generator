@@ -8,7 +8,6 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateHashModel;
-import freemarker.template.Version;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -47,10 +46,11 @@ import java.util.regex.Pattern;
  */
 public class RDF4JSchemaGeneratorCore {
 
-    private static final Logger log = LoggerFactory.getLogger(RDF4JSchemaGeneratorCore.class);
+	private static final Logger log = LoggerFactory.getLogger(RDF4JSchemaGeneratorCore.class);
 
     private static final IRI[] COMMENT_PROPERTIES = new IRI[]{RDFS.COMMENT, DCTERMS.DESCRIPTION, SKOS.DEFINITION, DC.DESCRIPTION};
     private static final IRI[] LABEL_PROPERTIES = new IRI[]{RDFS.LABEL, DCTERMS.TITLE, DC.TITLE, SKOS.PREF_LABEL, SKOS.ALT_LABEL};
+    private String templatePath = "/com/github/ansell/rdf4j/schemagenerator/javaStaticClassRDF4J.ftl";
     private String name = null;
     private String prefix = null;
     private String packageName = null;
@@ -213,10 +213,10 @@ public class RDF4JSchemaGeneratorCore {
 	        // Generate using Freemarker
 	        Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
 	
-	        cfg.setClassForTemplateLoading(RDF4JSchemaGeneratorCore.class, "");
+	        cfg.setClassForTemplateLoading(RDF4JSchemaGeneratorCore.class, "/");
 	        cfg.setDefaultEncoding("UTF-8");
 	
-	        Template template = cfg.getTemplate("javaStaticClassRDF4J.ftl");
+	        Template template = cfg.getTemplate(getTemplatePath());
 	
 	        Map<String, Object> templateData = new HashMap<>();
 	        templateData.put("indent", getIndent());
@@ -520,5 +520,13 @@ public class RDF4JSchemaGeneratorCore {
 
 	public void setLocalNameStringPropertySuffix(String localNameStringPropertySuffix) {
 		this.localNameStringPropertySuffix = localNameStringPropertySuffix;
+	}
+
+	public String getTemplatePath() {
+		return templatePath;
+	}
+
+	public void setTemplatePath(String templatePath) {
+		this.templatePath = templatePath;
 	}
 }

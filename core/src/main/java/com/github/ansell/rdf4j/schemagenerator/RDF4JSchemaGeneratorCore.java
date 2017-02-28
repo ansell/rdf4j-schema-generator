@@ -145,55 +145,10 @@ public class RDF4JSchemaGeneratorCore {
             }
         }
 
-        //print
-
-        //package is optional
-        if (StringUtils.isNotBlank(packageName)) {
-            out.printf("package %s;%n%n", getPackageName());
-        }
-        //imports
-        out.println("import org.eclipse.rdf4j.model.IRI;");
-        out.println("import org.eclipse.rdf4j.model.ValueFactory;");
-        out.println("import org.eclipse.rdf4j.model.impl.SimpleValueFactory;");
-        out.println();
-
         final IRI pfx = SimpleValueFactory.getInstance().createIRI(prefix);
         Literal oTitle = getFirstExistingObjectLiteral(model, pfx, getPreferredLanguage(), LABEL_PROPERTIES);
         Literal oDescr = getFirstExistingObjectLiteral(model, pfx, getPreferredLanguage(), COMMENT_PROPERTIES);
         Set<Value> oSeeAlso = model.filter(pfx, RDFS.SEEALSO, null).objects();
-
-        //class JavaDoc
-        out.println("/**");
-        if (oTitle != null) {
-            out.printf(" * %s.%n", WordUtils.wrap(oTitle.getLabel().replaceAll("\\s+", " "), 70, "\n * ", false));
-            out.println(" * <p>");
-        }
-        if (oDescr != null) {
-            out.printf(" * %s.%n", WordUtils.wrap(oDescr.getLabel().replaceAll("\\s+", " "), 70, "\n * ", false));
-            out.println(" * <p>");
-        }
-        out.printf(" * Namespace %s.%n", name);
-        out.printf(" * Prefix: {@code <%s>}%n", prefix);
-        if (!oSeeAlso.isEmpty()) {
-            out.println(" *");
-            for (Value s : oSeeAlso) {
-                if (s instanceof IRI) {
-                    out.printf(" * @see <a href=\"%s\">%s</a>%n", s.stringValue(), s.stringValue());
-                }
-            }
-        }
-        out.println(" */");
-        //class Definition
-        out.printf("public class %s {%n", className);
-        out.println();
-
-        //constants
-        out.printf(getIndent(1) + "/** {@code %s} **/%n", prefix);
-        out.printf(getIndent(1) + "public static final String NAMESPACE = \"%s\";%n", prefix);
-        out.println();
-        out.printf(getIndent(1) + "/** {@code %s} **/%n", name.toLowerCase());
-        out.printf(getIndent(1) + "public static final String PREFIX = \"%s\";%n", name.toLowerCase());
-        out.println();
 
         final List<String> keys = new ArrayList<>(splitUris.keySet());
         Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
@@ -208,27 +163,10 @@ public class RDF4JSchemaGeneratorCore {
 				final Literal comment = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), COMMENT_PROPERTIES);
                 final Literal label = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), LABEL_PROPERTIES);
 
-                out.println(getIndent(1) + "/**");
-                if (label != null) {
-                    out.printf(getIndent(1) + " * %s%n", label.getLabel());
-                    out.println(getIndent(1) + " * <p>");
-                }
-                out.printf(getIndent(1) + " * {@code %s}.%n", nextIRI.stringValue());
-                if (comment != null) {
-                    out.println(getIndent(1) + " * <p>");
-                    out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
-                }
-                out.println(getIndent(1) + " *");
-                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", nextIRI, key);
-                out.println(getIndent(1) + " */");
-
                 final String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(getStringPropertyPrefix()),
                         doCaseFormatting(key, getStringConstantCase()),
                         StringUtils.defaultString(getStringPropertySuffix())));
                 checkField(className, nextKey);
-                out.printf(getIndent(1) + "public static final String %s = %s.NAMESPACE + \"%s\";%n",
-                         nextKey, className, key);
-                out.println();
                 stringConstants.add(new SchemaRecordImpl(nextIRI, nextKey, key, label, comment));
             }
         }
@@ -250,27 +188,10 @@ public class RDF4JSchemaGeneratorCore {
                 	continue;
                 }
                 
-                out.println(getIndent(1) + "/**");
-                if (label != null) {
-                    out.printf(getIndent(1) + " * %s%n", label.getLabel());
-                    out.println(getIndent(1) + " * <p>");
-                }
-                out.printf(getIndent(1) + " * {@code %s}.%n", nextIRI.stringValue());
-                if (comment != null) {
-                    out.println(getIndent(1) + " * <p>");
-                    out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
-                }
-                out.println(getIndent(1) + " *");
-                out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", nextIRI, key);
-                out.println(getIndent(1) + " */");
-
                 final String nextKey = cleanKey(String.format("%s%s%s", StringUtils.defaultString(getLocalNameStringPropertyPrefix()),
                         doCaseFormatting(localNameKey, getLocalNameStringConstantCase()),
                         StringUtils.defaultString(getLocalNameStringPropertySuffix())));
                 checkField(className, nextKey);
-                out.printf(getIndent(1) + "public static final String %s = \"%s\";%n",
-                         nextKey, localNameKey);
-                out.println();
                 localNameStringConstants.add(new SchemaRecordImpl(nextIRI, nextKey, key, label, comment));
             }
         }
@@ -283,49 +204,12 @@ public class RDF4JSchemaGeneratorCore {
 			final Literal comment = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), COMMENT_PROPERTIES);
             final Literal label = getFirstExistingObjectLiteral(model, nextIRI, getPreferredLanguage(), LABEL_PROPERTIES);
 
-            out.println(getIndent(1) + "/**");
-            if (label != null) {
-                out.printf(getIndent(1) + " * %s%n", label.getLabel());
-                out.println(getIndent(1) + " * <p>");
-            }
-            out.printf(getIndent(1) + " * {@code %s}.%n", nextIRI.stringValue());
-            if (comment != null) {
-                out.println(getIndent(1) + " * <p>");
-                out.printf(getIndent(1) + " * %s%n", WordUtils.wrap(comment.getLabel().replaceAll("\\s+", " "), 70, "\n" + getIndent(1) + " * ", false));
-            }
-            out.println(getIndent(1) + " *");
-            out.printf(getIndent(1) + " * @see <a href=\"%s\">%s</a>%n", nextIRI, key);
-            out.println(getIndent(1) + " */");
-
             String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
             checkField(className, nextKey);
-            out.printf(getIndent(1) + "public static final IRI %s;%n", nextKey);
-            out.println();
             iriConstants.add(new SchemaRecordImpl(nextIRI, nextKey, key, label, comment));
         }
 
-        //static init
-        out.println(getIndent(1) + "static {");
-        out.printf(getIndent(2) + "ValueFactory factory = SimpleValueFactory.getInstance();%n");
-        out.println();
-        for (String key : keys) {
-            String nextKey = cleanKey(doCaseFormatting(key, getConstantCase()));
-            out.printf(getIndent(2) + "%s = factory.createIRI(%s.NAMESPACE, \"%s\");%n", nextKey, className, key);
-        }
-        out.println(getIndent(1) + "}");
-        out.println();
-
-        //private contructor to avoid instances
-        out.printf(getIndent(1) + "private %s() {%n", className);
-        out.println(getIndent(2) + "//static access only");
-        out.println(getIndent(1) + "}");
-        out.println();
-
-        //class end
-        out.println("}");
-        out.flush();
-        
-        try (StringWriter stringOutput = new StringWriter();) {
+        try {
 	        // Generate using Freemarker
 	        Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
 	
@@ -352,13 +236,12 @@ public class RDF4JSchemaGeneratorCore {
 	        TemplateHashModel staticModels = wrapper.getStaticModels();
 	        templateData.put("StringUtils", staticModels.get("org.apache.commons.lang3.StringUtils"));
 	        templateData.put("WordUtils", staticModels.get("org.apache.commons.lang3.text.WordUtils"));
-
-            template.process(templateData, stringOutput); 
-            System.out.println(stringOutput.getBuffer().toString());
-
-            stringOutput.flush();
+	
+	        template.process(templateData, out); 
         } catch (TemplateException e) {
         	throw new GenerationException(e);
+		} finally {
+			out.flush();
 		}
     }
 

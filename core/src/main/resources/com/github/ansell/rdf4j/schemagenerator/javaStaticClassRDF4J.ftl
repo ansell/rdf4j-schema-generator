@@ -28,29 +28,29 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 /**
- * ${title!"No title found"}
+ * ${title!"No title found"?js_string}
 <#if description??>
- * ${description!""}
+ * ${description?js_string}
 </#if>
  *
- * Namespace ${name}
- * Prefix: {@code <${prefix}>}
+ * Namespace ${name?js_string}
+ * Prefix: {@code <${prefix?js_string}>}
  *
 <#list seeAlsoUrls as seeAlsoUrl>
- * @see <a href="${seeAlsoUrl}>${seeAlsoUrl}</a>
+ * @see <a href="${seeAlsoUrl?js_string}>${seeAlsoUrl?js_string}</a>
 </#list>
  */
-public class ${className} {
+public class ${className?j_string} {
 
 <@doI/>/**
-<@doI/> * {@code <${prefix}>}
+<@doI/> * {@code <${prefix?js_string}>}
 <@doI/> */
-<@doI/>public static final String NAMESPACE = "${prefix}"; 
+<@doI/>public static final String NAMESPACE = "${prefix?j_string}"; 
 
 <@doI/>/**
-<@doI/> * {@code <${name}>}
+<@doI/> * {@code <${name?js_string}>}
 <@doI/> */
-<@doI/>public static final String PREFIX = "${name}"; 
+<@doI/>public static final String PREFIX = "${name?j_string}"; 
 
 <#if stringConstants??>
 <@doI/>/**********************
@@ -59,7 +59,7 @@ public class ${className} {
 <#list stringConstants as stringConstant>
 
 <@doI/><@schemaRecordJavadoc schemaRecord=stringConstant />
-<@doI/>public static final String ${stringConstant.getFormattedRecordKey()} = "${stringConstant.getRawRecordKey()}";
+<@doI/>public static final String ${stringConstant.getFormattedRecordKey()?j_string} = "${stringConstant.getRawRecordKey()?j_string}";
 </#list>
 </#if>
 
@@ -70,7 +70,7 @@ public class ${className} {
 <#list localNameStringConstants as localNameStringConstant>
 
 <@doI/><@schemaRecordJavadoc schemaRecord=localNameStringConstant />
-<@doI/>public static final String ${localNameStringConstant.getFormattedRecordKey()} = "${localNameStringConstant.getRawRecordKey()}";
+<@doI/>public static final String ${localNameStringConstant.getFormattedRecordKey()?j_string} = "${localNameStringConstant.getRawRecordKey()?j_string}";
 </#list>
 </#if>
 
@@ -81,7 +81,7 @@ public class ${className} {
 <#list iriConstants as iriConstant>
 
 <@doI/><@schemaRecordJavadoc schemaRecord=iriConstant />
-<@doI/>public static final IRI ${iriConstant.getFormattedRecordKey()};
+<@doI/>public static final IRI ${iriConstant.getFormattedRecordKey()?j_string};
 </#list>
 </#if>
 
@@ -95,12 +95,12 @@ public class ${className} {
 <@doI/><@doI/> * IRI Constant creation
 <@doI/><@doI/> ***********************/
 <#list iriConstants as iriConstant>
-<@doI/><@doI/>${iriConstant.getFormattedRecordKey()} = vf.createIRI("${iriConstant.getIRI().stringValue()?j_string}");
+<@doI/><@doI/>${iriConstant.getFormattedRecordKey()?j_string} = vf.createIRI("${iriConstant.getIRI().stringValue()?j_string}");
 </#list>
 </#if>
 <@doI/>}
 
-<@doI/>private ${className}() {
+<@doI/>private ${className?j_string}() {
 <@doI/><@doI/>// static access only
 <@doI/>}
 }

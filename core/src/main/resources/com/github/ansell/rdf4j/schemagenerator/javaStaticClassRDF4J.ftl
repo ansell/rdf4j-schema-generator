@@ -89,9 +89,9 @@ public class ${className} {
     static {
         ValueFactory vf = SimpleValueFactory.getInstance();
 <#if iriConstants??>
-        /***************
-         * IRI Constants
-         ***************/
+        /***********************
+         * IRI Constant creation
+         ***********************/
 <#list iriConstants as iriConstant>
         ${iriConstant.getFormattedRecordKey()} = vf.createIRI("${iriConstant.getIRI().stringValue()?j_string}");
 </#list>

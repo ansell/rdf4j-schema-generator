@@ -40,7 +40,7 @@ import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
  * @see <a href="${seeAlsoUrl?js_string}>${seeAlsoUrl?js_string}</a>
 </#list>
  */
-public class ${className?j_string} <#if metaInfServicesInterface??>implements ${metaInfServicesInterface} </#if>{
+public class ${className?j_string} <#if metaInfServicesInterface??>implements ${metaInfServicesInterface?j_string} </#if>{
 
 <@doI/>/**
 <@doI/> * {@code <${prefix?js_string}>}

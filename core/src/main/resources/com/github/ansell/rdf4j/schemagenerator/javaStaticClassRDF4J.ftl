@@ -40,12 +40,17 @@ import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
  * @see <a href="${seeAlsoUrl?js_string}>${seeAlsoUrl?js_string}</a>
 </#list>
  */
-public class ${className?j_string} {
+public class ${className?j_string} <#if metaInfServicesInterface??>implements ${metaInfServicesInterface?j_string} </#if>{
 
 <@doI/>/**
 <@doI/> * {@code <${prefix?js_string}>}
 <@doI/> */
 <@doI/>public static final String NAMESPACE = "${prefix?j_string}"; 
+
+<@doI/>/**
+<@doI/> * {@code <${prefix?js_string}>}
+<@doI/> */
+<@doI/>public static final IRI NAMESPACE_IRI;
 
 <@doI/>/**
 <@doI/> * {@code <${name?js_string}>}
@@ -90,6 +95,9 @@ public class ${className?j_string} {
 <@doI/> */
 <@doI/>static {
 <@doI/><@doI/>ValueFactory vf = SimpleValueFactory.getInstance();
+
+<@doI/><@doI/>NAMESPACE_IRI = vf.createIRI(NAMESPACE);
+
 <#if iriConstants??>
 <@doI/><@doI/>/***********************
 <@doI/><@doI/> * IRI Constant creation
@@ -100,7 +108,13 @@ public class ${className?j_string} {
 </#if>
 <@doI/>}
 
-<@doI/>private ${className?j_string}() {
-<@doI/><@doI/>// static access only
+<#if metaInfServicesInterface??>
+<@doI/>@Override
+<@doI/>public IRI getIRI() {
+<@doI/><@doI/>return NAMESPACE_IRI;
+<@doI/>}
+</#if>
+<@doI/>public ${className?j_string}() {
+<@doI/><@doI/>// To enable service discovery to succeed, even though this is a static class
 <@doI/>}
 }

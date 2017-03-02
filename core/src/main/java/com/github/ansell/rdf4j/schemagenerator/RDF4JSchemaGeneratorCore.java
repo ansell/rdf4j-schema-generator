@@ -64,6 +64,7 @@ public class RDF4JSchemaGeneratorCore {
     private String stringPropertySuffix;
     private String localNameStringPropertyPrefix;
     private String localNameStringPropertySuffix;
+    private String metaInfServicesInterface;
     private Set<String> createdFields = new HashSet<>();
     private static Set<String> reservedWords = Sets.newHashSet("abstract","assert","boolean","break","byte","case","catch","char","class","const","default","do","double","else","enum","extends","false","final","finally","float","for","goto","if","implements","import","instanceof","int","interface","long","native","new","null","package","private","protected","public","return","short","static","strictfp","super","switch","synchronized","this","throw","throws","transient","true","try","void","volatile","while","continue","PREFIX","NAMESPACE");
 
@@ -253,7 +254,7 @@ public class RDF4JSchemaGeneratorCore {
     }
 
     public void generateResourceBundle(String baseName, Path bundleDir) throws GenerationException, IOException {
-        HashMap<String, Properties> bundles = generateResourceBundle(baseName);
+        Map<String, Properties> bundles = generateResourceBundle(baseName);
 
         for (String bKey : bundles.keySet()) {
             final Properties bundle = bundles.get(bKey);
@@ -272,9 +273,9 @@ public class RDF4JSchemaGeneratorCore {
 
     }
 
-    public HashMap<String, Properties> generateResourceBundle(String baseName) throws GenerationException {
+    public Map<String, Properties> generateResourceBundle(String baseName) throws GenerationException {
         Pattern pattern = Pattern.compile(Pattern.quote(getPrefix()) + "(.+)");
-        HashMap<String, IRI> splitUris = new HashMap<>();
+        Map<String, IRI> splitUris = new HashMap<>();
         for (Resource nextSubject : model.subjects()) {
             if (nextSubject instanceof IRI) {
                 Matcher matcher = pattern.matcher(nextSubject.stringValue());
@@ -289,7 +290,7 @@ public class RDF4JSchemaGeneratorCore {
         keys.addAll(splitUris.keySet());
         Collections.sort(keys, String.CASE_INSENSITIVE_ORDER);
 
-        HashMap<String, Properties> bundles = new HashMap<>();
+        Map<String, Properties> bundles = new HashMap<>();
         // Default we have for sure
         bundles.put(baseName, new Properties());
         for (String key : keys) {
@@ -349,7 +350,7 @@ public class RDF4JSchemaGeneratorCore {
 		}
 	}
 
-	private Properties getBundleForLangTag(String baseName, HashMap<String, Properties> bundles,
+	private Properties getBundleForLangTag(String baseName, Map<String, Properties> bundles,
 			final Optional<String> lang) {
 		final Properties bundle;
 		if (!lang.isPresent()) {
@@ -528,5 +529,13 @@ public class RDF4JSchemaGeneratorCore {
 
 	public void setTemplatePath(String templatePath) {
 		this.templatePath = templatePath;
+	}
+
+	public String getMetaInfServicesInterface() {
+		return metaInfServicesInterface;
+	}
+
+	public void setMetaInfServicesInterface(String metaInfServicesInterface) {
+		this.metaInfServicesInterface = metaInfServicesInterface;
 	}
 }

@@ -64,6 +64,7 @@ public class RDF4JSchemaGeneratorCore {
     private String stringPropertySuffix;
     private String localNameStringPropertyPrefix;
     private String localNameStringPropertySuffix;
+    private String metaInfServicesInterface;
     private Set<String> createdFields = new HashSet<>();
     private static Set<String> reservedWords = Sets.newHashSet("abstract","assert","boolean","break","byte","case","catch","char","class","const","default","do","double","else","enum","extends","false","final","finally","float","for","goto","if","implements","import","instanceof","int","interface","long","native","new","null","package","private","protected","public","return","short","static","strictfp","super","switch","synchronized","this","throw","throws","transient","true","try","void","volatile","while","continue","PREFIX","NAMESPACE");
 
@@ -528,5 +529,13 @@ public class RDF4JSchemaGeneratorCore {
 
 	public void setTemplatePath(String templatePath) {
 		this.templatePath = templatePath;
+	}
+
+	public String getMetaInfServicesInterface() {
+		return metaInfServicesInterface;
+	}
+
+	public void setMetaInfServicesInterface(String metaInfServicesInterface) {
+		this.metaInfServicesInterface = metaInfServicesInterface;
 	}
 }

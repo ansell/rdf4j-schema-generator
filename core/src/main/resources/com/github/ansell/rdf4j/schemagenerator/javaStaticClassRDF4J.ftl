@@ -13,7 +13,7 @@ ${WordUtils.wrap(escapedDescription, 70, "\n ${oneIndent} * ", false)}</#macro>
 <@doI/> * <p>
 <@doI/> * <@escapeAndWrapLine rawString="${schemaRecord.getDescription().get().stringValue()}"/>
 </#if>
-<@doI/> * @see <a href="${schemaRecord.getIRI().stringValue()?js_string}}">${schemaRecord.getRawRecordKey()?js_string}</a>
+<@doI/> * @see <a href="${schemaRecord.getIRI().stringValue()?js_string}">${schemaRecord.getRawRecordKey()?js_string}</a>
 <@doI/> */
 </#macro>
 /*

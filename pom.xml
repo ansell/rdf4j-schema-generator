@@ -4,7 +4,7 @@
 
     <groupId>com.github.ansell.rdf4j-schema-generator</groupId>
     <artifactId>schema-generator-parent</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.3</version>
     <packaging>pom</packaging>
 
     <name>RDF4J Schema Generator</name>

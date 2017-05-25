@@ -52,16 +52,12 @@
     <properties>
         <httpclient.version>4.5.3</httpclient.version>
         <httpcore.version>4.4.6</httpcore.version>
-        <jackson.version>2.8.7</jackson.version>
+        <jackson.version>2.8.8</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <rdf4j.version>2.2</rdf4j.version>
+        <rdf4j.version>2.2.1</rdf4j.version>
         <slf4j.version>1.7.25</slf4j.version>
     </properties>
-
-    <prerequisites>
-        <maven>3.0.5</maven>
-    </prerequisites>
 
     <dependencyManagement>
         <dependencies>
@@ -218,7 +214,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>21.0</version>
+                <version>22.0</version>
             </dependency>
             <dependency>
                 <groupId>org.freemarker</groupId>
@@ -325,7 +321,7 @@
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.7.7.201606060606</version>
+					<version>0.7.9</version>
 				</plugin>
 				<plugin>
 					<groupId>org.eluder.coveralls</groupId>

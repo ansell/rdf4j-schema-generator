@@ -92,6 +92,10 @@ RDF4J Schema Generator provides a command line tool and maven plugin that allows
 
 # Changelog
 
+## 2017-05-25
+* Release 0.4
+* Update dependency versions
+
 ## 2017-04-03
 * Release 0.3
 * Add schema auto-discovery

@@ -1,5 +1,8 @@
 <#macro doI level=1>${StringUtils.repeat(indent, level)}</#macro>
-<#macro escapeAndWrapLine rawString><#assign escapedDescription = rawString?js_string>
+<#macro escapeAndWrapLine rawString><#assign escapedDescription = rawString?html>
+<#assign oneIndent><@doI/></#assign>
+${WordUtils.wrap(escapedDescription, 70, "\n ${oneIndent} * ", false)}</#macro>
+<#macro escapeAndWrapLineHTML rawString><#assign escapedDescription = rawString?html>
 <#assign oneIndent><@doI/></#assign>
 ${WordUtils.wrap(escapedDescription, 70, "\n ${oneIndent} * ", false)}</#macro>
 <#macro schemaRecordJavadoc schemaRecord>
@@ -8,12 +11,12 @@ ${WordUtils.wrap(escapedDescription, 70, "\n ${oneIndent} * ", false)}</#macro>
 <@doI/> * <@escapeAndWrapLine rawString="${schemaRecord.getLabel().get().stringValue()}"/>
 <@doI/> * <p>
 </#if>
-<@doI/> * {@code ${schemaRecord.getIRI().stringValue()?js_string}}
+<@doI/> * {@code ${schemaRecord.getIRI().stringValue()?html}}
 <#if schemaRecord.getDescription().isPresent()>
 <@doI/> * <p>
 <@doI/> * <@escapeAndWrapLine rawString="${schemaRecord.getDescription().get().stringValue()}"/>
 </#if>
-<@doI/> * @see <a href="${schemaRecord.getIRI().stringValue()?js_string}">${schemaRecord.getRawRecordKey()?js_string}</a>
+<@doI/> * @see <a href="${schemaRecord.getIRI().stringValue()?html}">${schemaRecord.getRawRecordKey()?html}</a>
 <@doI/> */
 </#macro>
 /*
@@ -28,32 +31,32 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 /**
- * ${title!"No title found"?js_string}
+ * ${title!"No title found"?html}
 <#if description??>
- * ${description?js_string}
+ * ${description.stringValue()?html}
 </#if>
  *
- * Namespace ${name?js_string}
- * Prefix: {@code <${prefix?js_string}>}
+ * Namespace ${name?html}
+ * Prefix: {@code <${prefix?html}>}
  *
 <#list seeAlsoUrls as seeAlsoUrl>
- * @see <a href="${seeAlsoUrl?js_string}>${seeAlsoUrl?js_string}</a>
+ * @see <a href="${seeAlsoUrl?html}">${seeAlsoUrl?html}</a>
 </#list>
  */
 public class ${className?j_string} <#if metaInfServicesInterface??>implements ${metaInfServicesInterface?j_string} </#if>{
 
 <@doI/>/**
-<@doI/> * {@code <${prefix?js_string}>}
+<@doI/> * {@code <${prefix?html}>}
 <@doI/> */
 <@doI/>public static final String NAMESPACE = "${prefix?j_string}"; 
 
 <@doI/>/**
-<@doI/> * {@code <${prefix?js_string}>}
+<@doI/> * {@code <${prefix?html}>}
 <@doI/> */
 <@doI/>public static final IRI NAMESPACE_IRI;
 
 <@doI/>/**
-<@doI/> * {@code <${name?js_string}>}
+<@doI/> * {@code <${name?html}>}
 <@doI/> */
 <@doI/>public static final String PREFIX = "${name?j_string}"; 
 

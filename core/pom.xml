@@ -13,10 +13,6 @@
 	<artifactId>schema-generator</artifactId>
 	<name>RDF4J Schema Generator :: Core</name>
 
-	<prerequisites>
-		<maven>3.0.5</maven>
-	</prerequisites>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.eclipse.rdf4j</groupId>

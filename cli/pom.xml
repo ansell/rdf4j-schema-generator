@@ -11,10 +11,6 @@
     <artifactId>schema-generator-cli</artifactId>
     <name>RDF4J Schema Generator :: CLI</name>
 
-    <prerequisites>
-        <maven>3.0.5</maven>
-    </prerequisites>
-
     <build>
         <resources>
             <resource>

@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.ansell</groupId>
         <artifactId>parentpom</artifactId>
-        <version>3</version>
+        <version>4</version>
     </parent>
 
     <groupId>com.github.ansell.rdf4j-schema-generator</groupId>

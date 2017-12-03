@@ -52,7 +52,7 @@ RDF4J Schema Generator provides a command line tool and maven plugin that allows
         <plugin>
             <groupId>com.github.ansell.rdf4j-schema-generator</groupId>
             <artifactId>schema-generator-maven-plugin</artifactId>
-            <version>0.3</version>
+            <version>0.4</version>
             <executions>
                 <execution>
                     <id>generate-schemas</id>
@@ -88,6 +88,13 @@ RDF4J Schema Generator provides a command line tool and maven plugin that allows
         </plugin>
     </plugins>
 </build>
+<dependencies>
+    <dependency>
+				<groupId>com.github.ansell.rdf4j-schema-generator</groupId>
+				<artifactId>schema-generator</artifactId>
+				<version>0.4</version>
+    </dependency>
+</dependencies>
 ```
 
 # Changelog

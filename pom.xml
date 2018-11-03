@@ -5,12 +5,12 @@
     <parent>
         <groupId>com.github.ansell</groupId>
         <artifactId>parentpom</artifactId>
-        <version>10</version>
+        <version>11</version>
     </parent>
 
     <groupId>com.github.ansell.rdf4j-schema-generator</groupId>
     <artifactId>schema-generator-parent</artifactId>
-    <version>0.4.2-SNAPSHOT</version>
+    <version>0.4.2</version>
     <packaging>pom</packaging>
 
     <name>RDF4J Schema Generator</name>

@@ -1,14 +1,13 @@
 package com.github.ansell.rdf4j.schemagenerator.test.vocabularies;
 
-import org.junit.Assume;
-
-import com.github.ansell.rdf4j.schemagenerator.test.AbstractSchemaSpecificTest;
-
-import org.eclipse.rdf4j.rio.RDFFormat;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.junit.Assume;
+
+import com.github.ansell.rdf4j.schemagenerator.test.AbstractSchemaSpecificTest;
 
 public class FoafSchemaTest extends AbstractSchemaSpecificTest {
 
@@ -16,7 +15,7 @@ public class FoafSchemaTest extends AbstractSchemaSpecificTest {
     protected InputStream getInputStream() {
         try {
             return new URL("http://xmlns.com/foaf/spec/index.rdf").openStream();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             Assume.assumeNoException(e);
             return null;
         }
@@ -31,9 +30,9 @@ public class FoafSchemaTest extends AbstractSchemaSpecificTest {
     protected RDFFormat getFormat() {
         return RDFFormat.RDFXML;
     }
-    
+
     @Override
     protected String getPrefix() {
-    	return "http://xmlns.com/foaf/0.1/";
+        return "http://xmlns.com/foaf/0.1/";
     }
 }

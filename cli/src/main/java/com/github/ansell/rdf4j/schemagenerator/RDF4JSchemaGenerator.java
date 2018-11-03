@@ -1,21 +1,5 @@
 package com.github.ansell.rdf4j.schemagenerator;
 
-import org.apache.commons.cli.*;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.eclipse.rdf4j.rio.*;
-
-import com.github.ansell.rdf4j.schemagenerator.GenerationException;
-import com.github.ansell.rdf4j.schemagenerator.RDF4JSchemaGeneratorCore;
-import com.google.common.base.CaseFormat;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,6 +15,30 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFParseException;
+import org.eclipse.rdf4j.rio.RDFParserRegistry;
+import org.eclipse.rdf4j.rio.Rio;
+import org.eclipse.rdf4j.rio.UnsupportedRDFormatException;
+
+import com.google.common.base.CaseFormat;
+
 /**
  * The Command Line Interface for the RDF4J Schema Generator.
  *
@@ -43,8 +51,8 @@ public class RDF4JSchemaGenerator {
     public static void main(String[] args) {
         Path tempFile = null;
         try {
-            CommandLineParser parser = new PosixParser();
-            CommandLine cli = parser.parse(getCliOpts(), args);
+            final CommandLineParser parser = new PosixParser();
+            final CommandLine cli = parser.parse(getCliOpts(), args);
 
             if (cli.hasOption('h')) {
                 printHelp();
@@ -52,44 +60,48 @@ public class RDF4JSchemaGenerator {
             }
 
             // two args must be left over: <input-inputFile> <output-inputFile>
-            String[] cliArgs = cli.getArgs();
+            final String[] cliArgs = cli.getArgs();
             final String input, output;
             switch (cliArgs.length) {
-                case 0:
-                    throw new ParseException("Missing input-file");
-                case 1:
-                    input = cliArgs[0];
-                    output = null;
-                    break;
-                case 2:
-                    input = cliArgs[0];
-                    output = cliArgs[1];
-                    break;
-                default:
-                    throw new ParseException("too many arguments");
+            case 0:
+                throw new ParseException("Missing input-file");
+            case 1:
+                input = cliArgs[0];
+                output = null;
+                break;
+            case 2:
+                input = cliArgs[0];
+                output = cliArgs[1];
+                break;
+            default:
+                throw new ParseException("too many arguments");
             }
 
-            Optional<RDFFormat> format = Rio.getParserFormatForMIMEType(cli.getOptionValue('f', null));
+            Optional<RDFFormat> format = Rio
+                    .getParserFormatForMIMEType(cli.getOptionValue('f', null));
 
             final RDF4JSchemaGeneratorCore builder;
             if (input.startsWith("http://")) {
-                URL url = new URL(input);
+                final URL url = new URL(input);
 
-                if(!format.isPresent()) {
-	                // try to guess format if they didn't specify it
-	                format = Rio.getParserFormatForFileName(url.getFile());
+                if (!format.isPresent()) {
+                    // try to guess format if they didn't specify it
+                    format = Rio.getParserFormatForFileName(url.getFile());
                 }
-                
-                tempFile = Files.createTempFile("schema-generator", "." + (format.isPresent() ? format.get().getDefaultFileExtension() : "cache"));
+
+                tempFile = Files.createTempFile("schema-generator", "."
+                        + (format.isPresent() ? format.get().getDefaultFileExtension() : "cache"));
 
                 try {
                     fetchSchema(url, tempFile);
-                } catch (URISyntaxException e) {
+                } catch (final URISyntaxException e) {
                     throw new ParseException("Invalid input URL: " + e.getMessage());
                 }
 
-                // Default to Turtle if we didn't guess the format or have it specified
-                builder = new RDF4JSchemaGeneratorCore(tempFile.toString(), format.orElse(RDFFormat.TURTLE));
+                // Default to Turtle if we didn't guess the format or have it
+                // specified
+                builder = new RDF4JSchemaGeneratorCore(tempFile.toString(),
+                        format.orElse(RDFFormat.TURTLE));
             } else {
                 // Default to Turtle if we didn't have the format specified
                 builder = new RDF4JSchemaGeneratorCore(input, format.orElse(RDFFormat.TURTLE));
@@ -120,28 +132,33 @@ public class RDF4JSchemaGenerator {
                 try {
                     final CaseFormat caseFormat = CaseFormat.valueOf(cli.getOptionValue('c'));
                     if (caseFormat == null) {
-                        throw new ParseException("Did not recognise constantCase: Must be one of " + Arrays.asList(CaseFormat.values()));
+                        throw new ParseException("Did not recognise constantCase: Must be one of "
+                                + Arrays.asList(CaseFormat.values()));
                     }
                     builder.setConstantCase(caseFormat);
-                } catch (IllegalArgumentException e) {
-                    throw new ParseException("Did not recognise constantCase: Must be one of " + Arrays.asList(CaseFormat.values()));
+                } catch (final IllegalArgumentException e) {
+                    throw new ParseException("Did not recognise constantCase: Must be one of "
+                            + Arrays.asList(CaseFormat.values()));
                 }
             }
             if (cli.hasOption('C')) {
                 try {
                     final CaseFormat caseFormat = CaseFormat.valueOf(cli.getOptionValue('C'));
                     if (caseFormat == null) {
-                        throw new ParseException("Did not recognise constantCase: Must be one of " + Arrays.asList(CaseFormat.values()));
+                        throw new ParseException("Did not recognise constantCase: Must be one of "
+                                + Arrays.asList(CaseFormat.values()));
                     }
                     builder.setStringConstantCase(caseFormat);
-                } catch (IllegalArgumentException e) {
-                    throw new ParseException("Did not recognise constantCase: Must be one of " + Arrays.asList(CaseFormat.values()));
+                } catch (final IllegalArgumentException e) {
+                    throw new ParseException("Did not recognise constantCase: Must be one of "
+                            + Arrays.asList(CaseFormat.values()));
                 }
             }
             if (cli.hasOption('s')) {
                 try {
-                    builder.setIndent(StringUtils.repeat(' ', Integer.parseInt(cli.getOptionValue('s', "4"))));
-                } catch (NumberFormatException e) {
+                    builder.setIndent(StringUtils.repeat(' ',
+                            Integer.parseInt(cli.getOptionValue('s', "4"))));
+                } catch (final NumberFormatException e) {
                     throw new ParseException("indent must be numeric");
                 }
             } else {
@@ -150,42 +167,46 @@ public class RDF4JSchemaGenerator {
 
             if (output != null) {
                 System.out.printf("Starting generation%n");
-                Path outFile = Paths.get(output);
+                final Path outFile = Paths.get(output);
                 if (outFile.getParent() != null) {
                     if (!Files.exists(outFile.getParent())) {
                         Files.createDirectories(outFile.getParent());
                     } else if (!Files.isDirectory(outFile.getParent())) {
-                        throw new IOException(String.format("%s is not a directory", outFile.getParent()));
+                        throw new IOException(
+                                String.format("%s is not a directory", outFile.getParent()));
                     }
                 }
                 builder.generate(outFile);
                 if (cli.hasOption('b')) {
                     System.out.printf("Generate ResourceBundles%n");
-                    builder.generateResourceBundle(outFile.getFileName().toString().replaceAll("\\.[^.]+$", ""), outFile.toAbsolutePath().getParent());
+                    builder.generateResourceBundle(
+                            outFile.getFileName().toString().replaceAll("\\.[^.]+$", ""),
+                            outFile.toAbsolutePath().getParent());
                 }
                 System.out.printf("Generation finished, result available in '%s'%n", output);
             } else {
                 builder.generate(System.out);
             }
 
-        } catch (UnsupportedRDFormatException e) {
+        } catch (final UnsupportedRDFormatException e) {
             System.err.printf("%s%nTry setting the format explicitly%n", e.getMessage());
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             printHelp(e.getMessage());
-        } catch (RDFParseException e) {
+        } catch (final RDFParseException e) {
             System.err.println("Could not parse input file: " + e.getMessage());
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             System.err.println("Could not read input-file: " + e.getMessage());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             System.err.println("Error during file-access: " + e.getMessage());
-        } catch (GenerationException e) {
+        } catch (final GenerationException e) {
             System.err.println(e.getMessage());
         } finally {
             if (tempFile != null) {
                 try {
                     Files.deleteIfExists(tempFile);
-                } catch (IOException e) {
-                    System.err.println("Error while deleting temp-file " + tempFile + ": "+ e.getMessage());
+                } catch (final IOException e) {
+                    System.err.println(
+                            "Error while deleting temp-file " + tempFile + ": " + e.getMessage());
                 }
             }
         }
@@ -196,136 +217,129 @@ public class RDF4JSchemaGenerator {
     }
 
     private static void printHelp(String error) {
-        HelpFormatter hf = new HelpFormatter();
-        PrintWriter w = new PrintWriter(System.out);
+        final HelpFormatter hf = new HelpFormatter();
+        final PrintWriter w = new PrintWriter(System.out);
         if (error != null) {
             hf.printWrapped(w, 80, error);
             w.println();
         }
-        hf.printWrapped(w, 80, 12, "usage: RDF4JSchemaGenerator [options...] <input-file> [<output-file>]");
-        hf.printWrapped(w, 80, 42, "  <input-file>                            the input file to read from");
-        hf.printWrapped(w, 80, 42, "  [<output-file>]                         the output file to write, StdOut if omitted");
+        hf.printWrapped(w, 80, 12,
+                "usage: RDF4JSchemaGenerator [options...] <input-file> [<output-file>]");
+        hf.printWrapped(w, 80, 42,
+                "  <input-file>                            the input file to read from");
+        hf.printWrapped(w, 80, 42,
+                "  [<output-file>]                         the output file to write, StdOut if omitted");
         hf.printOptions(w, 80, getCliOpts(), 2, 2);
         w.flush();
         w.close();
     }
 
-    @SuppressWarnings({"AccessStaticViaInstance", "static-access"})
+    @SuppressWarnings({ "AccessStaticViaInstance", "static-access" })
     private static Options getCliOpts() {
-        Options o = new Options();
+        final Options o = new Options();
 
-        o.addOption(OptionBuilder
-                .withLongOpt("format")
-                .withDescription("mime-type of the input file (will try to guess if absent)")
-                .hasArgs(1)
-                .withArgName("input-format")
-                .isRequired(false)
-                .create('f'));
+        OptionBuilder.withLongOpt("format");
+        OptionBuilder.withDescription("mime-type of the input file (will try to guess if absent)");
+        OptionBuilder.hasArgs(1);
+        OptionBuilder.withArgName("input-format");
+        OptionBuilder.isRequired(false);
+        o.addOption(OptionBuilder.create('f'));
 
-        o.addOption(OptionBuilder
-                .withLongOpt("package")
-                .withDescription("package declaration (will use default (empty) package if absent)")
-                .hasArgs(1)
-                .withArgName("package")
-                .isRequired(false)
-                .create('p'));
+        OptionBuilder.withLongOpt("package");
+        OptionBuilder.withDescription(
+                "package declaration (will use default (empty) package if absent)");
+        OptionBuilder.hasArgs(1);
+        OptionBuilder.withArgName("package");
+        OptionBuilder.isRequired(false);
+        o.addOption(OptionBuilder.create('p'));
 
-        o.addOption(OptionBuilder
-                .withLongOpt("name")
-                .withDescription("the name of the namespace (will try to guess from the input file if absent)")
-                .hasArgs(1)
-                .withArgName("ns")
-                .isRequired(false)
-                .create('n'));
+        OptionBuilder.withLongOpt("name");
+        OptionBuilder.withDescription(
+                "the name of the namespace (will try to guess from the input file if absent)");
+        OptionBuilder.hasArgs(1);
+        OptionBuilder.withArgName("ns");
+        OptionBuilder.isRequired(false);
+        o.addOption(OptionBuilder.create('n'));
 
-        o.addOption(OptionBuilder
-                .withLongOpt("uri")
-                .withDescription("the prefix for the schema (if not available in the input file)")
-                .hasArgs(1)
-                .withArgName("prefix")
-                .isRequired(false)
-                .create('u'));
+        OptionBuilder.withLongOpt("uri");
+        OptionBuilder
+                .withDescription("the prefix for the schema (if not available in the input file)");
+        OptionBuilder.hasArgs(1);
+        OptionBuilder.withArgName("prefix");
+        OptionBuilder.isRequired(false);
+        o.addOption(OptionBuilder.create('u'));
 
-        o.addOption(OptionBuilder
-                .withLongOpt("spaces")
-                .withDescription("use spaces for indentation (tabs if missing, 4 spaces if no number given)")
-                .hasOptionalArgs(1)
-                .withArgName("indent")
-                .isRequired(false)
-                .create('s'));
+        OptionBuilder.withLongOpt("spaces");
+        OptionBuilder.withDescription(
+                "use spaces for indentation (tabs if missing, 4 spaces if no number given)");
+        OptionBuilder.hasOptionalArgs(1);
+        OptionBuilder.withArgName("indent");
+        OptionBuilder.isRequired(false);
+        o.addOption(OptionBuilder.create('s'));
 
-        o.addOption(OptionBuilder
-                .withLongOpt("languageBundles")
-                .withDescription("generate L10N LanguageBundles")
-                .hasArg(false)
-                .isRequired(false)
-                .create('b'));
+        OptionBuilder.withLongOpt("languageBundles");
+        OptionBuilder.withDescription("generate L10N LanguageBundles");
+        OptionBuilder.hasArg(false);
+        OptionBuilder.isRequired(false);
+        o.addOption(OptionBuilder.create('b'));
 
-        o.addOption(OptionBuilder
-                .withLongOpt("language")
-                .withDescription("preferred language for schema labels")
-                .hasArgs(1)
-                .withArgName("prefLang")
-                .isRequired(false)
-                .create('l'));
+        OptionBuilder.withLongOpt("language");
+        OptionBuilder.withDescription("preferred language for schema labels");
+        OptionBuilder.hasArgs(1);
+        OptionBuilder.withArgName("prefLang");
+        OptionBuilder.isRequired(false);
+        o.addOption(OptionBuilder.create('l'));
 
-        o.addOption(OptionBuilder
-                .withLongOpt("constantCase")
-                .withDescription("case to use for URI constants, possible values: LOWER_UNDERSCORE, LOWER_CAMEL, UPPER_CAMEL, UPPER_UNDERSCORE")
-                .hasArgs(1)
-                .withArgName("constantCase")
-                .isRequired(false)
-                .create('c'));
+        OptionBuilder.withLongOpt("constantCase");
+        OptionBuilder.withDescription(
+                "case to use for URI constants, possible values: LOWER_UNDERSCORE, LOWER_CAMEL, UPPER_CAMEL, UPPER_UNDERSCORE");
+        OptionBuilder.hasArgs(1);
+        OptionBuilder.withArgName("constantCase");
+        OptionBuilder.isRequired(false);
+        o.addOption(OptionBuilder.create('c'));
 
-        o.addOption(OptionBuilder
-                .withLongOpt("stringConstantCase")
-                .withDescription("case to use for String constants, see constantCase")
-                .hasArgs(1)
-                .withArgName("constantCase")
-                .isRequired(false)
-                .create('C'));
+        OptionBuilder.withLongOpt("stringConstantCase");
+        OptionBuilder.withDescription("case to use for String constants, see constantCase");
+        OptionBuilder.hasArgs(1);
+        OptionBuilder.withArgName("constantCase");
+        OptionBuilder.isRequired(false);
+        o.addOption(OptionBuilder.create('C'));
 
-        o.addOption(OptionBuilder
-                .withLongOpt("stringConstantSuffix")
-                .withDescription("suffix to create string constants (e.g. _STRING)")
-                .hasArgs(1)
-                .withArgName("suffix")
-                .create('S'));
+        OptionBuilder.withLongOpt("stringConstantSuffix");
+        OptionBuilder.withDescription("suffix to create string constants (e.g. _STRING)");
+        OptionBuilder.hasArgs(1);
+        OptionBuilder.withArgName("suffix");
+        o.addOption(OptionBuilder.create('S'));
 
-        o.addOption(OptionBuilder
-                .withLongOpt("stringConstantPrefix")
-                .withDescription("prefix to create string constants (e.g. _)")
-                .hasArgs(1)
-                .withArgName("prefix")
-                .create('P'));
+        OptionBuilder.withLongOpt("stringConstantPrefix");
+        OptionBuilder.withDescription("prefix to create string constants (e.g. _)");
+        OptionBuilder.hasArgs(1);
+        OptionBuilder.withArgName("prefix");
+        o.addOption(OptionBuilder.create('P'));
 
-        o.addOption(OptionBuilder
-                .withLongOpt("help")
-                .withDescription("print this help")
-                .isRequired(false)
-                .hasArg(false)
-                .create('h'));
+        OptionBuilder.withLongOpt("help");
+        OptionBuilder.withDescription("print this help");
+        OptionBuilder.isRequired(false);
+        OptionBuilder.hasArg(false);
+        o.addOption(OptionBuilder.create('h'));
 
         return o;
     }
 
-    private static File fetchSchema(URL url, final Path tempFile) throws URISyntaxException, IOException {
+    private static File fetchSchema(URL url, final Path tempFile)
+            throws URISyntaxException, IOException {
         System.out.printf("Fetching remote schema <%s>%n", url);
         final Properties buildProperties = getBuildProperties();
         final HttpClientBuilder clientBuilder = HttpClientBuilder.create()
-                .setUserAgent(
-                        String.format("%s:%s/%s (%s)",
-                                buildProperties.getProperty("groupId", "unknown"),
-                                buildProperties.getProperty("artifactId", "unknown"),
-                                buildProperties.getProperty("version", "unknown"),
-                                buildProperties.getProperty("name", "unknown"))
-                );
+                .setUserAgent(String.format("%s:%s/%s (%s)",
+                        buildProperties.getProperty("groupId", "unknown"),
+                        buildProperties.getProperty("artifactId", "unknown"),
+                        buildProperties.getProperty("version", "unknown"),
+                        buildProperties.getProperty("name", "unknown")));
 
         try (CloseableHttpClient client = clientBuilder.build()) {
-            final HttpUriRequest request = RequestBuilder.get()
-                    .setUri(url.toURI())
-                    .setHeader(HttpHeaders.ACCEPT, getAcceptHeaderValue())
-                    .build();
+            final HttpUriRequest request = RequestBuilder.get().setUri(url.toURI())
+                    .setHeader(HttpHeaders.ACCEPT, getAcceptHeaderValue()).build();
 
             return client.execute(request, new ResponseHandler<File>() {
                 @Override
@@ -339,10 +353,10 @@ public class RDF4JSchemaGenerator {
     }
 
     private static Properties getBuildProperties() {
-        Properties p = new Properties();
+        final Properties p = new Properties();
         try {
             p.load(RDF4JSchemaGenerator.class.getResourceAsStream("/build.properties"));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ignore
         }
         return p;
@@ -350,7 +364,8 @@ public class RDF4JSchemaGenerator {
 
     private static String getAcceptHeaderValue() {
         final Set<RDFFormat> rdfFormats = RDFParserRegistry.getInstance().getKeys();
-        final Iterator<String> acceptParams = RDFFormat.getAcceptParams(rdfFormats, false, RDFFormat.TURTLE).iterator();
+        final Iterator<String> acceptParams = RDFFormat
+                .getAcceptParams(rdfFormats, false, RDFFormat.TURTLE).iterator();
         if (acceptParams.hasNext()) {
             final StringBuilder sb = new StringBuilder();
             while (acceptParams.hasNext()) {

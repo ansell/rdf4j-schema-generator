@@ -100,7 +100,7 @@ public class SchemaConfig {
     }
 
     public static SchemaConfig create(URL url, String name, String className) {
-        SchemaConfig v = new SchemaConfig();
+        final SchemaConfig v = new SchemaConfig();
         v.url = url;
         v.name = name;
         v.className = className;
@@ -108,7 +108,7 @@ public class SchemaConfig {
     }
 
     public static SchemaConfig create(File file, String name, String className) {
-        SchemaConfig v = new SchemaConfig();
+        final SchemaConfig v = new SchemaConfig();
         v.file = file;
         v.name = name;
         v.className = className;

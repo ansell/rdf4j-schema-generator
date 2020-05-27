@@ -166,7 +166,7 @@ public class RDF4JSchemaGenerator {
             }
 
             if (output != null) {
-                System.out.printf("Starting generation%n");
+                System.err.printf("Starting generation%n");
                 final Path outFile = Paths.get(output);
                 if (outFile.getParent() != null) {
                     if (!Files.exists(outFile.getParent())) {
@@ -178,12 +178,12 @@ public class RDF4JSchemaGenerator {
                 }
                 builder.generate(outFile);
                 if (cli.hasOption('b')) {
-                    System.out.printf("Generate ResourceBundles%n");
+                    System.err.printf("Generate ResourceBundles%n");
                     builder.generateResourceBundle(
                             outFile.getFileName().toString().replaceAll("\\.[^.]+$", ""),
                             outFile.toAbsolutePath().getParent());
                 }
-                System.out.printf("Generation finished, result available in '%s'%n", output);
+                System.err.printf("Generation finished, result available in '%s'%n", output);
             } else {
                 builder.generate(System.out);
             }
@@ -328,7 +328,7 @@ public class RDF4JSchemaGenerator {
 
     private static File fetchSchema(URL url, final Path tempFile)
             throws URISyntaxException, IOException {
-        System.out.printf("Fetching remote schema <%s>%n", url);
+        System.err.printf("Fetching remote schema <%s>%n", url);
         final Properties buildProperties = getBuildProperties();
         final HttpClientBuilder clientBuilder = HttpClientBuilder.create()
                 .setUserAgent(String.format("%s:%s/%s (%s)",
